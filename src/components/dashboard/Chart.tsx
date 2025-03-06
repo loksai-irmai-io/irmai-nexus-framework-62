@@ -199,7 +199,7 @@ const Chart: React.FC<ChartProps> = ({
       case 'pie':
         return (
           <ResponsiveContainer width="100%" height={height}>
-            <PieChart>
+            <PieChart margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
               <Pie
                 data={activeData}
                 cx="50%"
@@ -209,7 +209,8 @@ const Chart: React.FC<ChartProps> = ({
                 paddingAngle={2}
                 dataKey={series[0].dataKey}
                 nameKey={xAxisKey}
-                label={({ name, percent }) => showPercentages ? `${name}: ${(percent * 100).toFixed(0)}%` : name}
+                // Simplified label to prevent overflow
+                label={({ name, percent }) => showPercentages ? `${(percent * 100).toFixed(0)}%` : ''}
                 labelLine={false}
                 onClick={onClick ? handleDataClick : undefined}
                 cursor={onClick ? "pointer" : undefined}
