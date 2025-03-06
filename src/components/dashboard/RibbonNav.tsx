@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -7,9 +6,10 @@ import { cn } from '@/lib/utils';
 interface RibbonNavProps {
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-const RibbonNav: React.FC<RibbonNavProps> = ({ children, className }) => {
+const RibbonNav: React.FC<RibbonNavProps> = ({ children, className, style }) => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
@@ -47,7 +47,7 @@ const RibbonNav: React.FC<RibbonNavProps> = ({ children, className }) => {
   };
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative", className)} style={style}>
       {showLeftArrow && (
         <Button
           variant="outline"
