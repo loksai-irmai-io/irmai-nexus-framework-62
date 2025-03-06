@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -476,10 +475,13 @@ const Index = () => {
         </h2>
         <div className="mb-6 animate-fade-in" style={{ animationDelay: '1300ms' }}>
           <div className="p-1 border border-primary/20 rounded-lg bg-primary/5">
-            <KnowledgeGraph className="h-[400px] rounded-lg" />
+            <div className="relative w-full aspect-video sm:aspect-[16/9] xl:aspect-[21/9] overflow-hidden rounded-lg">
+              <KnowledgeGraph className="w-full h-full" />
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground mt-2 italic">
-            This is your central data hub – all insights and interdependencies are sourced here.
+          <p className="text-sm text-muted-foreground mt-2 italic flex justify-between items-center">
+            <span>This is your central data hub – all insights and interdependencies are sourced here.</span>
+            <span className="text-xs text-primary/70 hidden sm:inline">Click, drag and zoom to explore the digital twin</span>
           </p>
         </div>
         

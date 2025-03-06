@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { Info, Plus, Minus, Filter } from 'lucide-react';
+import { Info, Plus, Minus, Filter, Move } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -130,6 +129,8 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
   const [activeFilter, setActiveFilter] = useState<NodeType | null>(null);
   
   const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   
   // Initialize graph
   useEffect(() => {
@@ -138,6 +139,24 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     }, 800);
     
     return () => clearTimeout(timer);
+  }, []);
+  
+  // Update dimensions on resize
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        setDimensions({ 
+          width: Math.max(width, 400), 
+          height: Math.max(height, 300) 
+        });
+      }
+    };
+    
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    
+    return () => window.removeEventListener('resize', updateDimensions);
   }, []);
   
   // Handle level changes when a node is selected
@@ -211,26 +230,33 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     setVisibleEdges(filteredEdges);
   }, [activeFilter]);
   
-  // Node position and sizing helper method
+  // Node position and sizing helper method - updated to use dynamic dimensions
   const adjustNodePositions = (nodes: GraphNode[], zoomFactor: number = 1) => {
-    const center = { x: 400, y: 300 };
+    const center = { 
+      x: dimensions.width / 2, 
+      y: dimensions.height / 2 
+    };
     
     return nodes.map(node => {
-      // Adjust position based on zoom
-      const adjustedX = center.x + (node.x - center.x) * zoomFactor;
-      const adjustedY = center.y + (node.y - center.y) * zoomFactor;
+      // Scale original positions based on new dimensions
+      const scaledX = (node.x / 800) * dimensions.width;
+      const scaledY = (node.y / 600) * dimensions.height;
       
-      // Adjust radius based on node level and zoom
-      let radiusMultiplier = 1;
-      if (node.level === 'main') radiusMultiplier = 1.2;
-      else if (node.level === 'category') radiusMultiplier = 1;
-      else radiusMultiplier = 0.9;
+      // Adjust position based on zoom
+      const adjustedX = center.x + (scaledX - center.x) * zoomFactor;
+      const adjustedY = center.y + (scaledY - center.y) * zoomFactor;
+      
+      // Adjust radius based on node level, zoom, and container size
+      let radiusMultiplier = Math.min(dimensions.width, dimensions.height) / 1000;
+      if (node.level === 'main') radiusMultiplier *= 1.2;
+      else if (node.level === 'category') radiusMultiplier *= 1;
+      else radiusMultiplier *= 0.9;
       
       return {
         ...node,
         x: adjustedX,
         y: adjustedY,
-        radius: node.radius * radiusMultiplier * (isZoomed ? 1.2 : 1)
+        radius: node.radius * radiusMultiplier * (isZoomed ? 1.2 : 1) * Math.max(1, Math.min(dimensions.width, dimensions.height) / 600)
       };
     });
   };
@@ -429,14 +455,14 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     return styles[type];
   };
   
-  // Apply adjustments to node positions
+  // Apply adjustments to node positions with dynamic dimensions
   const adjustedNodes = adjustNodePositions(visibleNodes, isZoomed ? 1.5 : 1);
   
   return (
-    <div className={cn("rounded-lg border bg-card shadow-sm overflow-hidden relative", className)}>
-      <div className="p-4 border-b bg-card flex justify-between items-center">
+    <div className={cn("rounded-lg border bg-card shadow-sm overflow-hidden relative", className)} ref={containerRef}>
+      <div className="p-3 sm:p-4 border-b bg-card flex flex-wrap justify-between items-center gap-2">
         <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-lg text-primary">Digital Twin Hub</h3>
+          <h3 className="font-semibold text-base sm:text-lg text-primary truncate">Digital Twin Hub</h3>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -451,15 +477,15 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
           </TooltipProvider>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 flex-wrap justify-end">
           {/* Navigation buttons */}
-          <div className="flex items-center gap-1 mr-2">
+          <div className="flex items-center gap-1 mr-1 sm:mr-2">
             <Button
               variant="outline"
               size="sm"
               onClick={handleBack}
               disabled={currentLevel === 'main'}
-              className="text-xs h-8"
+              className="text-xs h-7 sm:h-8 px-1 sm:px-2"
             >
               Back
             </Button>
@@ -468,79 +494,104 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
               size="sm"
               onClick={handleReset}
               disabled={currentLevel === 'main'}
-              className="text-xs h-8"
+              className="text-xs h-7 sm:h-8 px-1 sm:px-2"
             >
               Reset
             </Button>
           </div>
           
-          {/* Filter buttons for types */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeFilter === 'process' ? "default" : "ghost"}
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => handleFilterByType('process')}
-                >
-                  <div className="w-3 h-3 rounded-full bg-green-600"></div>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Filter Processes</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          {/* Filter buttons - simplified for mobile */}
+          <div className="hidden sm:flex items-center gap-1">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={activeFilter === 'process' ? "default" : "ghost"}
+                    size="icon"
+                    className="h-7 w-7 sm:h-8 sm:w-8"
+                    onClick={() => handleFilterByType('process')}
+                  >
+                    <div className="w-3 h-3 rounded-full bg-green-600"></div>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Filter Processes</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={activeFilter === 'risk' ? "default" : "ghost"}
+                    size="icon"
+                    className="h-7 w-7 sm:h-8 sm:w-8"
+                    onClick={() => handleFilterByType('risk')}
+                  >
+                    <div className="w-3 h-3 rounded-full bg-red-600"></div>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Filter Risks</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={activeFilter === 'control' ? "default" : "ghost"}
+                    size="icon"
+                    className="h-7 w-7 sm:h-8 sm:w-8"
+                    onClick={() => handleFilterByType('control')}
+                  >
+                    <div className="w-3 h-3 rounded-full bg-purple-600"></div>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Filter Controls</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeFilter === 'risk' ? "default" : "ghost"}
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => handleFilterByType('risk')}
-                >
-                  <div className="w-3 h-3 rounded-full bg-red-600"></div>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Filter Risks</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={activeFilter === 'control' ? "default" : "ghost"}
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => handleFilterByType('control')}
-                >
-                  <div className="w-3 h-3 rounded-full bg-purple-600"></div>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Filter Controls</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          {/* Filter dropdown for mobile */}
+          <div className="sm:hidden">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={activeFilter ? "default" : "outline"}
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => setActiveFilter(activeFilter ? null : 'process')}
+                  >
+                    <Filter className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Toggle Filters</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           
           {/* Zoom toggle */}
           <Button
             variant="outline"
             size="sm"
             onClick={handleZoomToggle}
-            className="text-xs h-8 ml-2"
+            className="text-xs h-7 sm:h-8 px-1 sm:px-2 ml-1 sm:ml-2"
           >
-            {isZoomed ? <Minus className="h-3 w-3 mr-1" /> : <Plus className="h-3 w-3 mr-1" />}
-            {isZoomed ? 'Zoom Out' : 'Zoom In'}
+            {isZoomed ? <Minus className="h-3 w-3 mr-0 sm:mr-1" /> : <Plus className="h-3 w-3 mr-0 sm:mr-1" />}
+            <span className="hidden sm:inline">{isZoomed ? 'Zoom Out' : 'Zoom In'}</span>
           </Button>
         </div>
       </div>
       
-      <div className={cn(
-        "relative bg-[#FAFBFC] dark:bg-gray-900 overflow-hidden transition-all",
-        isZoomed ? "aspect-auto h-[550px]" : "aspect-[16/9]",
-        detailsPanel.visible ? "pr-[300px]" : ""
-      )}>
+      <div 
+        className={cn(
+          "relative bg-[#FAFBFC] dark:bg-gray-900 overflow-hidden transition-all",
+          detailsPanel.visible ? "pr-0 md:pr-[300px]" : ""
+        )}
+        style={{
+          height: isZoomed ? Math.max(400, dimensions.height) : Math.max(300, dimensions.height)
+        }}
+      >
         {isLoading ? (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="shimmer h-full w-full bg-gray-200 dark:bg-gray-800"></div>
@@ -549,7 +600,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
           <svg 
             ref={svgRef}
             className="w-full h-full"
-            viewBox="0 0 800 600"
+            viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
             preserveAspectRatio="xMidYMid meet"
           >
             {/* Draw edges */}
@@ -689,9 +740,16 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
           </svg>
         )}
         
-        {/* Details Panel */}
+        {/* Details Panel - made responsive */}
         {detailsPanel.visible && detailsPanel.node && (
-          <div className="absolute top-0 right-0 bottom-0 w-[300px] bg-background/95 backdrop-blur-sm border-l shadow-md p-4 overflow-y-auto transition-all duration-300 animate-in slide-in-from-right">
+          <div className={cn(
+            "fixed md:absolute z-10 md:z-auto",
+            "top-1/2 left-1/2 md:top-0 md:right-0 md:left-auto md:bottom-0",
+            "transform -translate-x-1/2 -translate-y-1/2 md:translate-x-0 md:translate-y-0",
+            "w-[90vw] max-w-[350px] md:w-[300px] h-auto max-h-[80vh] md:h-full",
+            "bg-background/95 backdrop-blur-sm border shadow-md rounded-lg md:rounded-none md:border-l md:border-t-0 md:border-r-0 md:border-b-0",
+            "p-4 overflow-y-auto transition-all duration-300 animate-in md:slide-in-from-right"
+          )}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-lg">{detailsPanel.node.label}</h3>
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDetailsPanel({node: null, visible: false})}>
@@ -755,10 +813,10 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
           </div>
         )}
         
-        {/* Legend Panel */}
-        <div className="absolute top-2 left-2 bg-background/90 backdrop-blur-sm border rounded-md p-2 text-xs shadow-sm">
+        {/* Legend Panel - made responsive */}
+        <div className="absolute top-2 left-2 bg-background/90 backdrop-blur-sm border rounded-md p-2 text-xs shadow-sm max-w-[180px] md:max-w-none">
           <div className="font-medium mb-1">Legend</div>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
             <div className="flex items-center gap-1">
               <div className="w-3 h-3 rounded-full bg-blue-600"></div>
               <span>Product</span>
@@ -786,9 +844,15 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
           </div>
         </div>
         
-        {/* Overlay instruction */}
-        <div className="absolute bottom-0 left-0 p-2 bg-background/80 backdrop-blur-sm text-xs text-muted-foreground">
+        {/* Overlay instruction - hidden on small screens */}
+        <div className="absolute bottom-0 left-0 p-2 bg-background/80 backdrop-blur-sm text-xs text-muted-foreground hidden sm:block">
           Click any node to drill down to related details
+        </div>
+        
+        {/* Touch indicator for mobile */}
+        <div className="absolute bottom-0 right-0 p-2 bg-background/80 backdrop-blur-sm text-xs text-muted-foreground sm:hidden flex items-center gap-1">
+          <Move className="h-3 w-3" />
+          <span>Tap to explore</span>
         </div>
       </div>
     </div>
