@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -5,6 +6,7 @@ import KnowledgeGraph from '@/components/dashboard/KnowledgeGraph';
 import MetricCard from '@/components/dashboard/MetricCard';
 import ModuleSummary from '@/components/dashboard/ModuleSummary';
 import Chart from '@/components/dashboard/Chart';
+import RibbonNav from '@/components/dashboard/RibbonNav';
 import { 
   AlertTriangle, 
   Shield, 
@@ -13,7 +15,9 @@ import {
   GitBranch, 
   SearchX, 
   TestTube, 
-  Presentation 
+  Presentation,
+  Gauge,
+  BarChart4
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
@@ -265,7 +269,17 @@ const Index = () => {
           Real-time insights and analytics for operational risk management
         </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-fade-in" style={{ animationDelay: '100ms' }}>
+        <RibbonNav className="mb-6 animate-fade-in" style={{ animationDelay: '100ms' }}>
+          <MetricCard
+            title="Process Discovery"
+            value="24"
+            severity="medium"
+            icon={<GitBranch className="h-5 w-5" />}
+            tooltip="Active processes being monitored in the system"
+            trend={3}
+            isLoading={loading}
+            onClick={() => handleNavigate('process-discovery')}
+          />
           <MetricCard
             title="Open Risks"
             value="46"
@@ -307,7 +321,28 @@ const Index = () => {
             isLoading={loading}
             onClick={() => handleMetricClick("Compliance")}
           />
-        </div>
+          <MetricCard
+            title="Control Model Failures"
+            value="15%"
+            severity="medium"
+            icon={<Gauge className="h-5 w-5" />}
+            tooltip="Percentage of control models that have failed testing"
+            trend={-3}
+            isLoading={loading}
+            onClick={() => handleNavigate('controls-testing')}
+          />
+          <MetricCard
+            title="Scenario Analysis"
+            value="3.2M"
+            prefix="$"
+            severity="high"
+            icon={<BarChart4 className="h-5 w-5" />}
+            tooltip="Projected loss based on current scenario analysis"
+            trend={8}
+            isLoading={loading}
+            onClick={() => handleNavigate('scenario-analysis')}
+          />
+        </RibbonNav>
         
         <div className="mb-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
           <h2 className="text-2xl font-semibold tracking-tight mb-4">Digital Twin Overview</h2>
