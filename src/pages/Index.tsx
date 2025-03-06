@@ -493,19 +493,7 @@ const Index = () => {
         
         <Separator className="my-8 animate-fade-in" style={{ animationDelay: '800ms' }} />
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '900ms' }}>
-          <Chart 
-            title="Incidents by Severity"
-            data={incidentSeverityData}
-            series={[
-              { name: 'Count', dataKey: 'value', color: '#f97316' }
-            ]}
-            type="bar"
-            xAxisKey="name"
-            height={300}
-            tooltip="Distribution of incidents by severity level"
-            onClick={(data) => handleNavigate('incident-management', { severity: data.name })}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '900ms' }}>
           <Chart 
             title="Controls Health"
             data={controlsHealthData}
