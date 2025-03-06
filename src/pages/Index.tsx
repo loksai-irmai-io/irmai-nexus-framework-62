@@ -16,11 +16,10 @@ import {
   SearchX, 
   TestTube, 
   Presentation,
-  Gauge,
-  BarChart4,
   Network,
   Activity,
   Database,
+  ChevronRight,
   FileBarChart,
   Workflow,
   ClipboardList
@@ -57,88 +56,37 @@ const controlsHealthData = [
   { name: 'Failing', value: 15 },
 ];
 
-const processDiscoveryData = [
-  { name: 'Payment Processing', value: 32 },
-  { name: 'Customer Onboarding', value: 24 },
-  { name: 'Loan Applications', value: 18 },
-  { name: 'Account Management', value: 16 },
-  { name: 'Reporting', value: 10 },
-];
-
-const outlierAnalysisData = [
-  { name: 'Jan', count: 5, rate: 1.2 },
-  { name: 'Feb', count: 8, rate: 1.8 },
-  { name: 'Mar', count: 12, rate: 2.5 },
-  { name: 'Apr', count: 7, rate: 1.5 },
-  { name: 'May', count: 15, rate: 3.0 },
-  { name: 'Jun', count: 10, rate: 2.0 },
-];
-
-const predictiveRiskData = [
-  { name: 'Fraud', probability: 0.7, impact: 85 },
-  { name: 'Data Breach', probability: 0.4, impact: 95 },
-  { name: 'System Failure', probability: 0.3, impact: 80 },
-  { name: 'Compliance', probability: 0.5, impact: 70 },
-  { name: 'Operations', probability: 0.6, impact: 60 },
-];
-
-const gapAnalysisData = [
-  { name: 'PCI-DSS', current: 75, target: 100 },
-  { name: 'GDPR', current: 85, target: 100 },
-  { name: 'SOX', current: 90, target: 100 },
-  { name: 'ISO 27001', current: 65, target: 100 },
-  { name: 'Basel III', current: 70, target: 100 },
-];
-
-const moduleSummaryData = [
+// Combined module data with insights for the 4 sleek ribbons
+const combinedModuleSummaryData = [
   {
     id: 'process-discovery',
-    title: 'Process Discovery',
-    description: 'Process mining and discovery insights',
+    title: 'Process Discovery & Analysis',
+    description: 'Process mining insights with outlier detection',
     icon: <GitBranch className="h-4 w-4" />,
     metrics: [
       { label: 'Processes', value: '24' },
       { label: 'Activities', value: '158' },
-      { label: 'Variants', value: '42' },
-      { label: 'Cases', value: '2,453' },
+      { label: 'Outliers', value: '18' },
+      { label: 'Cases', value: '5,120' },
     ],
     insights: [
       'Payment processing has 3 bottlenecks identified',
-      'Customer onboarding has 2 automation opportunities'
+      '5 new anomalies detected in payment workflow'
     ],
-    status: 'info' as const,
-    actionText: 'View Process Discovery',
+    status: 'warning' as const,
+    actionText: 'View Process Insights',
     actionHref: '/process-discovery',
   },
   {
-    id: 'outlier-analysis',
-    title: 'Outlier Analysis',
-    description: 'Anomaly detection and unusual patterns',
-    icon: <SearchX className="h-4 w-4" />,
-    metrics: [
-      { label: 'Outliers', value: '18' },
-      { label: 'False Positives', value: '3' },
-      { label: 'Accuracy', value: '94%' },
-      { label: 'Cases Analyzed', value: '5,120' },
-    ],
-    insights: [
-      '5 new anomalies detected in the payment process',
-      'Loan approval has unusual timestamp patterns'
-    ],
-    status: 'warning' as const,
-    actionText: 'View Outlier Analysis',
-    actionHref: '/outlier-analysis',
-  },
-  {
-    id: 'fmea-analysis',
+    id: 'risk-analytics',
     title: 'Predictive Risk Analytics',
-    description: 'Risk assessment and failure mode analysis',
+    description: 'Risk assessment with failure mode analysis',
     icon: <Shield className="h-4 w-4" />,
     metrics: [
       { label: 'Open Risks', value: '46' },
       { label: 'High Severity', value: '5' },
-      { label: 'Medium Severity', value: '18' },
-      { label: 'Low Severity', value: '23' },
+      { label: 'RPN Score', value: '187' },
+      { label: 'Controls', value: '124' },
     ],
     insights: [
       'Payment fraud risk increased by 12% this month',
@@ -150,55 +98,41 @@ const moduleSummaryData = [
   },
   {
     id: 'compliance-monitoring',
-    title: 'Compliance Monitoring',
-    description: 'Regulatory compliance and gap analysis',
+    title: 'Compliance & Controls',
+    description: 'Regulatory compliance and control testing',
     icon: <CheckCheck className="h-4 w-4" />,
     metrics: [
-      { label: 'Compliance Score', value: '85%' },
+      { label: 'Compliance', value: '85%' },
       { label: 'Critical Gaps', value: '3' },
-      { label: 'Controls', value: '124' },
-      { label: 'Frameworks', value: '8' },
+      { label: 'Control Tests', value: '32' },
+      { label: 'Pass Rate', value: '76%' },
     ],
     insights: [
       'GDPR compliance score improved by 5% this quarter',
-      'PCI-DSS has 2 new gaps requiring immediate action'
+      'PCI-DSS has 2 control failures requiring attention'
     ],
     status: 'warning' as const,
-    actionText: 'View Compliance Monitoring',
+    actionText: 'View Compliance & Controls',
     actionHref: '/compliance-monitoring',
-  }
-];
-
-const placeholderModuleData = [
-  {
-    id: 'controls-testing',
-    title: 'Controls Testing',
-    description: 'Coming Soon: Automated controls testing and validation',
-    icon: <TestTube className="h-4 w-4" />,
-    metrics: [
-      { label: 'Controls', value: '124' },
-      { label: 'Tested', value: '0' },
-      { label: 'Passing', value: '-' },
-      { label: 'Failing', value: '-' },
-    ],
-    status: 'info' as const,
-    actionText: 'Module Coming Soon',
-    actionHref: '#',
   },
   {
-    id: 'scenario-analysis',
-    title: 'Scenario Analysis',
-    description: 'Coming Soon: Risk scenario modeling and simulation',
-    icon: <Presentation className="h-4 w-4" />,
+    id: 'incident-management',
+    title: 'Incident & Loss Management',
+    description: 'Event tracking with scenario analysis',
+    icon: <AlertTriangle className="h-4 w-4" />,
     metrics: [
-      { label: 'Scenarios', value: '0' },
-      { label: 'Simulations', value: '0' },
-      { label: 'Coverage', value: '-' },
-      { label: 'Avg. Loss', value: '-' },
+      { label: 'Open Incidents', value: '12' },
+      { label: 'Critical', value: '2' },
+      { label: 'This Month', value: '$120K' },
+      { label: 'YTD Loss', value: '$963K' },
+    ],
+    insights: [
+      'System outage on June 15 impacted 2,500 customers',
+      'Fraud losses trending 5% below prior year'
     ],
     status: 'info' as const,
-    actionText: 'Module Coming Soon',
-    actionHref: '#',
+    actionText: 'View Incident Management',
+    actionHref: '/incident-management',
   }
 ];
 
@@ -275,80 +209,18 @@ const Index = () => {
           Real-time insights and analytics for operational risk management
         </p>
         
-        <RibbonNav className="mb-6 animate-fade-in" style={{ animationDelay: '100ms' }}>
-          <MetricCard
-            title="Process Discovery"
-            value="24"
-            severity="medium"
-            icon={<GitBranch className="h-5 w-5" />}
-            tooltip="Active processes being monitored in the system"
-            trend={3}
-            isLoading={loading}
-            onClick={() => handleNavigate('process-discovery')}
-          />
-          <MetricCard
-            title="Open Risks"
-            value="46"
-            severity="medium"
-            icon={<AlertTriangle className="h-5 w-5" />}
-            tooltip="Total number of open risk items across all categories"
-            trend={8}
-            isLoading={loading}
-            onClick={() => handleMetricClick("Risk Management")}
-          />
-          <MetricCard
-            title="High-Severity Risks"
-            value="5"
-            severity="critical"
-            icon={<Shield className="h-5 w-5" />}
-            tooltip="Risks with critical or high severity ratings"
-            trend={-2}
-            isLoading={loading}
-            onClick={() => handleMetricClick("High-Severity Risks")}
-          />
-          <MetricCard
-            title="Total Potential Loss"
-            value="963K"
-            prefix="$"
-            severity="high"
-            icon={<DollarSign className="h-5 w-5" />}
-            tooltip="Estimated financial impact of all identified risks"
-            trend={12}
-            isLoading={loading}
-            onClick={() => handleMetricClick("Potential Loss")}
-          />
-          <MetricCard
-            title="Compliance Score"
-            value="85%"
-            severity="low"
-            icon={<CheckCheck className="h-5 w-5" />}
-            tooltip="Overall compliance score across all regulatory frameworks"
-            trend={5}
-            isLoading={loading}
-            onClick={() => handleMetricClick("Compliance")}
-          />
-          <MetricCard
-            title="Control Model Failures"
-            value="15%"
-            severity="medium"
-            icon={<Gauge className="h-5 w-5" />}
-            tooltip="Percentage of control models that have failed testing"
-            trend={-3}
-            isLoading={loading}
-            onClick={() => handleNavigate('controls-testing')}
-          />
-          <MetricCard
-            title="Scenario Analysis"
-            value="3.2M"
-            prefix="$"
-            severity="high"
-            icon={<BarChart4 className="h-5 w-5" />}
-            tooltip="Projected loss based on current scenario analysis"
-            trend={8}
-            isLoading={loading}
-            onClick={() => handleNavigate('scenario-analysis')}
-          />
-        </RibbonNav>
+        {/* Combined Module Summaries - 4 Sleek Ribbons */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '100ms' }}>
+          {combinedModuleSummaryData.map((moduleData) => (
+            <ModuleSummary
+              key={moduleData.id}
+              data={moduleData}
+              isLoading={loading}
+              onClick={() => handleNavigate(moduleData.actionHref.substring(1))}
+              className="h-full"
+            />
+          ))}
+        </div>
         
         <div className="mb-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
           <h2 className="text-2xl font-semibold tracking-tight mb-4">Digital Twin Overview</h2>
@@ -838,15 +710,6 @@ const Index = () => {
               </div>
             </div>
           </div>
-        </div>
-        
-        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '1000ms' }}>
-          Upcoming Modules
-        </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
-          {placeholderModuleData.map(module => (
-            <ModuleSummary key={module.id} data={module} isLoading={loading} />
-          ))}
         </div>
       </div>
     </Layout>
