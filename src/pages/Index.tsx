@@ -344,48 +344,6 @@ const Index = () => {
           />
         </RibbonNav>
         
-        <div className="mb-6 animate-fade-in" style={{ animationDelay: '150ms' }}>
-          <h2 className="text-2xl font-semibold tracking-tight mb-4">Performance Indicators</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <CompactMetric 
-              label="Risk Coverage"
-              value="76%"
-              icon="chart-bar"
-              trend={{ direction: 'up', value: 4 }}
-              tooltip="Percentage of risk areas with active controls"
-              onClick={() => handleNavigate('risk-coverage')}
-            />
-            <CompactMetric 
-              label="Control Effectiveness"
-              value="82%"
-              icon="circle-check"
-              trend={{ direction: 'down', value: 2 }}
-              variant="alt"
-              accentColor="#8B5CF6"
-              tooltip="Measure of how well controls are performing"
-              onClick={() => handleNavigate('control-effectiveness')}
-            />
-            <CompactMetric 
-              label="Testing Completion"
-              value="68%"
-              icon="activity"
-              trend={{ direction: 'up', value: 12 }}
-              variant="card"
-              tooltip="Progress on scheduled control testing"
-              onClick={() => handleNavigate('testing-progress')}
-            />
-            <CompactMetric 
-              label="Risk Velocity"
-              value="Medium"
-              icon="trending-up"
-              tooltip="Rate at which risk exposure is changing"
-              variant="minimal"
-              className="border-l-4 border-amber-500 pl-3"
-              onClick={() => handleNavigate('risk-velocity')}
-            />
-          </div>
-        </div>
-        
         <div className="mb-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
           <h2 className="text-2xl font-semibold tracking-tight mb-4">Digital Twin Overview</h2>
           <div className="p-1 border border-primary/20 rounded-lg bg-primary/5">
