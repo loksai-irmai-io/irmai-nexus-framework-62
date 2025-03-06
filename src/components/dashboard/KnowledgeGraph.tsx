@@ -496,7 +496,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     return (expandedNodes[nodeId] || node?.expansionState) === 'expanded';
   };
   
-  // Get node color based on type
+  // Get node color based on type - modified to remove hover transformations
   const getNodeColor = (type: NodeType, isSelected: boolean, isHovered: boolean) => {
     const baseColorMap: Record<NodeType, string> = {
       product: 'bg-blue-600',
@@ -511,9 +511,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       testing: 'bg-cyan-600',
     };
     
-    const hoverState = isSelected ? 'opacity-90' : isHovered ? 'opacity-80' : 'opacity-80';
-    
-    return `${baseColorMap[type]} ${hoverState}`;
+    return `${baseColorMap[type]}`;
   };
   
   // Get node border color based on type
@@ -774,7 +772,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                       {node.label}
                     </text>
                     
-                    {expandable && (
+                    {expandable && node.children && node.children.length > 0 && (
                       <g transform={`translate(0, ${node.radius * 0.6})`}>
                         <circle
                           cx="0"
