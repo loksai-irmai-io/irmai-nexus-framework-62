@@ -21,7 +21,7 @@ export const SidebarProvider: React.FC<{children: React.ReactNode}> = ({ childre
   const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(true);
 
-  // Close sidebar by default on mobile
+  // Close sidebar by default on mobile or when screen becomes mobile-sized
   useEffect(() => {
     if (isMobile !== undefined) {
       setIsOpen(!isMobile);

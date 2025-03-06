@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -40,16 +41,16 @@ interface KnowledgeGraphProps {
 // Main sample data
 const generateMainNodes = (): GraphNode[] => {
   return [
-    { id: 'bank', label: 'IRMAI Bank', type: 'product', level: 'main', x: 400, y: 250, radius: 60, expansionState: 'collapsed' },
+    { id: 'bank', label: 'IRMAI Bank', type: 'product', level: 'main', x: 400, y: 250, radius: 70, expansionState: 'collapsed' },
   ];
 };
 
 // Category level nodes - these appear when a main node is clicked
 const generateCategoryNodes = (): GraphNode[] => {
   return [
-    { id: 'processes', label: 'Processes', type: 'process', level: 'category', x: 250, y: 150, radius: 45, parent: 'bank', children: ['onboarding', 'kyc', 'payment'], expansionState: 'collapsed' },
-    { id: 'risks', label: 'Risks', type: 'risk', level: 'category', x: 400, y: 120, radius: 45, parent: 'bank', children: ['fraud', 'compliance', 'operational'], expansionState: 'collapsed' },
-    { id: 'controls', label: 'Controls', type: 'control', level: 'category', x: 550, y: 150, radius: 45, parent: 'bank', children: ['authcontrol', 'monitoring', 'test1'], expansionState: 'collapsed' },
+    { id: 'processes', label: 'Processes', type: 'process', level: 'category', x: 250, y: 150, radius: 55, parent: 'bank', children: ['onboarding', 'kyc', 'payment'], expansionState: 'collapsed' },
+    { id: 'risks', label: 'Risks', type: 'risk', level: 'category', x: 400, y: 120, radius: 55, parent: 'bank', children: ['fraud', 'compliance', 'operational'], expansionState: 'collapsed' },
+    { id: 'controls', label: 'Controls', type: 'control', level: 'category', x: 550, y: 150, radius: 55, parent: 'bank', children: ['authcontrol', 'monitoring', 'test1'], expansionState: 'collapsed' },
   ];
 };
 
@@ -57,19 +58,19 @@ const generateCategoryNodes = (): GraphNode[] => {
 const generateDetailNodes = (): GraphNode[] => {
   return [
     // Process nodes
-    { id: 'onboarding', label: 'Customer Onboarding', type: 'process', level: 'detail', x: 200, y: 280, radius: 35, parent: 'processes', module: 'process-discovery', details: 'Customer onboarding process includes KYC verification, document collection, and account setup.' },
-    { id: 'kyc', label: 'KYC', type: 'process', level: 'detail', x: 150, y: 350, radius: 30, parent: 'processes', module: 'process-discovery', details: 'Know Your Customer verification ensures proper customer identification and risk assessment.' },
-    { id: 'payment', label: 'Payment Processing', type: 'process', level: 'detail', x: 600, y: 280, radius: 35, parent: 'processes', module: 'process-discovery', details: 'Payment processing handles transactions, fraud detection, and settlement activities.' },
+    { id: 'onboarding', label: 'Customer Onboarding', type: 'process', level: 'detail', x: 200, y: 280, radius: 45, parent: 'processes', module: 'process-discovery', details: 'Customer onboarding process includes KYC verification, document collection, and account setup.' },
+    { id: 'kyc', label: 'KYC', type: 'process', level: 'detail', x: 150, y: 350, radius: 35, parent: 'processes', module: 'process-discovery', details: 'Know Your Customer verification ensures proper customer identification and risk assessment.' },
+    { id: 'payment', label: 'Payment Processing', type: 'process', level: 'detail', x: 600, y: 280, radius: 45, parent: 'processes', module: 'process-discovery', details: 'Payment processing handles transactions, fraud detection, and settlement activities.' },
     
     // Risk nodes
-    { id: 'fraud', label: 'Fraud Risk', type: 'risk', level: 'detail', x: 300, y: 380, radius: 32, parent: 'risks', module: 'fmea-analysis', details: 'Risk of financial fraud including identity theft, transaction fraud, and account takeover.' },
-    { id: 'compliance', label: 'Compliance Risk', type: 'risk', level: 'detail', x: 500, y: 380, radius: 32, parent: 'risks', module: 'fmea-analysis', details: 'Risk of non-compliance with regulatory requirements including PCI-DSS, GDPR, and AML regulations.' },
-    { id: 'operational', label: 'Operational Risk', type: 'risk', level: 'detail', x: 400, y: 330, radius: 32, parent: 'risks', module: 'fmea-analysis', details: 'Risk of losses due to inadequate or failed internal processes, people, and systems.' },
+    { id: 'fraud', label: 'Fraud Risk', type: 'risk', level: 'detail', x: 300, y: 380, radius: 40, parent: 'risks', module: 'fmea-analysis', details: 'Risk of financial fraud including identity theft, transaction fraud, and account takeover.' },
+    { id: 'compliance', label: 'Compliance Risk', type: 'risk', level: 'detail', x: 500, y: 380, radius: 42, parent: 'risks', module: 'fmea-analysis', details: 'Risk of non-compliance with regulatory requirements including PCI-DSS, GDPR, and AML regulations.' },
+    { id: 'operational', label: 'Operational Risk', type: 'risk', level: 'detail', x: 400, y: 330, radius: 42, parent: 'risks', module: 'fmea-analysis', details: 'Risk of losses due to inadequate or failed internal processes, people, and systems.' },
     
     // Control nodes
-    { id: 'authcontrol', label: 'Auth Controls', type: 'control', level: 'detail', x: 350, y: 450, radius: 32, parent: 'controls', module: 'compliance-monitoring', details: 'Authentication controls include multi-factor authentication, password policies, and access management.' },
-    { id: 'monitoring', label: 'Transaction Monitoring', type: 'control', level: 'detail', x: 450, y: 450, radius: 32, parent: 'controls', module: 'compliance-monitoring', details: 'Continuous monitoring of transactions to detect suspicious activities and prevent fraud.' },
-    { id: 'test1', label: 'Control Tests', type: 'testing', level: 'detail', x: 175, y: 450, radius: 25, parent: 'controls', module: 'controls-testing', details: 'Regular testing of controls to ensure their effectiveness and identify potential gaps.' },
+    { id: 'authcontrol', label: 'Auth Controls', type: 'control', level: 'detail', x: 350, y: 450, radius: 40, parent: 'controls', module: 'compliance-monitoring', details: 'Authentication controls include multi-factor authentication, password policies, and access management.' },
+    { id: 'monitoring', label: 'Transaction Monitoring', type: 'control', level: 'detail', x: 450, y: 450, radius: 45, parent: 'controls', module: 'compliance-monitoring', details: 'Continuous monitoring of transactions to detect suspicious activities and prevent fraud.' },
+    { id: 'test1', label: 'Control Tests', type: 'testing', level: 'detail', x: 175, y: 450, radius: 40, parent: 'controls', module: 'controls-testing', details: 'Regular testing of controls to ensure their effectiveness and identify potential gaps.' },
   ];
 };
 
@@ -177,6 +178,12 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     // Get expansion states
     const expansionStates = {...expandedNodes};
     
+    // Check if any category nodes are expanded
+    const hasCategoryExpanded = Object.keys(expansionStates).some(nodeId => {
+      const node = findNodeById(nodeId);
+      return node?.level === 'category' && expansionStates[nodeId] === 'expanded';
+    });
+    
     // Cache to store calculated positions to maintain consistency
     const positionCache: Record<string, {x: number, y: number}> = {};
     
@@ -189,9 +196,11 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       
       let position: {x: number, y: number};
       
-      // For main node, use the center
+      // For main node, use the center but move up when category nodes are expanded
       if (node.level === 'main') {
-        position = { x: center.x, y: center.y * 0.8 }; // Position main node higher
+        // Move the main node up more when category nodes are expanded
+        const yOffset = hasCategoryExpanded ? 0.5 : 0.8;
+        position = { x: center.x, y: center.y * yOffset }; 
       }
       // For nodes with parents, position hierarchically (top to bottom)
       else if (parentPosition && node.parent) {
@@ -211,7 +220,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
             
             position = {
               x: horizontalPosition,
-              y: parentPosition.y + 120 // Fixed vertical distance from parent
+              y: parentPosition.y + 130 // Increased vertical distance from parent
             };
           } 
           // For detail nodes, arrange in groups under their categories
@@ -228,13 +237,13 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
             const row = Math.floor(nodeIndex / columns);
             const col = nodeIndex % columns;
             
-            // Determine spacing based on container size
-            const horizontalSpacing = Math.min(80, dimensions.width / (columns * 2));
-            const verticalSpacing = Math.min(80, dimensions.height / 10);
+            // Determine spacing based on container size and node count
+            const horizontalSpacing = Math.min(100, dimensions.width / (columns * 1.5));
+            const verticalSpacing = Math.min(100, dimensions.height / 8);
             
             position = {
               x: parentX + (col - Math.floor(columns/2)) * horizontalSpacing,
-              y: parentPosition.y + 100 + (row * verticalSpacing)
+              y: parentPosition.y + 120 + (row * verticalSpacing) // Increased vertical spacing
             };
           }
         }
@@ -251,14 +260,20 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     const adjustPosition = (node: GraphNode, parentPosition?: {x: number, y: number}) => {
       const calculatedPosition = calculatePosition(node, parentPosition);
       
-      // Scale radius based on container size and node level
-      let radiusMultiplier = Math.min(dimensions.width, dimensions.height) / 1000;
-      if (node.level === 'main') radiusMultiplier *= 1.2;
-      else if (node.level === 'category') radiusMultiplier *= 1;
-      else radiusMultiplier *= 0.9;
+      // Scale radius based on container size, node level, and label length
+      let radiusMultiplier = Math.min(dimensions.width, dimensions.height) / 900;
+      
+      // Adjust radius based on node level
+      if (node.level === 'main') radiusMultiplier *= 1.3;
+      else if (node.level === 'category') radiusMultiplier *= 1.1;
+      else radiusMultiplier *= 1.0;
+      
+      // Also adjust based on label length
+      const labelLengthFactor = Math.min(1.5, Math.max(1, node.label.length / 10));
       
       // Apply zoom factor to radius but not to position
-      const scaledRadius = node.radius * radiusMultiplier * (isZoomed ? 1.2 : 1) * 
+      const scaledRadius = node.radius * radiusMultiplier * labelLengthFactor * 
+                          (isZoomed ? 1.2 : 1) * 
                           Math.max(1, Math.min(dimensions.width, dimensions.height) / 600);
       
       return {
@@ -527,7 +542,10 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
   };
   
   // Handle node selection
-  const handleNodeClick = (nodeId: string) => {
+  const handleNodeClick = (nodeId: string, event: React.MouseEvent) => {
+    // Prevent event propagation to ensure stable interaction
+    event.stopPropagation();
+    
     const node = findNodeById(nodeId);
     if (!node) return;
     
@@ -543,6 +561,14 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     if (node.module && node.level === 'detail') {
       toast.info(`Navigating to ${node.label} in ${node.module.replace('-', ' ')}...`);
     }
+  };
+  
+  // Handle node hover with stable behavior
+  const handleNodeHover = (nodeId: string | null, event: React.MouseEvent | null) => {
+    if (event) {
+      event.stopPropagation();
+    }
+    setHoveredNode(nodeId);
   };
   
   // Check if a node is expanded
@@ -621,19 +647,24 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     return false;
   };
   
-  // Draw enhanced path between nodes with better visibility
+  // Enhanced path between nodes with better visibility
   const getEdgePath = (source: GraphNode, target: GraphNode) => {
-    // For a hierarchical layout, use a curved path for better visibility
+    // For a hierarchical layout, use an appropriate curve type based on relationship
     if (source.level !== target.level) {
-      // For lines connecting different levels, use Bezier curves
+      // For lines connecting different levels, use Bezier curves with more visibility
       const midX = (source.x + target.x) / 2;
       const midY = (source.y + target.y) / 2;
       
-      // Control point adjustments for more natural curves
-      const controlPointX = midX;
-      const controlPointY = source.y < target.y ? 
-                           source.y + (target.y - source.y) * 0.25 : 
-                           target.y + (source.y - target.y) * 0.25;
+      // Adjust control points for clear visibility
+      let controlPointX = midX;
+      let controlPointY = midY;
+      
+      // For parent-child relationships, make the curve more pronounced
+      if (target.parent === source.id || source.parent === target.id) {
+        controlPointY = source.y < target.y ? 
+                      source.y + (target.y - source.y) * 0.4 : 
+                      target.y + (source.y - target.y) * 0.4;
+      }
       
       return `M${source.x},${source.y} Q${controlPointX},${controlPointY} ${target.x},${target.y}`;
     }
@@ -789,7 +820,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
           detailsPanel.visible ? "pr-0 md:pr-[300px]" : ""
         )}
         style={{
-          height: isZoomed ? Math.max(400, dimensions.height) : Math.max(300, dimensions.height)
+          height: isZoomed ? Math.max(450, dimensions.height) : Math.max(350, dimensions.height)
         }}
       >
         {isLoading ? (
@@ -813,14 +844,19 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                 const isRelated = isEdgeRelated(edge);
                 const isExpanded = expandedNodes[edge.source] === 'expanded' || expandedNodes[edge.target] === 'expanded';
                 
+                // Make edges more visible when expanded
+                const edgeOpacity = isExpanded ? 0.9 : 0.5;
+                const edgeWidth = isRelated ? (isExpanded ? 2.5 : 2) : 1;
+                const edgeColor = isRelated ? (isExpanded ? '#4a5568' : '#64748b') : '#e2e8f0';
+                
                 return (
                   <g key={edge.id}>
                     <path
                       d={getEdgePath(source, target)}
-                      stroke={isRelated ? '#64748b' : '#e2e8f0'}
-                      strokeWidth={isRelated ? 2 : 1}
+                      stroke={edgeColor}
+                      strokeWidth={edgeWidth}
                       fill="none"
-                      opacity={isExpanded ? 0.9 : 0.4}
+                      opacity={edgeOpacity}
                       strokeDasharray={source.level === target.level ? undefined : "none"}
                     />
                   </g>
@@ -832,19 +868,18 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
               {adjustedNodes.map((node) => {
                 const isSelected = selectedNode === node.id;
                 const isHovered = hoveredNode === node.id;
+                const labelFontSize = node.level === 'main' ? 16 : (node.level === 'category' ? 14 : 12);
                 
+                // Ensure node click event has stopPropagation to prevent unintended behavior
                 return (
                   <g 
                     key={node.id}
                     transform={`translate(${node.x},${node.y})`}
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent event bubbling
-                      handleNodeClick(node.id);
-                    }}
-                    onMouseEnter={() => setHoveredNode(node.id)}
-                    onMouseLeave={() => setHoveredNode(null)}
+                    onClick={(e) => handleNodeClick(node.id, e)}
+                    onMouseEnter={(e) => handleNodeHover(node.id, e)}
+                    onMouseLeave={(e) => handleNodeHover(null, e)}
                     style={{ cursor: 'pointer' }}
-                    className="transition-transform duration-150" // Add smooth transition
+                    className="transition-opacity duration-150"
                   >
                     <circle
                       cx="0"
@@ -858,11 +893,11 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                     
                     <text
                       x="0"
-                      y="3"
+                      y="2"
                       textAnchor="middle"
                       dominantBaseline="middle"
                       className={getNodeTextColor(node.type)}
-                      fontSize={node.level === 'main' ? 14 : 12}
+                      fontSize={labelFontSize}
                     >
                       {node.label}
                     </text>
