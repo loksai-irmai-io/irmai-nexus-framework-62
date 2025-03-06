@@ -167,7 +167,134 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     return [...allNodes.main, ...allNodes.category, ...allNodes.detail].find(n => n.id === id);
   };
 
-  // New function to handle node expansion/collapse
+  // Improved node position calculation to maintain consistent layout
+  const adjustNodePositions = (nodes: GraphNode[], zoomFactor: number = 1) => {
+    const center = { 
+      x: dimensions.width / 2, 
+      y: dimensions.height / 2 
+    };
+    
+    // Get expansion states
+    const expansionStates = {...expandedNodes};
+    
+    // Cache to store calculated positions to maintain consistency
+    const positionCache: Record<string, {x: number, y: number}> = {};
+    
+    // Function to calculate position deterministically based on parent
+    const calculatePosition = (node: GraphNode, parentPosition?: {x: number, y: number}) => {
+      // If this node already has a calculated position, use it
+      if (positionCache[node.id]) {
+        return positionCache[node.id];
+      }
+      
+      let position: {x: number, y: number};
+      const isExpanded = expansionStates[node.id] === 'expanded';
+      
+      // For main node, use the center
+      if (node.level === 'main') {
+        position = {
+          x: center.x,
+          y: center.y
+        };
+      }
+      // For nodes with parents, position deterministically around parent
+      else if (parentPosition && node.parent) {
+        const parentNode = findNodeById(node.parent);
+        if (!parentNode) {
+          // Fallback to original position if parent not found
+          position = {
+            x: node.x,
+            y: node.y
+          };
+        } else {
+          // Use the node's index among siblings to calculate a fixed angle
+          let siblings: GraphNode[] = [];
+          if (parentNode.level === 'main') {
+            siblings = allNodes.category.filter(n => n.parent === parentNode.id);
+          } else if (parentNode.level === 'category') {
+            siblings = allNodes.detail.filter(n => n.parent === parentNode.id);
+          }
+          
+          const nodeIndex = siblings.findIndex(n => n.id === node.id);
+          const totalSiblings = siblings.length;
+          
+          // Calculate angle based on position in siblings (evenly distributed)
+          const angleStep = (2 * Math.PI) / Math.max(totalSiblings, 3);
+          const angle = nodeIndex * angleStep;
+          
+          // Distance from parent based on level and zoom
+          const distance = parentNode.level === 'main' ? 
+            150 * (isExpanded ? 1.2 : 1) : 
+            120 * (isExpanded ? 1.2 : 1);
+          
+          position = {
+            x: parentPosition.x + Math.cos(angle) * distance,
+            y: parentPosition.y + Math.sin(angle) * distance
+          };
+        }
+      } else {
+        // Fallback to original position or an appropriate position based on the graph center
+        position = {
+          x: node.x,
+          y: node.y
+        };
+      }
+      
+      // Store in cache for consistency
+      positionCache[node.id] = position;
+      return position;
+    };
+    
+    // Function to adjust a node's position and properties
+    const adjustPosition = (node: GraphNode, parentPosition?: {x: number, y: number}) => {
+      const calculatedPosition = calculatePosition(node, parentPosition);
+      const isExpanded = expansionStates[node.id] === 'expanded';
+      
+      // Scale position based on dimensions and zoom
+      const scaledX = calculatedPosition.x;
+      const scaledY = calculatedPosition.y;
+      
+      // Adjust position based on zoom
+      const adjustedX = center.x + (scaledX - center.x) * zoomFactor;
+      const adjustedY = center.y + (scaledY - center.y) * zoomFactor;
+      
+      // Adjust radius based on node level, zoom, and container size
+      let radiusMultiplier = Math.min(dimensions.width, dimensions.height) / 1000;
+      if (node.level === 'main') radiusMultiplier *= 1.2;
+      else if (node.level === 'category') radiusMultiplier *= 1;
+      else radiusMultiplier *= 0.9;
+      
+      return {
+        ...node,
+        x: adjustedX,
+        y: adjustedY,
+        radius: node.radius * radiusMultiplier * (isZoomed ? 1.2 : 1) * Math.max(1, Math.min(dimensions.width, dimensions.height) / 600)
+      };
+    };
+    
+    // Process nodes in hierarchy order: main -> category -> detail
+    // This ensures parents have positions before their children
+    const mainNodes = nodes.filter(n => n.level === 'main').map(n => 
+      adjustPosition(n)
+    );
+    
+    // For each main node, position its children consistently
+    const categoryNodes = nodes.filter(n => n.level === 'category').map(n => {
+      const parentNode = mainNodes.find(m => m.id === n.parent);
+      return adjustPosition(n, parentNode ? {x: parentNode.x, y: parentNode.y} : undefined);
+    });
+    
+    // For each category node, position its children consistently
+    const detailNodes = nodes.filter(n => n.level === 'detail').map(n => {
+      const parentNode = categoryNodes.find(c => c.id === n.parent);
+      return adjustPosition(n, parentNode ? {x: parentNode.x, y: parentNode.y} : undefined);
+    });
+    
+    // Return nodes in the original order to maintain rendering consistency
+    return [...mainNodes, ...categoryNodes, ...detailNodes];
+  };
+  
+  // Improved function to handle node expansion/collapse with better edge management
   const toggleNodeExpansion = (nodeId: string) => {
     const node = findNodeById(nodeId);
     if (!node) return;
@@ -190,7 +317,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       // Based on node level, add different child nodes
       if (node.level === 'main') {
         // Add category nodes connected to this main node
-        nodesToAdd = allNodes.category;
+        nodesToAdd = allNodes.category.filter(n => n.parent === node.id);
         edgesToAdd = allEdges.filter(e => 
           (e.source === node.id && nodesToAdd.some(n => n.id === e.target)) ||
           (e.target === node.id && nodesToAdd.some(n => n.id === e.source))
@@ -258,13 +385,10 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       );
       
       // Remove edges connected to removed nodes
-      setVisibleEdges(prev => 
-        prev.filter(e => {
-          const sourceInVisible = visibleNodes.some(n => n.id === e.source);
-          const targetInVisible = visibleNodes.some(n => n.id === e.target);
-          return sourceInVisible && targetInVisible;
-        })
-      );
+      setVisibleEdges(prev => {
+        const remainingNodeIds = new Set(visibleNodes.map(n => n.id));
+        return prev.filter(e => remainingNodeIds.has(e.source) && remainingNodeIds.has(e.target));
+      });
     }
   };
   
@@ -307,71 +431,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     setVisibleNodes(filteredNodes);
     setVisibleEdges(filteredEdges);
   }, [activeFilter]);
-  
-  // Node position and sizing helper method - updated to use dynamic dimensions
-  const adjustNodePositions = (nodes: GraphNode[], zoomFactor: number = 1) => {
-    const center = { 
-      x: dimensions.width / 2, 
-      y: dimensions.height / 2 
-    };
-    
-    // Get expansion states
-    const expansionStates = {...expandedNodes};
-    
-    // Function to recursively adjust node positions based on parent's position
-    const adjustPosition = (node: GraphNode, parentPosition?: {x: number, y: number}) => {
-      let adjustedNode = {...node};
-      const isExpanded = expansionStates[node.id] === 'expanded';
-      
-      // If node has a parent position specified, position it relative to parent
-      if (parentPosition && node.parent) {
-        const angle = Math.random() * Math.PI * 2; // Random angle around the parent
-        const distance = isExpanded ? 150 : 100; // Distance from parent
-        
-        adjustedNode.x = parentPosition.x + Math.cos(angle) * distance;
-        adjustedNode.y = parentPosition.y + Math.sin(angle) * distance;
-      }
-      
-      // Scale original positions based on new dimensions
-      const scaledX = (adjustedNode.x / 800) * dimensions.width;
-      const scaledY = (adjustedNode.y / 600) * dimensions.height;
-      
-      // Adjust position based on zoom
-      const adjustedX = center.x + (scaledX - center.x) * zoomFactor;
-      const adjustedY = center.y + (scaledY - center.y) * zoomFactor;
-      
-      // Adjust radius based on node level, zoom, and container size
-      let radiusMultiplier = Math.min(dimensions.width, dimensions.height) / 1000;
-      if (adjustedNode.level === 'main') radiusMultiplier *= 1.2;
-      else if (adjustedNode.level === 'category') radiusMultiplier *= 1;
-      else radiusMultiplier *= 0.9;
-      
-      return {
-        ...adjustedNode,
-        x: adjustedX,
-        y: adjustedY,
-        radius: node.radius * radiusMultiplier * (isZoomed ? 1.2 : 1) * Math.max(1, Math.min(dimensions.width, dimensions.height) / 600)
-      };
-    };
-    
-    // Organize nodes by level (main -> category -> detail)
-    const mainNodes = nodes.filter(n => n.level === 'main').map(n => adjustPosition(n));
-    
-    // For each main node, position its children around it
-    const categoryNodes = nodes.filter(n => n.level === 'category').map(n => {
-      const parentNode = mainNodes.find(m => m.id === n.parent);
-      return adjustPosition(n, parentNode ? {x: parentNode.x, y: parentNode.y} : undefined);
-    });
-    
-    // For each category node, position its children around it
-    const detailNodes = nodes.filter(n => n.level === 'detail').map(n => {
-      const parentNode = categoryNodes.find(c => c.id === n.parent);
-      return adjustPosition(n, parentNode ? {x: parentNode.x, y: parentNode.y} : undefined);
-    });
-    
-    // Combine all adjusted nodes
-    return [...mainNodes, ...categoryNodes, ...detailNodes];
-  };
   
   // Go back to previous level
   const handleBack = () => {
