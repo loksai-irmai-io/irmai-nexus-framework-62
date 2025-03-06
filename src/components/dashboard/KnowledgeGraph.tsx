@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -564,8 +563,8 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       policy: 'bg-slate-500',
       regulation: 'bg-yellow-500',
       framework: 'bg-indigo-500',
-      issue: 'bg-pink-500',
-      testing: 'bg-cyan-500',
+      issue: 'bg-pink-600',
+      testing: 'bg-cyan-600',
     };
     return styles[type];
   };
@@ -593,7 +592,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
         </div>
         
         <div className="flex items-center gap-1 sm:gap-2 flex-wrap justify-end">
-          {/* Navigation buttons */}
           <div className="flex items-center gap-1 mr-1 sm:mr-2">
             <Button
               variant="outline"
@@ -615,7 +613,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
             </Button>
           </div>
           
-          {/* Filter buttons - simplified for mobile */}
           <div className="hidden sm:flex items-center gap-1">
             <TooltipProvider>
               <Tooltip>
@@ -666,7 +663,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
             </TooltipProvider>
           </div>
           
-          {/* Filter dropdown for mobile */}
           <div className="sm:hidden">
             <TooltipProvider>
               <Tooltip>
@@ -685,7 +681,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
             </TooltipProvider>
           </div>
           
-          {/* Zoom toggle */}
           <Button
             variant="outline"
             size="sm"
@@ -718,7 +713,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
             viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
             preserveAspectRatio="xMidYMid meet"
           >
-            {/* Draw edges */}
             <g>
               {visibleEdges.map(edge => {
                 const source = adjustedNodes.find(node => node.id === edge.source);
@@ -743,7 +737,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
               })}
             </g>
             
-            {/* Draw nodes */}
             <g>
               {adjustedNodes.map((node) => {
                 const isSelected = selectedNode === node.id;
@@ -760,7 +753,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                     onMouseLeave={() => setHoveredNode(null)}
                     style={{ cursor: 'pointer' }}
                   >
-                    {/* Node circle */}
                     <circle
                       cx="0"
                       cy="0"
@@ -770,7 +762,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                       className={getNodeBorderColor(node.type, isSelected)}
                     />
                     
-                    {/* Node label */}
                     <text
                       x="0"
                       y="3"
@@ -782,7 +773,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                       {node.label}
                     </text>
                     
-                    {/* Expansion indicator */}
                     {expandable && (
                       <g transform={`translate(0, ${node.radius * 0.6})`}>
                         <circle
@@ -805,7 +795,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
           </svg>
         )}
         
-        {/* Details panel */}
         {detailsPanel.visible && detailsPanel.node && (
           <div className="absolute top-0 right-0 bottom-0 w-full md:w-[300px] bg-card border-l overflow-y-auto p-4 dark:border-gray-800 shadow-md">
             <div className="space-y-4">
