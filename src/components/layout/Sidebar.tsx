@@ -7,13 +7,13 @@ import {
   GitBranch, 
   SearchX, 
   Shield, 
+  Share2, 
   CheckCheck, 
   Siren, 
   Settings, 
   TestTube, 
   Presentation, 
-  BookText, 
-  Share2
+  BookText
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from '@/components/ui/badge';
@@ -106,19 +106,19 @@ const Sidebar: React.FC = () => {
   return (
     <aside 
       className={cn(
-        "fixed inset-y-0 left-0 z-30 flex flex-col border-r transition-all duration-300 ease-in-out animate-fade-in bg-sidebar",
-        isOpen ? "w-60" : "w-0 -translate-x-full sm:translate-x-0 sm:w-16"
+        "fixed inset-y-0 left-0 z-30 flex flex-col border-r shadow-lg transition-all duration-300 ease-in-out animate-fade-in bg-sidebar",
+        isOpen ? "w-64" : "w-0 -translate-x-full sm:translate-x-0 sm:w-16"
       )}
     >
       <div className="flex flex-col h-full overflow-y-auto">
-        <div className="h-16 flex items-center px-4 border-b">
+        <div className="h-16 flex items-center justify-center px-4 border-b bg-sidebar">
           {isOpen && (
-            <div className="text-lg font-semibold">
+            <div className="text-lg font-semibold text-primary">
               IRMAI
             </div>
           )}
         </div>
-        <nav className="flex-1 p-2 space-y-1">
+        <nav className="flex-1 p-3 space-y-2 overflow-y-auto">
           {mainMenuItems.map((item) => (
             <TooltipProvider key={item.id}>
               <Tooltip delayDuration={isOpen ? 1000 : 0}>
@@ -126,24 +126,24 @@ const Sidebar: React.FC = () => {
                   <a
                     href={item.href}
                     className={cn(
-                      "flex items-center p-2 rounded-md text-sm group transition-all",
+                      "flex items-center px-3 py-2.5 rounded-lg text-sm group transition-all hover:bg-sidebar-accent/50",
                       item.active 
                         ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
-                        : "hover:bg-sidebar-accent/50 text-sidebar-foreground",
+                        : "text-sidebar-foreground",
                       item.comingSoon && "opacity-60"
                     )}
                   >
                     <item.icon className={cn(
-                      "h-5 w-5 mr-3 flex-shrink-0",
-                      isOpen ? "" : "mx-auto"
+                      "h-5 w-5 flex-shrink-0",
+                      isOpen ? "mr-3" : "mx-auto"
                     )} />
                     {isOpen && (
-                      <div className="flex items-center justify-between w-full">
-                        <span className="truncate">{item.label}</span>
+                      <div className="flex items-center justify-between w-full min-w-0">
+                        <span className="truncate mr-2">{item.label}</span>
                         {item.comingSoon && (
                           <Badge 
                             variant="outline" 
-                            className="text-[10px] py-0 px-1.5 ml-1 whitespace-nowrap"
+                            className="text-[10px] py-0.5 px-1.5 whitespace-nowrap bg-secondary/10"
                           >
                             Coming Soon
                           </Badge>
@@ -169,8 +169,8 @@ const Sidebar: React.FC = () => {
             </TooltipProvider>
           ))}
         </nav>
-        <div className="p-2 border-t">
-          <div className="text-xs text-center text-muted-foreground p-2">
+        <div className="p-3 border-t">
+          <div className="text-xs text-center text-muted-foreground py-2">
             {isOpen ? 'IRMAI v1.0.0' : 'v1'}
           </div>
         </div>
