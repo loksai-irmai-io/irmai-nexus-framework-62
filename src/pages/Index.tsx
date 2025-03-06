@@ -479,9 +479,8 @@ const Index = () => {
               <KnowledgeGraph className="w-full h-full" />
             </div>
           </div>
-          <p className="text-sm text-muted-foreground mt-2 italic flex justify-between items-center">
+          <p className="text-sm text-muted-foreground mt-2 italic">
             <span>This is your central data hub – all insights and interdependencies are sourced here.</span>
-            <span className="text-xs text-primary/70 hidden sm:inline">Click, drag and zoom to explore the digital twin</span>
           </p>
         </div>
         
