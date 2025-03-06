@@ -1,4 +1,4 @@
-<lov-code>
+
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -726,4 +726,133 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                 
                 if (!source || !target) return null;
                 
-                const isRelated =
+                const isRelated = isEdgeRelated(edge);
+                
+                return (
+                  <g key={edge.id}>
+                    <path
+                      d={getEdgePath(source, target)}
+                      stroke={isRelated ? '#94a3b8' : '#e2e8f0'}
+                      strokeWidth={isRelated ? 1.5 : 1}
+                      fill="none"
+                      opacity={isRelated ? 0.6 : 0.3}
+                      markerEnd="url(#arrowhead)"
+                    />
+                  </g>
+                );
+              })}
+            </g>
+            
+            {/* Draw nodes */}
+            <g>
+              {adjustedNodes.map((node) => {
+                const isSelected = selectedNode === node.id;
+                const isHovered = hoveredNode === node.id;
+                const expandable = node.level === 'main' || node.level === 'category';
+                const expanded = isNodeExpanded(node.id);
+                
+                return (
+                  <g 
+                    key={node.id}
+                    transform={`translate(${node.x},${node.y})`}
+                    onClick={() => handleNodeClick(node.id)}
+                    onMouseEnter={() => setHoveredNode(node.id)}
+                    onMouseLeave={() => setHoveredNode(null)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {/* Node circle */}
+                    <circle
+                      cx="0"
+                      cy="0"
+                      r={node.radius}
+                      className={getNodeColor(node.type, isSelected, isHovered)}
+                      strokeWidth={isSelected ? 3 : 1.5}
+                      className={getNodeBorderColor(node.type, isSelected)}
+                    />
+                    
+                    {/* Node label */}
+                    <text
+                      x="0"
+                      y="3"
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      className={getNodeTextColor(node.type)}
+                      fontSize={node.level === 'main' ? 14 : 12}
+                    >
+                      {node.label}
+                    </text>
+                    
+                    {/* Expansion indicator */}
+                    {expandable && (
+                      <g transform={`translate(0, ${node.radius * 0.6})`}>
+                        <circle
+                          cx="0"
+                          cy="0"
+                          r={node.radius * 0.2}
+                          className={`fill-white/80 stroke-current ${getNodeBorderColor(node.type, false)}`}
+                        />
+                        {expanded ? (
+                          <Minus className="h-2 w-2 stroke-current text-gray-700" />
+                        ) : (
+                          <Plus className="h-2 w-2 stroke-current text-gray-700" />
+                        )}
+                      </g>
+                    )}
+                  </g>
+                );
+              })}
+            </g>
+          </svg>
+        )}
+        
+        {/* Details panel */}
+        {detailsPanel.visible && detailsPanel.node && (
+          <div className="absolute top-0 right-0 bottom-0 w-full md:w-[300px] bg-card border-l overflow-y-auto p-4 dark:border-gray-800 shadow-md">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <Badge className={getBadgeStyle(detailsPanel.node.type)}>
+                  {detailsPanel.node.type.charAt(0).toUpperCase() + detailsPanel.node.type.slice(1)}
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setDetailsPanel({ node: null, visible: false })}
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              <h3 className="text-xl font-semibold">{detailsPanel.node.label}</h3>
+              
+              {detailsPanel.node.module && (
+                <div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+                  Module: {detailsPanel.node.module.replace('-', ' ')}
+                </div>
+              )}
+              
+              {detailsPanel.node.details && (
+                <p className="text-sm text-muted-foreground">
+                  {detailsPanel.node.details}
+                </p>
+              )}
+              
+              <div className="pt-4">
+                <Button 
+                  className="w-full"
+                  onClick={() => {
+                    toast.info(`Navigating to ${detailsPanel.node?.label}...`);
+                    setDetailsPanel({ node: null, visible: false });
+                  }}
+                >
+                  View Details
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default KnowledgeGraph;
