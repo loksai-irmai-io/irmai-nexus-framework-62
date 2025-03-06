@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -344,16 +345,6 @@ const Index = () => {
           />
         </RibbonNav>
         
-        <div className="mb-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
-          <h2 className="text-2xl font-semibold tracking-tight mb-4">Digital Twin Overview</h2>
-          <div className="p-1 border border-primary/20 rounded-lg bg-primary/5">
-            <KnowledgeGraph className="h-[400px] rounded-lg" />
-          </div>
-          <p className="text-sm text-muted-foreground mt-2 italic">
-            This is your central data hub – all insights and interdependencies are sourced here.
-          </p>
-        </div>
-        
         <div className="mb-6 animate-fade-in" style={{ animationDelay: '300ms' }}>
           <Chart 
             title="Loss Events Over Time"
@@ -488,6 +479,18 @@ const Index = () => {
           {placeholderModuleData.map(module => (
             <ModuleSummary key={module.id} data={module} isLoading={loading} />
           ))}
+        </div>
+        
+        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '1200ms' }}>
+          Digital Twin Overview
+        </h2>
+        <div className="mb-6 animate-fade-in" style={{ animationDelay: '1300ms' }}>
+          <div className="p-1 border border-primary/20 rounded-lg bg-primary/5">
+            <KnowledgeGraph className="h-[400px] rounded-lg" />
+          </div>
+          <p className="text-sm text-muted-foreground mt-2 italic">
+            This is your central data hub – all insights and interdependencies are sourced here.
+          </p>
         </div>
       </div>
     </Layout>
