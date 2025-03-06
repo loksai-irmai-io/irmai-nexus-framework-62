@@ -396,7 +396,7 @@ const Index = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
+        <div className="mb-6 animate-fade-in" style={{ animationDelay: '300ms' }}>
           <Chart 
             title="Loss Events Over Time"
             description="Trend of financial impact and event count by month"
@@ -410,19 +410,6 @@ const Index = () => {
             height={300}
             tooltip="Click on any month to see detailed incident reports for that period"
             onClick={handleLossEventClick}
-          />
-          
-          <Chart 
-            title="Risk Distribution by Category"
-            description="Breakdown of risks by category or business unit"
-            data={riskDistributionData}
-            series={[{ name: 'Percentage', dataKey: 'value', color: '#0ea5e9' }]}
-            type="pie"
-            showPercentages={true}
-            showLegend={true}
-            height={300}
-            tooltip="Click on any category to see detailed risk analysis for that segment"
-            onClick={handleRiskCategoryClick}
           />
         </div>
         
