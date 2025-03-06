@@ -821,9 +821,13 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                 cx={node.x}
                 cy={node.y}
                 r={node.radius}
-                className={`${getNodeColor(node.type, isSelected)} ${isSelected ? 'opacity-90' : 'opacity-80'} ${isHovered ? 'opacity-100' : ''}`}
+                className={cn(
+                  getNodeColor(node.type, isSelected),
+                  getNodeBorderColor(node.type, isSelected),
+                  isSelected ? 'opacity-90' : 'opacity-80',
+                  isHovered && 'opacity-100'
+                )}
                 strokeWidth={isSelected ? 2 : 1}
-                className={getNodeBorderColor(node.type, isSelected)}
               />
               
               {/* Node Text */}
