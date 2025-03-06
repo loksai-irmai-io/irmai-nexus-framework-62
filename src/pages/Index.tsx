@@ -65,7 +65,7 @@ const moduleSummaryData = [
       'Payment processing has 3 bottlenecks identified',
       'Customer onboarding has 2 automation opportunities'
     ],
-    status: 'info',
+    status: 'info' as const,
     actionText: 'View Process Discovery',
     actionHref: '/process-discovery',
   },
@@ -84,7 +84,7 @@ const moduleSummaryData = [
       '5 new anomalies detected in the payment process',
       'Loan approval has unusual timestamp patterns'
     ],
-    status: 'warning',
+    status: 'warning' as const,
     actionText: 'View Outlier Analysis',
     actionHref: '/outlier-analysis',
   },
@@ -103,7 +103,7 @@ const moduleSummaryData = [
       'Payment fraud risk increased by 12% this month',
       'Data privacy risks require immediate attention'
     ],
-    status: 'error',
+    status: 'error' as const,
     actionText: 'View Risk Analytics',
     actionHref: '/fmea-analysis',
   },
@@ -122,7 +122,7 @@ const moduleSummaryData = [
       'GDPR compliance score improved by 5% this quarter',
       'PCI-DSS has 2 new gaps requiring immediate action'
     ],
-    status: 'warning',
+    status: 'warning' as const,
     actionText: 'View Compliance Monitoring',
     actionHref: '/compliance-monitoring',
   }
@@ -141,7 +141,7 @@ const placeholderModuleData = [
       { label: 'Passing', value: '-' },
       { label: 'Failing', value: '-' },
     ],
-    status: 'info',
+    status: 'info' as const,
     actionText: 'Module Coming Soon',
     actionHref: '#',
   },
@@ -156,7 +156,7 @@ const placeholderModuleData = [
       { label: 'Coverage', value: '-' },
       { label: 'Avg. Loss', value: '-' },
     ],
-    status: 'info',
+    status: 'info' as const,
     actionText: 'Module Coming Soon',
     actionHref: '#',
   }

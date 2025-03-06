@@ -17,6 +17,13 @@ export type ChartDataSeries = {
   dataKey: string;
 };
 
+// Define the types for click event handlers
+type CurveProps = {
+  payload?: ChartData;
+  name?: string;
+  value?: number;
+};
+
 type ChartProps = {
   title: string;
   description?: string;
@@ -96,6 +103,17 @@ const Chart: React.FC<ChartProps> = ({
     }
   };
   
+  // Safely handle click events by extracting the correct data
+  const handleDataClick = (data: any) => {
+    if (!onClick) return;
+    
+    // Extract the payload data which contains the actual chart data point
+    const payload = data.payload || data;
+    if (payload && typeof payload === 'object') {
+      onClick(payload as ChartData);
+    }
+  };
+  
   const renderChart = () => {
     if (isLoading) {
       return (
@@ -133,7 +151,7 @@ const Chart: React.FC<ChartProps> = ({
                   fill={item.color || COLORS[index % COLORS.length]}
                   radius={[4, 4, 0, 0]}
                   stackId={stacked ? "stack" : undefined}
-                  onClick={onClick ? (data) => onClick(data) : undefined}
+                  onClick={onClick ? handleDataClick : undefined}
                   cursor={onClick ? "pointer" : undefined}
                 />
               ))}
@@ -170,7 +188,7 @@ const Chart: React.FC<ChartProps> = ({
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   activeDot={{ r: 5 }}
-                  onClick={onClick ? (data) => onClick(data) : undefined}
+                  onClick={onClick ? handleDataClick : undefined}
                   cursor={onClick ? "pointer" : undefined}
                 />
               ))}
@@ -193,7 +211,7 @@ const Chart: React.FC<ChartProps> = ({
                 nameKey={xAxisKey}
                 label={({ name, percent }) => showPercentages ? `${name}: ${(percent * 100).toFixed(0)}%` : name}
                 labelLine={false}
-                onClick={onClick ? (data) => onClick(data) : undefined}
+                onClick={onClick ? handleDataClick : undefined}
                 cursor={onClick ? "pointer" : undefined}
               >
                 {activeData.map((entry, index) => (
@@ -204,7 +222,17 @@ const Chart: React.FC<ChartProps> = ({
                 ))}
               </Pie>
               <RechartsTooltip 
-                formatter={(value, name) => showPercentages ? [`${value} (${((value / activeData.reduce((acc, curr) => acc + Number(curr[series[0].dataKey]), 0)) * 100).toFixed(0)}%)`, name] : [value, name]}
+                formatter={(value: any, name: any) => {
+                  const total = activeData.reduce((acc: number, curr: any) => {
+                    const val = Number(curr[series[0].dataKey]);
+                    return acc + (isNaN(val) ? 0 : val);
+                  }, 0);
+                  
+                  const percentage = total > 0 ? (Number(value) / total) * 100 : 0;
+                  return showPercentages 
+                    ? [`${value} (${percentage.toFixed(0)}%)`, name] 
+                    : [value, name];
+                }}
               />
               {showLegend && (
                 <Legend 
@@ -247,7 +275,7 @@ const Chart: React.FC<ChartProps> = ({
                   fill={item.color || COLORS[index % COLORS.length]}
                   fillOpacity={0.2}
                   stackId={stacked ? "stack" : undefined}
-                  onClick={onClick ? (data) => onClick(data) : undefined}
+                  onClick={onClick ? handleDataClick : undefined}
                   cursor={onClick ? "pointer" : undefined}
                 />
               ))}
@@ -284,22 +312,22 @@ const Chart: React.FC<ChartProps> = ({
                       fill={item.color || COLORS[index % COLORS.length]}
                       radius={[4, 4, 0, 0]}
                       stackId={stacked ? "stack" : undefined}
-                      onClick={onClick ? (data) => onClick(data) : undefined}
+                      onClick={onClick ? handleDataClick : undefined}
                       cursor={onClick ? "pointer" : undefined}
                     />
                   );
                 } else {
                   return (
                     <Line 
-                      key={index}
                       type="monotone"
+                      key={index}
                       dataKey={item.dataKey}
                       name={item.name}
                       stroke={item.color || COLORS[index % COLORS.length]}
                       strokeWidth={2}
                       dot={{ r: 3 }}
                       activeDot={{ r: 5 }}
-                      onClick={onClick ? (data) => onClick(data) : undefined}
+                      onClick={onClick ? handleDataClick : undefined}
                       cursor={onClick ? "pointer" : undefined}
                     />
                   );
