@@ -123,14 +123,14 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
               ))}
             </div>
             
-            <div className="flex-1 min-h-[180px]">
+            <div className="flex-1 min-h-[240px]">
               <Chart 
                 title={data.title + " Chart"}
                 data={data.chartData}
                 series={data.chartSeries}
                 type={data.chartType}
                 xAxisKey={data.xAxisKey}
-                height={data.chartHeight || 180}
+                height={data.chartHeight || 220}
                 showPercentages={data.chartType === 'pie'}
               />
             </div>

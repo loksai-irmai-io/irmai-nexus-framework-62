@@ -197,13 +197,16 @@ const Chart: React.FC<ChartProps> = ({
         );
         
       case 'pie':
+        // For pie charts, increase the height and adjust margins
+        const pieHeight = height >= 300 ? height : Math.max(300, height + 50);
+        
         return (
-          <ResponsiveContainer width="100%" height={height}>
-            <PieChart margin={{ top: 20, right: 20, bottom: 30, left: 20 }}>
+          <ResponsiveContainer width="100%" height={pieHeight}>
+            <PieChart margin={{ top: 30, right: 30, bottom: 50, left: 30 }}>
               <Pie
                 data={activeData}
                 cx="50%"
-                cy="45%"
+                cy="40%"
                 innerRadius={60}
                 outerRadius={90}
                 paddingAngle={2}
@@ -241,8 +244,11 @@ const Chart: React.FC<ChartProps> = ({
                   align="center"
                   wrapperStyle={{ 
                     fontSize: '12px', 
-                    paddingTop: '15px',
-                    bottom: 0
+                    paddingTop: '20px',
+                    bottom: 0,
+                    width: '90%',
+                    marginLeft: 'auto',
+                    marginRight: 'auto'
                   }}
                 />
               )}
