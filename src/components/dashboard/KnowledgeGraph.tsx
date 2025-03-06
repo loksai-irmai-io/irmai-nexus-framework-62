@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { Info, Plus, Minus, Filter, Move, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { Info, Minus, Filter, Move, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,16 +40,16 @@ interface KnowledgeGraphProps {
 // Main sample data
 const generateMainNodes = (): GraphNode[] => {
   return [
-    { id: 'bank', label: 'IRMAI Bank', type: 'product', level: 'main', x: 400, y: 250, radius: 70, expansionState: 'collapsed' },
+    { id: 'bank', label: 'IRMAI Bank', type: 'product', level: 'main', x: 400, y: 250, radius: 50, expansionState: 'collapsed' },
   ];
 };
 
 // Category level nodes - these appear when a main node is clicked
 const generateCategoryNodes = (): GraphNode[] => {
   return [
-    { id: 'processes', label: 'Processes', type: 'process', level: 'category', x: 250, y: 150, radius: 55, parent: 'bank', children: ['onboarding', 'kyc', 'payment'], expansionState: 'collapsed' },
-    { id: 'risks', label: 'Risks', type: 'risk', level: 'category', x: 400, y: 120, radius: 55, parent: 'bank', children: ['fraud', 'compliance', 'operational'], expansionState: 'collapsed' },
-    { id: 'controls', label: 'Controls', type: 'control', level: 'category', x: 550, y: 150, radius: 55, parent: 'bank', children: ['authcontrol', 'monitoring', 'test1'], expansionState: 'collapsed' },
+    { id: 'processes', label: 'Processes', type: 'process', level: 'category', x: 250, y: 150, radius: 40, parent: 'bank', children: ['onboarding', 'kyc', 'payment'], expansionState: 'collapsed' },
+    { id: 'risks', label: 'Risks', type: 'risk', level: 'category', x: 400, y: 120, radius: 40, parent: 'bank', children: ['fraud', 'compliance', 'operational'], expansionState: 'collapsed' },
+    { id: 'controls', label: 'Controls', type: 'control', level: 'category', x: 550, y: 150, radius: 40, parent: 'bank', children: ['authcontrol', 'monitoring', 'test1'], expansionState: 'collapsed' },
   ];
 };
 
@@ -57,19 +57,19 @@ const generateCategoryNodes = (): GraphNode[] => {
 const generateDetailNodes = (): GraphNode[] => {
   return [
     // Process nodes
-    { id: 'onboarding', label: 'Customer Onboarding', type: 'process', level: 'detail', x: 200, y: 280, radius: 45, parent: 'processes', module: 'process-discovery', details: 'Customer onboarding process includes KYC verification, document collection, and account setup.' },
-    { id: 'kyc', label: 'KYC', type: 'process', level: 'detail', x: 150, y: 350, radius: 35, parent: 'processes', module: 'process-discovery', details: 'Know Your Customer verification ensures proper customer identification and risk assessment.' },
-    { id: 'payment', label: 'Payment Processing', type: 'process', level: 'detail', x: 600, y: 280, radius: 45, parent: 'processes', module: 'process-discovery', details: 'Payment processing handles transactions, fraud detection, and settlement activities.' },
+    { id: 'onboarding', label: 'Customer Onboarding', type: 'process', level: 'detail', x: 200, y: 280, radius: 35, parent: 'processes', module: 'process-discovery', details: 'Customer onboarding process includes KYC verification, document collection, and account setup.' },
+    { id: 'kyc', label: 'KYC', type: 'process', level: 'detail', x: 150, y: 350, radius: 30, parent: 'processes', module: 'process-discovery', details: 'Know Your Customer verification ensures proper customer identification and risk assessment.' },
+    { id: 'payment', label: 'Payment Processing', type: 'process', level: 'detail', x: 600, y: 280, radius: 35, parent: 'processes', module: 'process-discovery', details: 'Payment processing handles transactions, fraud detection, and settlement activities.' },
     
     // Risk nodes
-    { id: 'fraud', label: 'Fraud Risk', type: 'risk', level: 'detail', x: 300, y: 380, radius: 40, parent: 'risks', module: 'fmea-analysis', details: 'Risk of financial fraud including identity theft, transaction fraud, and account takeover.' },
-    { id: 'compliance', label: 'Compliance Risk', type: 'risk', level: 'detail', x: 500, y: 380, radius: 42, parent: 'risks', module: 'fmea-analysis', details: 'Risk of non-compliance with regulatory requirements including PCI-DSS, GDPR, and AML regulations.' },
-    { id: 'operational', label: 'Operational Risk', type: 'risk', level: 'detail', x: 400, y: 330, radius: 42, parent: 'risks', module: 'fmea-analysis', details: 'Risk of losses due to inadequate or failed internal processes, people, and systems.' },
+    { id: 'fraud', label: 'Fraud Risk', type: 'risk', level: 'detail', x: 300, y: 380, radius: 30, parent: 'risks', module: 'fmea-analysis', details: 'Risk of financial fraud including identity theft, transaction fraud, and account takeover.' },
+    { id: 'compliance', label: 'Compliance Risk', type: 'risk', level: 'detail', x: 500, y: 380, radius: 32, parent: 'risks', module: 'fmea-analysis', details: 'Risk of non-compliance with regulatory requirements including PCI-DSS, GDPR, and AML regulations.' },
+    { id: 'operational', label: 'Operational Risk', type: 'risk', level: 'detail', x: 400, y: 330, radius: 32, parent: 'risks', module: 'fmea-analysis', details: 'Risk of losses due to inadequate or failed internal processes, people, and systems.' },
     
     // Control nodes
-    { id: 'authcontrol', label: 'Auth Controls', type: 'control', level: 'detail', x: 350, y: 450, radius: 40, parent: 'controls', module: 'compliance-monitoring', details: 'Authentication controls include multi-factor authentication, password policies, and access management.' },
-    { id: 'monitoring', label: 'Transaction Monitoring', type: 'control', level: 'detail', x: 450, y: 450, radius: 45, parent: 'controls', module: 'compliance-monitoring', details: 'Continuous monitoring of transactions to detect suspicious activities and prevent fraud.' },
-    { id: 'test1', label: 'Control Tests', type: 'testing', level: 'detail', x: 175, y: 450, radius: 40, parent: 'controls', module: 'controls-testing', details: 'Regular testing of controls to ensure their effectiveness and identify potential gaps.' },
+    { id: 'authcontrol', label: 'Auth Controls', type: 'control', level: 'detail', x: 350, y: 450, radius: 30, parent: 'controls', module: 'compliance-monitoring', details: 'Authentication controls include multi-factor authentication, password policies, and access management.' },
+    { id: 'monitoring', label: 'Transaction Monitoring', type: 'control', level: 'detail', x: 450, y: 450, radius: 35, parent: 'controls', module: 'compliance-monitoring', details: 'Continuous monitoring of transactions to detect suspicious activities and prevent fraud.' },
+    { id: 'test1', label: 'Control Tests', type: 'testing', level: 'detail', x: 175, y: 450, radius: 30, parent: 'controls', module: 'controls-testing', details: 'Regular testing of controls to ensure their effectiveness and identify potential gaps.' },
   ];
 };
 
@@ -167,7 +167,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     return [...allNodes.main, ...allNodes.category, ...allNodes.detail].find(n => n.id === id);
   };
 
-  // Improved node position calculation for hierarchical layout
+  // Improved node position calculation for hierarchical layout with smaller sizes
   const adjustNodePositions = (nodes: GraphNode[], zoomFactor: number = 1) => {
     const center = { 
       x: dimensions.width / 2, 
@@ -224,7 +224,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
             
             position = {
               x: horizontalPosition,
-              y: parentPosition.y + 150 // Increased vertical distance from parent
+              y: parentPosition.y + 130 // Reduced vertical distance from parent
             };
           } 
           // For detail nodes, arrange in groups under their categories
@@ -242,12 +242,12 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
             const col = nodeIndex % columns;
             
             // Determine spacing based on container size and node count
-            const horizontalSpacing = Math.min(140, dimensions.width / (columns * 1.5));
-            const verticalSpacing = Math.min(140, dimensions.height / 8);
+            const horizontalSpacing = Math.min(120, dimensions.width / (columns * 1.5));
+            const verticalSpacing = Math.min(120, dimensions.height / 8);
             
             position = {
               x: parentX + (col - Math.floor(columns/2)) * horizontalSpacing,
-              y: parentPosition.y + 150 + (row * verticalSpacing) // Increased vertical spacing
+              y: parentPosition.y + 130 + (row * verticalSpacing) // Reduced vertical spacing
             };
           }
         }
@@ -260,25 +260,25 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       return position;
     };
     
-    // Function to adjust a node's position and properties
+    // Function to adjust a node's position and properties with reduced sizes
     const adjustPosition = (node: GraphNode, parentPosition?: {x: number, y: number}) => {
       const calculatedPosition = calculatePosition(node, parentPosition);
       
-      // Scale radius based on container size, node level, and label length
-      let radiusMultiplier = Math.min(dimensions.width, dimensions.height) / 800;
+      // Scale radius based on container size, node level, and label length but with reduced sizes
+      let radiusMultiplier = Math.min(dimensions.width, dimensions.height) / 1000; // Reduced base scale
       
       // Adjust radius based on node level
-      if (node.level === 'main') radiusMultiplier *= 1.5;
-      else if (node.level === 'category') radiusMultiplier *= 1.3;
-      else radiusMultiplier *= 1.2;
+      if (node.level === 'main') radiusMultiplier *= 1.3;
+      else if (node.level === 'category') radiusMultiplier *= 1.1;
+      else radiusMultiplier *= 1.0;
       
       // Also adjust based on label length - longer labels get bigger circles
-      const labelLengthFactor = Math.min(2.0, Math.max(1.2, node.label.length / 8));
+      const labelLengthFactor = Math.min(1.8, Math.max(1.0, node.label.length / 10));
       
-      // Apply zoom factor to radius but not to position
+      // Apply zoom factor to radius but not to position with smaller base size
       const scaledRadius = node.radius * radiusMultiplier * labelLengthFactor * 
-                          (isZoomed ? 1.3 : 1.1) * 
-                          Math.max(1, Math.min(dimensions.width, dimensions.height) / 600);
+                          (isZoomed ? 1.2 : 1.0) * 
+                          Math.max(1, Math.min(dimensions.width, dimensions.height) / 700);
       
       return {
         ...node,
@@ -614,7 +614,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       testing: 'stroke-cyan-800',
     };
     
-    const strokeWidth = isSelected ? 'stroke-[3px]' : 'stroke-[1.5px]';
+    const strokeWidth = isSelected ? 'stroke-[2px]' : 'stroke-[1px]';
     
     return `${baseColorMap[type]} ${strokeWidth}`;
   };
@@ -667,8 +667,8 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
   // Get edge style based on connected nodes
   const getEdgeStyle = (edge: GraphEdge, isHovered: boolean) => {
     // Default styles
-    let strokeWidth = "1.5";
-    let opacity = "0.6";
+    let strokeWidth = "1";
+    let opacity = "0.5";
     let dashArray = "";
     
     // Enhance edge visibility
@@ -678,8 +678,8 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     
     // If connected to expanded nodes, make the edge more visible
     if (isSourceExpanded || isTargetExpanded) {
-      strokeWidth = "2";
-      opacity = "0.9";
+      strokeWidth = "1.5";
+      opacity = "0.7";
     }
     
     // If edge connects nodes on different levels, use solid line
@@ -688,13 +688,13 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     const targetNode = findNodeById(edge.target);
     
     if (sourceNode && targetNode && sourceNode.level === targetNode.level) {
-      dashArray = "5,5";
+      dashArray = "4,4";
     }
     
     // If the edge is hovered or connects to selected node, make it stand out
     if (isHovered || edge.source === selectedNode || edge.target === selectedNode) {
-      strokeWidth = "2.5";
-      opacity = "1";
+      strokeWidth = "2";
+      opacity = "0.9";
       dashArray = "";
     }
     
@@ -719,3 +719,301 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       issue: 'bg-pink-600',
       testing: 'bg-cyan-600',
     };
+    
+    return styles[type];
+  };
+  
+  // Calculate node text size based on node radius
+  const getNodeTextSize = (radius: number) => {
+    // Scale font size based on node radius, but keep within readable limits
+    const fontSize = Math.max(8, Math.min(14, radius / 4));
+    return `${fontSize}px`;
+  };
+  
+  // Format the node label to handle long text
+  const formatNodeLabel = (label: string, radius: number) => {
+    // For very small nodes, abbreviate the label
+    if (radius < 20) {
+      return label.length > 3 ? `${label.substring(0, 3)}...` : label;
+    }
+    
+    // For medium nodes, show more characters
+    if (radius < 30) {
+      return label.length > 8 ? `${label.substring(0, 8)}...` : label;
+    }
+    
+    // For larger nodes, show most of the label
+    if (radius < 40) {
+      return label.length > 15 ? `${label.substring(0, 15)}...` : label;
+    }
+    
+    // For very large nodes, show the full label or nearly full
+    return label.length > 30 ? `${label.substring(0, 30)}...` : label;
+  };
+  
+  // Position nodes with adjusted positions and sizes
+  const adjustedNodes = adjustNodePositions(visibleNodes);
+  
+  // If loading, show a skeleton loading state
+  if (isLoading) {
+    return (
+      <div className={cn("relative w-full h-full", className)} ref={containerRef}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="animate-pulse flex flex-col items-center">
+            <div className="h-20 w-20 bg-gray-200 dark:bg-gray-800 rounded-full mb-4"></div>
+            <div className="h-2 w-24 bg-gray-200 dark:bg-gray-800 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className={cn("relative w-full h-full", className)} ref={containerRef}>
+      {/* SVG Graph */}
+      <svg 
+        ref={svgRef}
+        width={dimensions.width} 
+        height={dimensions.height}
+        className="overflow-visible"
+        onClick={() => setSelectedNode(null)}
+      >
+        {/* Edges */}
+        {visibleEdges.map(edge => {
+          const source = adjustedNodes.find(n => n.id === edge.source);
+          const target = adjustedNodes.find(n => n.id === edge.target);
+          
+          if (!source || !target) return null;
+          
+          const isHovered = hoveredNode === source.id || hoveredNode === target.id;
+          const { strokeWidth, opacity, strokeDasharray } = getEdgeStyle(edge, isHovered);
+          
+          return (
+            <g key={edge.id}>
+              <path
+                d={getEdgePath(source, target)}
+                fill="none"
+                stroke="#888"
+                strokeWidth={strokeWidth}
+                opacity={opacity}
+                strokeDasharray={strokeDasharray}
+              />
+            </g>
+          );
+        })}
+        
+        {/* Nodes */}
+        {adjustedNodes.map(node => {
+          const isSelected = selectedNode === node.id;
+          const isHovered = hoveredNode === node.id;
+          const isExpanded = isNodeExpanded(node.id);
+          
+          return (
+            <g 
+              key={node.id}
+              onClick={e => handleNodeClick(node.id, e)}
+              onMouseEnter={e => handleNodeHover(node.id, e)}
+              onMouseLeave={e => handleNodeHover(null, e)}
+              style={{ cursor: 'pointer' }}
+            >
+              {/* Node Circle */}
+              <circle
+                cx={node.x}
+                cy={node.y}
+                r={node.radius}
+                className={`${getNodeColor(node.type, isSelected)} opacity-80 ${isSelected ? 'opacity-90' : ''} ${isHovered ? 'opacity-100' : ''}`}
+                className={getNodeColor(node.type, isSelected)}
+                strokeWidth={isSelected ? 2 : 1}
+                className={getNodeBorderColor(node.type, isSelected)}
+              />
+              
+              {/* Node Text */}
+              <text
+                x={node.x}
+                y={node.y}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className={getNodeTextColor(node.type)}
+                style={{ fontSize: getNodeTextSize(node.radius) }}
+              >
+                {formatNodeLabel(node.label, node.radius)}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+      
+      {/* Info Panel - shows when a node is selected */}
+      {detailsPanel.visible && detailsPanel.node && (
+        <div className="absolute bottom-4 right-4 w-72 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700">
+          <div className="flex justify-between items-start mb-2">
+            <div className="flex items-center">
+              <Badge className={getBadgeStyle(detailsPanel.node.type)}>
+                {detailsPanel.node.type}
+              </Badge>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="h-6 w-6 ml-auto"
+                onClick={() => setDetailsPanel({node: null, visible: false})}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          
+          <h3 className="text-base font-semibold mb-1">{detailsPanel.node.label}</h3>
+          
+          {detailsPanel.node.details && (
+            <p className="text-sm text-muted-foreground mb-2">{detailsPanel.node.details}</p>
+          )}
+          
+          {detailsPanel.node.module && (
+            <div className="mt-2">
+              <Badge variant="outline" className="text-xs">
+                {detailsPanel.node.module.replace('-', ' ')}
+              </Badge>
+            </div>
+          )}
+          
+          <Button 
+            size="sm" 
+            className="w-full mt-3"
+            onClick={() => {
+              toast.info(`Navigating to ${detailsPanel.node!.label}...`);
+              setDetailsPanel({node: null, visible: false});
+            }}
+          >
+            View Details
+          </Button>
+        </div>
+      )}
+      
+      {/* Controls */}
+      <div className="absolute top-2 left-2 flex flex-col gap-1">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="icon"
+                className="h-8 w-8 bg-background"
+                onClick={handleReset}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                </svg>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>Reset View</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
+        {parentHistory.length > 0 && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  className="h-8 w-8 bg-background"
+                  onClick={handleBack}
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <p>Go Back</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+        
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="icon"
+                className={cn("h-8 w-8 bg-background", isZoomed && "border-primary")}
+                onClick={handleZoomToggle}
+              >
+                {isZoomed ? (
+                  <Minus className="h-4 w-4" />
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>{isZoomed ? "Zoom Out" : "Zoom In"}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="icon"
+                className="h-8 w-8 bg-background"
+                onClick={() => {
+                  // Show help tooltip
+                  toast.info("Click on nodes to expand/collapse categories and view details.");
+                }}
+              >
+                <Info className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>Help</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+      
+      {/* Type Filter */}
+      <div className="absolute top-2 right-2">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="icon"
+                className={cn("h-8 w-8 bg-background", activeFilter && "border-primary")}
+              >
+                <Filter className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="left" align="end" alignOffset={-40}>
+              <div className="flex flex-col gap-1 min-w-[150px]">
+                <p className="text-xs font-medium mb-1">Filter by Type</p>
+                {(['process', 'risk', 'control', 'incident', 'policy'] as NodeType[]).map((type) => (
+                  <Badge 
+                    key={type}
+                    className={cn(
+                      "cursor-pointer justify-start mb-1",
+                      getBadgeStyle(type),
+                      activeFilter === type ? "opacity-100" : "opacity-70"
+                    )}
+                    onClick={() => handleFilterByType(type)}
+                  >
+                    {type}
+                  </Badge>
+                ))}
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    </div>
+  );
+};
+
+export default KnowledgeGraph;
