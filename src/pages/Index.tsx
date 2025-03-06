@@ -450,7 +450,7 @@ const Index = () => {
             showPercentages={true}
             height={300}
             tooltip="Current health status of control mechanisms"
-            onClick={(data) => handleNavigate('controls-testing', { status: data.name.toLowerCase() })}
+            onClick={(data) => handleNavigate('controls-testing', { status: String(data.name).toLowerCase() })}
           />
           <div className="bg-card rounded-lg border shadow-sm p-4">
             <h3 className="font-semibold mb-3">Announcements & Tips</h3>
