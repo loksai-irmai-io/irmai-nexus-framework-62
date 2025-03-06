@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import KnowledgeGraph from '@/components/dashboard/KnowledgeGraph';
 import MetricCard from '@/components/dashboard/MetricCard';
-import InfoWidget from '@/components/dashboard/InfoWidget';
+import InfoWidget, { InfoWidgetData } from '@/components/dashboard/InfoWidget';
 import Chart from '@/components/dashboard/Chart';
 import RibbonNav from '@/components/dashboard/RibbonNav';
 import { 
@@ -122,8 +122,8 @@ const moduleSummaryData = [
     ],
     chartData: processDiscoveryData,
     chartSeries: [{ name: 'Activities', dataKey: 'value', color: '#22c55e' }],
-    chartType: 'pie',
-    status: 'info',
+    chartType: 'pie' as const,
+    status: 'info' as const,
     actionText: 'View Process Discovery',
     actionHref: '/process-discovery',
     chartHeight: 200,
@@ -170,9 +170,9 @@ const moduleSummaryData = [
       { name: 'Anomaly Count', dataKey: 'count', color: '#f97316' },
       { name: 'Anomaly Rate (%)', dataKey: 'rate', color: '#3b82f6' }
     ],
-    chartType: 'composed',
+    chartType: 'composed' as const,
     xAxisKey: 'name',
-    status: 'warning',
+    status: 'warning' as const,
     actionText: 'View Outlier Analysis',
     actionHref: '/outlier-analysis',
     chartHeight: 200,
@@ -223,9 +223,9 @@ const moduleSummaryData = [
       { name: 'Impact', dataKey: 'impact', color: '#ef4444' },
       { name: 'Size', dataKey: 'size', color: '#d946ef' }
     ],
-    chartType: 'composed',
+    chartType: 'composed' as const,
     xAxisKey: 'name',
-    status: 'error',
+    status: 'error' as const,
     actionText: 'View Risk Analytics',
     actionHref: '/fmea-analysis',
     chartHeight: 200,
@@ -272,9 +272,9 @@ const moduleSummaryData = [
       { name: 'Current Compliance', dataKey: 'current', color: '#0ea5e9' },
       { name: 'Target', dataKey: 'target', color: '#64748b' }
     ],
-    chartType: 'bar',
+    chartType: 'bar' as const,
     xAxisKey: 'name',
-    status: 'warning',
+    status: 'warning' as const,
     actionText: 'View Compliance Monitoring',
     actionHref: '/compliance-monitoring',
     chartHeight: 200,
@@ -314,7 +314,7 @@ const placeholderModuleData = [
   }
 ];
 
-const infoWidgetData = [
+const infoWidgetData: InfoWidgetData[] = [
   {
     id: 'process-discovery',
     title: 'Process Discovery',
