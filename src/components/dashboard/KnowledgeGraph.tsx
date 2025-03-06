@@ -167,7 +167,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     return [...allNodes.main, ...allNodes.category, ...allNodes.detail].find(n => n.id === id);
   };
 
-  // Improved node position calculation to maintain consistent layout
+  // Improved node position calculation for hierarchical layout
   const adjustNodePositions = (nodes: GraphNode[], zoomFactor: number = 1) => {
     const center = { 
       x: dimensions.width / 2, 
@@ -180,7 +180,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     // Cache to store calculated positions to maintain consistency
     const positionCache: Record<string, {x: number, y: number}> = {};
     
-    // Function to calculate position deterministically based on parent
+    // Function to calculate position deterministically based on level and parent
     const calculatePosition = (node: GraphNode, parentPosition?: {x: number, y: number}) => {
       // If this node already has a calculated position, use it
       if (positionCache[node.id]) {
@@ -188,48 +188,57 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       }
       
       let position: {x: number, y: number};
-      const isExpanded = expansionStates[node.id] === 'expanded';
       
       // For main node, use the center
       if (node.level === 'main') {
-        position = { x: center.x, y: center.y };
+        position = { x: center.x, y: center.y * 0.8 }; // Position main node higher
       }
-      // For nodes with parents, position deterministically around parent
+      // For nodes with parents, position hierarchically (top to bottom)
       else if (parentPosition && node.parent) {
         const parentNode = findNodeById(node.parent);
         if (!parentNode) {
-          // Fallback to original position if parent not found
           position = { x: node.x, y: node.y };
         } else {
-          // Use the node's index among siblings to calculate a fixed angle
-          let siblings: GraphNode[] = [];
-          if (parentNode.level === 'main') {
-            siblings = allNodes.category.filter(n => n.parent === parentNode.id);
-          } else if (parentNode.level === 'category') {
-            siblings = allNodes.detail.filter(n => n.parent === parentNode.id);
+          // For category nodes, arrange horizontally under the main node
+          if (node.level === 'category') {
+            const siblings = allNodes.category.filter(n => n.parent === parentNode.id);
+            const nodeIndex = siblings.findIndex(n => n.id === node.id);
+            const totalSiblings = siblings.length;
+            
+            // Calculate horizontal spacing based on container width
+            const horizontalSpacing = dimensions.width / (totalSiblings + 1);
+            const horizontalPosition = horizontalSpacing * (nodeIndex + 1);
+            
+            position = {
+              x: horizontalPosition,
+              y: parentPosition.y + 120 // Fixed vertical distance from parent
+            };
+          } 
+          // For detail nodes, arrange in groups under their categories
+          else {
+            const siblings = allNodes.detail.filter(n => n.parent === parentNode.id);
+            const nodeIndex = siblings.findIndex(n => n.id === node.id);
+            const totalSiblings = siblings.length;
+            
+            // Find parent's horizontal position
+            const parentX = positionCache[parentNode.id]?.x || parentPosition.x;
+            
+            // Calculate position in a grid-like pattern under the parent
+            const columns = Math.ceil(Math.sqrt(totalSiblings));
+            const row = Math.floor(nodeIndex / columns);
+            const col = nodeIndex % columns;
+            
+            // Determine spacing based on container size
+            const horizontalSpacing = Math.min(80, dimensions.width / (columns * 2));
+            const verticalSpacing = Math.min(80, dimensions.height / 10);
+            
+            position = {
+              x: parentX + (col - Math.floor(columns/2)) * horizontalSpacing,
+              y: parentPosition.y + 100 + (row * verticalSpacing)
+            };
           }
-          
-          const nodeIndex = siblings.findIndex(n => n.id === node.id);
-          const totalSiblings = siblings.length;
-          
-          // Calculate angle based on position in siblings (evenly distributed)
-          // Using a fixed angle approach rather than dynamic positioning
-          const angleStep = (2 * Math.PI) / Math.max(totalSiblings, 3);
-          const angle = nodeIndex * angleStep;
-          
-          // Fixed distance from parent based on level and container size
-          const baseDistance = Math.min(dimensions.width, dimensions.height) * 0.2;
-          const distance = parentNode.level === 'main' ? 
-            baseDistance * (isExpanded ? 1.2 : 1) : 
-            baseDistance * 0.8 * (isExpanded ? 1.2 : 1);
-          
-          position = {
-            x: parentPosition.x + Math.cos(angle) * distance,
-            y: parentPosition.y + Math.sin(angle) * distance
-          };
         }
       } else {
-        // Fallback to original position or an appropriate position based on the graph center
         position = { x: node.x, y: node.y };
       }
       
@@ -241,7 +250,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     // Function to adjust a node's position and properties
     const adjustPosition = (node: GraphNode, parentPosition?: {x: number, y: number}) => {
       const calculatedPosition = calculatePosition(node, parentPosition);
-      const isExpanded = expansionStates[node.id] === 'expanded';
       
       // Scale radius based on container size and node level
       let radiusMultiplier = Math.min(dimensions.width, dimensions.height) / 1000;
@@ -282,7 +290,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     return [...mainNodes, ...categoryNodes, ...detailNodes];
   };
   
-  // Improved function to handle node expansion/collapse with better edge management
+  // Improved function to handle node expansion/collapse
   const toggleNodeExpansion = (nodeId: string) => {
     const node = findNodeById(nodeId);
     if (!node) return;
@@ -543,7 +551,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     return (expandedNodes[nodeId] || node?.expansionState) === 'expanded';
   };
   
-  // Get node color based on type - modified to remove hover transformations
+  // Get node color based on type
   const getNodeColor = (type: NodeType, isSelected: boolean) => {
     const baseColorMap: Record<NodeType, string> = {
       product: 'bg-blue-600',
@@ -586,14 +594,51 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     return 'fill-white font-semibold';
   };
   
-  // Calculate if an edge is related to the selected node
+  // Calculate if an edge is related to the selected node or its descendants
   const isEdgeRelated = (edge: GraphEdge) => {
     if (!selectedNode) return true;
-    return edge.source === selectedNode || edge.target === selectedNode;
+    
+    const node = findNodeById(selectedNode);
+    if (!node) return true;
+    
+    // If edge connects to the selected node, it's related
+    if (edge.source === selectedNode || edge.target === selectedNode) return true;
+    
+    // If the selected node is expanded, all edges connected to its children are related
+    if (expandedNodes[selectedNode] === 'expanded') {
+      // For main node, check if edge connects to any category node
+      if (node.level === 'main') {
+        const categoryNodes = allNodes.category.filter(n => n.parent === node.id);
+        const categoryIds = categoryNodes.map(n => n.id);
+        if (categoryIds.includes(edge.source) || categoryIds.includes(edge.target)) return true;
+      }
+      // For category node, check if edge connects to any detail node
+      else if (node.level === 'category' && node.children) {
+        if (node.children.includes(edge.source) || node.children.includes(edge.target)) return true;
+      }
+    }
+    
+    return false;
   };
   
-  // Draw path between nodes
+  // Draw enhanced path between nodes with better visibility
   const getEdgePath = (source: GraphNode, target: GraphNode) => {
+    // For a hierarchical layout, use a curved path for better visibility
+    if (source.level !== target.level) {
+      // For lines connecting different levels, use Bezier curves
+      const midX = (source.x + target.x) / 2;
+      const midY = (source.y + target.y) / 2;
+      
+      // Control point adjustments for more natural curves
+      const controlPointX = midX;
+      const controlPointY = source.y < target.y ? 
+                           source.y + (target.y - source.y) * 0.25 : 
+                           target.y + (source.y - target.y) * 0.25;
+      
+      return `M${source.x},${source.y} Q${controlPointX},${controlPointY} ${target.x},${target.y}`;
+    }
+    
+    // For nodes on the same level, use straight lines
     return `M${source.x},${source.y} L${target.x},${target.y}`;
   };
   
@@ -766,15 +811,17 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                 if (!source || !target) return null;
                 
                 const isRelated = isEdgeRelated(edge);
+                const isExpanded = expandedNodes[edge.source] === 'expanded' || expandedNodes[edge.target] === 'expanded';
                 
                 return (
                   <g key={edge.id}>
                     <path
                       d={getEdgePath(source, target)}
-                      stroke={isRelated ? '#94a3b8' : '#e2e8f0'}
-                      strokeWidth={isRelated ? 1.5 : 1}
+                      stroke={isRelated ? '#64748b' : '#e2e8f0'}
+                      strokeWidth={isRelated ? 2 : 1}
                       fill="none"
-                      opacity={isRelated ? 0.6 : 0.3}
+                      opacity={isExpanded ? 0.9 : 0.4}
+                      strokeDasharray={source.level === target.level ? undefined : "none"}
                     />
                   </g>
                 );
@@ -785,9 +832,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
               {adjustedNodes.map((node) => {
                 const isSelected = selectedNode === node.id;
                 const isHovered = hoveredNode === node.id;
-                const expandable = (node.level === 'main' || node.level === 'category') && 
-                                  node.children && node.children.length > 0; // Only show + on expandable nodes
-                const expanded = isNodeExpanded(node.id);
                 
                 return (
                   <g 
@@ -822,29 +866,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                     >
                       {node.label}
                     </text>
-                    
-                    {/* Only show expand/collapse button on expandable nodes */}
-                    {expandable && (
-                      <g 
-                        transform={`translate(0, ${node.radius * 0.6})`}
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevent event bubbling
-                          toggleNodeExpansion(node.id);
-                        }}
-                      >
-                        <circle
-                          cx="0"
-                          cy="0"
-                          r={node.radius * 0.2}
-                          className={`fill-white/80 stroke-current ${getNodeBorderColor(node.type, false)}`}
-                        />
-                        {expanded ? (
-                          <Minus className="h-2 w-2 stroke-current text-gray-700" style={{ transform: 'translate(-50%, -50%)' }} />
-                        ) : (
-                          <Plus className="h-2 w-2 stroke-current text-gray-700" style={{ transform: 'translate(-50%, -50%)' }} />
-                        )}
-                      </g>
-                    )}
                   </g>
                 );
               })}
