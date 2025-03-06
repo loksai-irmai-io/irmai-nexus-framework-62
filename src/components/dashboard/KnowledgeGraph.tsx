@@ -135,7 +135,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 800);
     
     return () => clearTimeout(timer);
   }, []);
@@ -359,19 +359,19 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
   // Get node color based on type
   const getNodeColor = (type: NodeType, isSelected: boolean, isHovered: boolean) => {
     const baseColorMap: Record<NodeType, string> = {
-      product: 'bg-blue-500',
-      process: 'bg-green-500',
-      risk: 'bg-red-500',
-      control: 'bg-purple-500',
-      incident: 'bg-orange-500',
-      policy: 'bg-slate-500',
-      regulation: 'bg-yellow-500',
-      framework: 'bg-indigo-500',
-      issue: 'bg-pink-500',
-      testing: 'bg-cyan-500',
+      product: 'bg-blue-600',
+      process: 'bg-green-600',
+      risk: 'bg-red-600',
+      control: 'bg-purple-600',
+      incident: 'bg-orange-600',
+      policy: 'bg-slate-600',
+      regulation: 'bg-yellow-600',
+      framework: 'bg-indigo-600',
+      issue: 'bg-pink-600',
+      testing: 'bg-cyan-600',
     };
     
-    const hoverState = isSelected ? 'opacity-90' : isHovered ? 'opacity-80' : 'opacity-70';
+    const hoverState = isSelected ? 'opacity-90' : isHovered ? 'opacity-80' : 'opacity-80';
     
     return `${baseColorMap[type]} ${hoverState}`;
   };
@@ -379,16 +379,16 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
   // Get node border color based on type
   const getNodeBorderColor = (type: NodeType, isSelected: boolean) => {
     const baseColorMap: Record<NodeType, string> = {
-      product: 'stroke-blue-700',
-      process: 'stroke-green-700',
-      risk: 'stroke-red-700',
-      control: 'stroke-purple-700',
-      incident: 'stroke-orange-700',
-      policy: 'stroke-slate-700',
-      regulation: 'stroke-yellow-700',
-      framework: 'stroke-indigo-700',
-      issue: 'stroke-pink-700',
-      testing: 'stroke-cyan-700',
+      product: 'stroke-blue-800',
+      process: 'stroke-green-800',
+      risk: 'stroke-red-800',
+      control: 'stroke-purple-800',
+      incident: 'stroke-orange-800',
+      policy: 'stroke-slate-800',
+      regulation: 'stroke-yellow-800',
+      framework: 'stroke-indigo-800',
+      issue: 'stroke-pink-800',
+      testing: 'stroke-cyan-800',
     };
     
     const strokeWidth = isSelected ? 'stroke-[3px]' : 'stroke-[1.5px]';
@@ -398,7 +398,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
   
   // Get node text color based on type
   const getNodeTextColor = (type: NodeType) => {
-    return 'fill-white font-medium';
+    return 'fill-white font-semibold';
   };
   
   // Calculate if an edge is related to the selected node
@@ -479,13 +479,12 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant="ghost"
+                  variant={activeFilter === 'process' ? "default" : "ghost"}
                   size="icon"
                   className="h-8 w-8"
                   onClick={() => handleFilterByType('process')}
-                  data-active={activeFilter === 'process'}
                 >
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-600"></div>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Filter Processes</TooltipContent>
@@ -496,13 +495,12 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant="ghost"
+                  variant={activeFilter === 'risk' ? "default" : "ghost"}
                   size="icon"
                   className="h-8 w-8"
                   onClick={() => handleFilterByType('risk')}
-                  data-active={activeFilter === 'risk'}
                 >
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-red-600"></div>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Filter Risks</TooltipContent>
@@ -513,13 +511,12 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant="ghost"
+                  variant={activeFilter === 'control' ? "default" : "ghost"}
                   size="icon"
                   className="h-8 w-8"
                   onClick={() => handleFilterByType('control')}
-                  data-active={activeFilter === 'control'}
                 >
-                  <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-purple-600"></div>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Filter Controls</TooltipContent>
@@ -570,16 +567,16 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                     <path
                       d={getEdgePath(source, target)}
                       className={cn(
-                        "edge transition-all duration-300",
+                        "edge",
                         isRelated 
                           ? (source.type === 'risk' || target.type === 'risk')
-                            ? "stroke-red-400 stroke-[2px]" 
+                            ? "stroke-red-500 stroke-[2.5px]" 
                             : (source.type === 'process' || target.type === 'process')
-                              ? "stroke-green-400 stroke-[2px]"
+                              ? "stroke-green-500 stroke-[2.5px]"
                               : (source.type === 'control' || target.type === 'control')
-                                ? "stroke-purple-400 stroke-[2px]"
-                                : "stroke-blue-400 stroke-[2px]"
-                          : "stroke-gray-200 dark:stroke-gray-700",
+                                ? "stroke-purple-500 stroke-[2.5px]"
+                                : "stroke-blue-500 stroke-[2.5px]"
+                          : "stroke-gray-300 dark:stroke-gray-700",
                         selectedNode && !isRelated ? "opacity-30" : "opacity-90"
                       )}
                       markerEnd="url(#arrowhead)"
@@ -589,7 +586,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                         x={(source.x + target.x) / 2}
                         y={(source.y + target.y) / 2}
                         dy="-5"
-                        className="text-[10px] fill-gray-500 text-center pointer-events-none font-medium"
+                        className="text-[10px] fill-gray-600 text-center pointer-events-none font-medium"
                         textAnchor="middle"
                       >
                         {edge.label}
@@ -615,7 +612,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                   <g 
                     key={node.id}
                     className={cn(
-                      "node cursor-pointer transition-all duration-300",
+                      "cursor-pointer",
                       isNodeSelected ? "scale-110" : "",
                       isNodeHovered ? "scale-105" : "",
                       selectedNode && !isRelated && node.id !== selectedNode ? "opacity-30" : "opacity-100"
@@ -628,7 +625,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                     <circle
                       r={node.radius}
                       className={cn(
-                        "transition-all",
                         getNodeColor(node.type, isNodeSelected, isNodeHovered),
                         getNodeBorderColor(node.type, isNodeSelected)
                       )}
@@ -638,7 +634,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                     <text
                       dy="0.3em"
                       className={cn(
-                        "node-label pointer-events-none",
+                        "pointer-events-none",
                         node.level === 'main' ? "text-base" : node.level === 'category' ? "text-sm" : "text-xs",
                         getNodeTextColor(node.type),
                         isNodeSelected ? "font-bold" : ""
@@ -685,7 +681,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                 markerWidth="6"
                 markerHeight="6"
                 orient="auto"
-                className="fill-blue-300 dark:fill-blue-600"
+                className="fill-blue-400 dark:fill-blue-600"
               >
                 <path d="M 0 0 L 10 5 L 0 10 z" />
               </marker>
@@ -760,31 +756,31 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
         )}
         
         {/* Legend Panel */}
-        <div className="absolute top-2 left-2 bg-background/90 backdrop-blur-sm border rounded-md p-2 text-xs">
+        <div className="absolute top-2 left-2 bg-background/90 backdrop-blur-sm border rounded-md p-2 text-xs shadow-sm">
           <div className="font-medium mb-1">Legend</div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-1">
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+              <div className="w-3 h-3 rounded-full bg-blue-600"></div>
               <span>Product</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <div className="w-3 h-3 rounded-full bg-green-600"></div>
               <span>Process</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-3 h-3 rounded-full bg-red-600"></div>
               <span>Risk</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+              <div className="w-3 h-3 rounded-full bg-purple-600"></div>
               <span>Control</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-600"></div>
               <span>Regulation</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+              <div className="w-3 h-3 rounded-full bg-orange-600"></div>
               <span>Incident</span>
             </div>
           </div>
