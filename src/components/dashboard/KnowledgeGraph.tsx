@@ -1,7 +1,8 @@
+<lov-code>
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { Info, Plus, Minus, Filter, Move } from 'lucide-react';
+import { Info, Plus, Minus, Filter, Move, ChevronDown, ChevronUp } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Button } from "@/components/ui/button";
 // Knowledge graph data types
 type NodeType = 'product' | 'process' | 'risk' | 'control' | 'incident' | 'policy' | 'regulation' | 'framework' | 'issue' | 'testing';
 type NodeLevel = 'main' | 'category' | 'detail';
+type ExpansionState = 'collapsed' | 'expanded' | 'detailed';
 
 interface GraphNode {
   id: string;
@@ -22,6 +24,7 @@ interface GraphNode {
   children?: string[];
   parent?: string;
   details?: string;
+  expansionState?: ExpansionState;
 }
 
 interface GraphEdge {
@@ -38,16 +41,16 @@ interface KnowledgeGraphProps {
 // Main sample data
 const generateMainNodes = (): GraphNode[] => {
   return [
-    { id: 'bank', label: 'IRMAI Bank', type: 'product', level: 'main', x: 400, y: 250, radius: 60 },
+    { id: 'bank', label: 'IRMAI Bank', type: 'product', level: 'main', x: 400, y: 250, radius: 60, expansionState: 'collapsed' },
   ];
 };
 
 // Category level nodes - these appear when a main node is clicked
 const generateCategoryNodes = (): GraphNode[] => {
   return [
-    { id: 'processes', label: 'Processes', type: 'process', level: 'category', x: 250, y: 150, radius: 45, parent: 'bank', children: ['onboarding', 'kyc', 'payment'] },
-    { id: 'risks', label: 'Risks', type: 'risk', level: 'category', x: 400, y: 120, radius: 45, parent: 'bank', children: ['fraud', 'compliance', 'operational'] },
-    { id: 'controls', label: 'Controls', type: 'control', level: 'category', x: 550, y: 150, radius: 45, parent: 'bank', children: ['authcontrol', 'monitoring', 'test1'] },
+    { id: 'processes', label: 'Processes', type: 'process', level: 'category', x: 250, y: 150, radius: 45, parent: 'bank', children: ['onboarding', 'kyc', 'payment'], expansionState: 'collapsed' },
+    { id: 'risks', label: 'Risks', type: 'risk', level: 'category', x: 400, y: 120, radius: 45, parent: 'bank', children: ['fraud', 'compliance', 'operational'], expansionState: 'collapsed' },
+    { id: 'controls', label: 'Controls', type: 'control', level: 'category', x: 550, y: 150, radius: 45, parent: 'bank', children: ['authcontrol', 'monitoring', 'test1'], expansionState: 'collapsed' },
   ];
 };
 
@@ -121,6 +124,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
   // State for interaction
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const [expandedNodes, setExpandedNodes] = useState<Record<string, ExpansionState>>({});
   const [currentLevel, setCurrentLevel] = useState<NodeLevel>('main');
   const [parentHistory, setParentHistory] = useState<string[]>([]);
   const [detailsPanel, setDetailsPanel] = useState<{node: GraphNode | null, visible: boolean}>({node: null, visible: false});
@@ -159,53 +163,128 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
   
+  // Helper to find a node by ID across all levels
+  const findNodeById = (id: string): GraphNode | undefined => {
+    return [...allNodes.main, ...allNodes.category, ...allNodes.detail].find(n => n.id === id);
+  };
+
+  // New function to handle node expansion/collapse
+  const toggleNodeExpansion = (nodeId: string) => {
+    const node = findNodeById(nodeId);
+    if (!node) return;
+
+    // Get current expansion state
+    const currentState = expandedNodes[nodeId] || node.expansionState || 'collapsed';
+    const newState: ExpansionState = currentState === 'collapsed' ? 'expanded' : 'collapsed';
+    
+    // Update expanded nodes state
+    setExpandedNodes({
+      ...expandedNodes,
+      [nodeId]: newState
+    });
+
+    // If expanding a node
+    if (newState === 'expanded') {
+      let nodesToAdd: GraphNode[] = [];
+      let edgesToAdd: GraphEdge[] = [];
+      
+      // Based on node level, add different child nodes
+      if (node.level === 'main') {
+        // Add category nodes connected to this main node
+        nodesToAdd = allNodes.category;
+        edgesToAdd = allEdges.filter(e => 
+          (e.source === node.id && nodesToAdd.some(n => n.id === e.target)) ||
+          (e.target === node.id && nodesToAdd.some(n => n.id === e.source))
+        );
+      } else if (node.level === 'category' && node.children) {
+        // Add detail nodes that are children of this category
+        nodesToAdd = allNodes.detail.filter(n => node.children?.includes(n.id));
+        edgesToAdd = allEdges.filter(e => 
+          (e.source === node.id && nodesToAdd.some(n => n.id === e.target)) ||
+          (e.target === node.id && nodesToAdd.some(n => n.id === e.source))
+        );
+        
+        // Also add edges between detail nodes if they exist
+        const detailNodeIds = nodesToAdd.map(n => n.id);
+        const interconnectionEdges = allEdges.filter(e => 
+          detailNodeIds.includes(e.source) && detailNodeIds.includes(e.target)
+        );
+        edgesToAdd = [...edgesToAdd, ...interconnectionEdges];
+      }
+      
+      // Add these nodes and edges to visible elements
+      setVisibleNodes(prev => {
+        // Filter out any duplicates
+        const existingIds = new Set(prev.map(n => n.id));
+        const newNodes = nodesToAdd.filter(n => !existingIds.has(n.id));
+        return [...prev, ...newNodes];
+      });
+      
+      setVisibleEdges(prev => {
+        // Filter out any duplicates
+        const existingIds = new Set(prev.map(e => e.id));
+        const newEdges = edgesToAdd.filter(e => !existingIds.has(e.id));
+        return [...prev, ...newEdges];
+      });
+    } else {
+      // If collapsing, remove child nodes that are not needed
+      // Find all descendants of this node
+      let descendantIds: string[] = [];
+      
+      if (node.level === 'main') {
+        // Get all category nodes that are children of this main node
+        const categoryNodes = allNodes.category.filter(n => n.parent === node.id);
+        descendantIds = categoryNodes.map(n => n.id);
+        
+        // Get all detail nodes that are children of these categories
+        categoryNodes.forEach(catNode => {
+          if (catNode.children) {
+            descendantIds = [...descendantIds, ...catNode.children];
+          }
+        });
+      } else if (node.level === 'category' && node.children) {
+        // Just get direct children
+        descendantIds = node.children;
+      }
+      
+      // Only keep nodes that aren't descendants of the collapsed node, unless they're expanded themselves
+      setVisibleNodes(prev => 
+        prev.filter(n => {
+          // Keep the node itself and nodes that aren't descendants
+          if (n.id === node.id || !descendantIds.includes(n.id)) return true;
+          
+          // Or keep nodes that are explicitly expanded by the user
+          return expandedNodes[n.id] === 'expanded';
+        })
+      );
+      
+      // Remove edges connected to removed nodes
+      setVisibleEdges(prev => 
+        prev.filter(e => {
+          const sourceInVisible = visibleNodes.some(n => n.id === e.source);
+          const targetInVisible = visibleNodes.some(n => n.id === e.target);
+          return sourceInVisible && targetInVisible;
+        })
+      );
+    }
+  };
+  
   // Handle level changes when a node is selected
   useEffect(() => {
     if (!selectedNode) return;
     
     const node = findNodeById(selectedNode);
     if (!node) return;
-    
-    // Handle drill down from main to category
-    if (node.level === 'main') {
-      // Show category nodes and connect them to the main node
-      const categoryNodes = allNodes.category;
-      const categoryEdges = allEdges.filter(e => e.source === node.id || e.target === node.id);
-      
-      setVisibleNodes([node, ...categoryNodes]);
-      setVisibleEdges(categoryEdges);
-      setCurrentLevel('category');
-      setParentHistory([node.id]);
-    }
-    // Handle drill down from category to detail
-    else if (node.level === 'category') {
-      const detailNodes = allNodes.detail.filter(n => n.parent === node.id);
-      
-      // Find edges that connect this category to its details
-      const directEdges = allEdges.filter(e => 
-        (e.source === node.id && detailNodes.some(n => n.id === e.target)) ||
-        (e.target === node.id && detailNodes.some(n => n.id === e.source))
-      );
-      
-      // Also find edges that connect between these detail nodes
-      const detailNodeIds = detailNodes.map(n => n.id);
-      const interconnectionEdges = allEdges.filter(e => 
-        detailNodeIds.includes(e.source) && detailNodeIds.includes(e.target)
-      );
-      
-      // Combine all related nodes and edges
-      const allRelatedNodes = [...visibleNodes.filter(n => n.id !== node.id), node, ...detailNodes];
-      const allRelatedEdges = [...visibleEdges.filter(e => e.source === parentHistory[0] || e.target === parentHistory[0]), ...directEdges, ...interconnectionEdges];
-      
-      setVisibleNodes(allRelatedNodes);
-      setVisibleEdges(allRelatedEdges);
-      setCurrentLevel('detail');
-      setParentHistory([...parentHistory, node.id]);
-    }
-    // When a detail node is clicked, show its details in the panel
-    else if (node.level === 'detail') {
+
+    // Handle showing details panel for detail nodes
+    if (node.level === 'detail') {
       setDetailsPanel({node, visible: true});
+      return;
     }
+    
+    // For main and category nodes, expand/collapse them
+    toggleNodeExpansion(selectedNode);
+    
   }, [selectedNode]);
   
   // Handle node filtering
@@ -237,10 +316,26 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       y: dimensions.height / 2 
     };
     
-    return nodes.map(node => {
+    // Get expansion states
+    const expansionStates = {...expandedNodes};
+    
+    // Function to recursively adjust node positions based on parent's position
+    const adjustPosition = (node: GraphNode, parentPosition?: {x: number, y: number}) => {
+      let adjustedNode = {...node};
+      const isExpanded = expansionStates[node.id] === 'expanded';
+      
+      // If node has a parent position specified, position it relative to parent
+      if (parentPosition && node.parent) {
+        const angle = Math.random() * Math.PI * 2; // Random angle around the parent
+        const distance = isExpanded ? 150 : 100; // Distance from parent
+        
+        adjustedNode.x = parentPosition.x + Math.cos(angle) * distance;
+        adjustedNode.y = parentPosition.y + Math.sin(angle) * distance;
+      }
+      
       // Scale original positions based on new dimensions
-      const scaledX = (node.x / 800) * dimensions.width;
-      const scaledY = (node.y / 600) * dimensions.height;
+      const scaledX = (adjustedNode.x / 800) * dimensions.width;
+      const scaledY = (adjustedNode.y / 600) * dimensions.height;
       
       // Adjust position based on zoom
       const adjustedX = center.x + (scaledX - center.x) * zoomFactor;
@@ -248,22 +343,35 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       
       // Adjust radius based on node level, zoom, and container size
       let radiusMultiplier = Math.min(dimensions.width, dimensions.height) / 1000;
-      if (node.level === 'main') radiusMultiplier *= 1.2;
-      else if (node.level === 'category') radiusMultiplier *= 1;
+      if (adjustedNode.level === 'main') radiusMultiplier *= 1.2;
+      else if (adjustedNode.level === 'category') radiusMultiplier *= 1;
       else radiusMultiplier *= 0.9;
       
       return {
-        ...node,
+        ...adjustedNode,
         x: adjustedX,
         y: adjustedY,
         radius: node.radius * radiusMultiplier * (isZoomed ? 1.2 : 1) * Math.max(1, Math.min(dimensions.width, dimensions.height) / 600)
       };
+    };
+    
+    // Organize nodes by level (main -> category -> detail)
+    const mainNodes = nodes.filter(n => n.level === 'main').map(n => adjustPosition(n));
+    
+    // For each main node, position its children around it
+    const categoryNodes = nodes.filter(n => n.level === 'category').map(n => {
+      const parentNode = mainNodes.find(m => m.id === n.parent);
+      return adjustPosition(n, parentNode ? {x: parentNode.x, y: parentNode.y} : undefined);
     });
-  };
-  
-  // Helper to find a node by ID across all levels
-  const findNodeById = (id: string): GraphNode | undefined => {
-    return [...allNodes.main, ...allNodes.category, ...allNodes.detail].find(n => n.id === id);
+    
+    // For each category node, position its children around it
+    const detailNodes = nodes.filter(n => n.level === 'detail').map(n => {
+      const parentNode = categoryNodes.find(c => c.id === n.parent);
+      return adjustPosition(n, parentNode ? {x: parentNode.x, y: parentNode.y} : undefined);
+    });
+    
+    // Combine all adjusted nodes
+    return [...mainNodes, ...categoryNodes, ...detailNodes];
   };
   
   // Go back to previous level
@@ -313,6 +421,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     setSelectedNode(null);
     setDetailsPanel({node: null, visible: false});
     setActiveFilter(null);
+    setExpandedNodes({});
   };
   
   // Toggle zoom state
@@ -380,6 +489,12 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     if (node.module && node.level === 'detail') {
       toast.info(`Navigating to ${node.label} in ${node.module.replace('-', ' ')}...`);
     }
+  };
+  
+  // Check if a node is expanded
+  const isNodeExpanded = (nodeId: string): boolean => {
+    const node = findNodeById(nodeId);
+    return (expandedNodes[nodeId] || node?.expansionState) === 'expanded';
   };
   
   // Get node color based on type
@@ -611,252 +726,4 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                 
                 if (!source || !target) return null;
                 
-                const isRelated = isEdgeRelated(edge);
-                
-                return (
-                  <g key={edge.id}>
-                    <path
-                      d={getEdgePath(source, target)}
-                      className={cn(
-                        "edge",
-                        isRelated 
-                          ? (source.type === 'risk' || target.type === 'risk')
-                            ? "stroke-red-500 stroke-[2.5px]" 
-                            : (source.type === 'process' || target.type === 'process')
-                              ? "stroke-green-500 stroke-[2.5px]"
-                              : (source.type === 'control' || target.type === 'control')
-                                ? "stroke-purple-500 stroke-[2.5px]"
-                                : "stroke-blue-500 stroke-[2.5px]"
-                          : "stroke-gray-300 dark:stroke-gray-700",
-                        selectedNode && !isRelated ? "opacity-30" : "opacity-90"
-                      )}
-                      markerEnd="url(#arrowhead)"
-                    />
-                    {edge.label && isRelated && (
-                      <text
-                        x={(source.x + target.x) / 2}
-                        y={(source.y + target.y) / 2}
-                        dy="-5"
-                        className="text-[10px] fill-gray-600 text-center pointer-events-none font-medium"
-                        textAnchor="middle"
-                      >
-                        {edge.label}
-                      </text>
-                    )}
-                  </g>
-                );
-              })}
-            </g>
-            
-            {/* Draw nodes */}
-            <g>
-              {adjustedNodes.map(node => {
-                const isNodeSelected = selectedNode === node.id;
-                const isNodeHovered = hoveredNode === node.id;
-                const isRelated = selectedNode ? 
-                  visibleEdges.some(edge => 
-                    (edge.source === selectedNode && edge.target === node.id) || 
-                    (edge.source === node.id && edge.target === selectedNode)
-                  ) || node.id === selectedNode : true;
-                
-                return (
-                  <g 
-                    key={node.id}
-                    className={cn(
-                      "cursor-pointer",
-                      isNodeSelected ? "scale-110" : "",
-                      isNodeHovered ? "scale-105" : "",
-                      selectedNode && !isRelated && node.id !== selectedNode ? "opacity-30" : "opacity-100"
-                    )}
-                    transform={`translate(${node.x},${node.y})`}
-                    onClick={() => handleNodeClick(node.id)}
-                    onMouseEnter={() => setHoveredNode(node.id)}
-                    onMouseLeave={() => setHoveredNode(null)}
-                  >
-                    <circle
-                      r={node.radius}
-                      className={cn(
-                        getNodeColor(node.type, isNodeSelected, isNodeHovered),
-                        getNodeBorderColor(node.type, isNodeSelected)
-                      )}
-                    />
-                    
-                    {/* Node label */}
-                    <text
-                      dy="0.3em"
-                      className={cn(
-                        "pointer-events-none",
-                        node.level === 'main' ? "text-base" : node.level === 'category' ? "text-sm" : "text-xs",
-                        getNodeTextColor(node.type),
-                        isNodeSelected ? "font-bold" : ""
-                      )}
-                      textAnchor="middle"
-                    >
-                      {node.label}
-                    </text>
-                    
-                    {/* Add a + indicator if node has children and is not a detail node */}
-                    {node.level !== 'detail' && (
-                      <text
-                        dy={`${node.radius - 20}px`}
-                        dx="0"
-                        className="text-sm fill-white pointer-events-none font-bold"
-                        textAnchor="middle"
-                      >
-                        {isNodeSelected ? "" : "⊕"}
-                      </text>
-                    )}
-                    
-                    {/* Module indicator for selected detail nodes */}
-                    {isNodeSelected && node.level === 'detail' && node.module && (
-                      <text
-                        dy={`${node.radius + 15}px`}
-                        className="text-[10px] fill-primary text-center pointer-events-none italic"
-                        textAnchor="middle"
-                      >
-                        {node.module.replace('-', ' ')}
-                      </text>
-                    )}
-                  </g>
-                );
-              })}
-            </g>
-            
-            {/* Arrowhead marker for edges */}
-            <defs>
-              <marker
-                id="arrowhead"
-                viewBox="0 0 10 10"
-                refX="8"
-                refY="5"
-                markerWidth="6"
-                markerHeight="6"
-                orient="auto"
-                className="fill-blue-400 dark:fill-blue-600"
-              >
-                <path d="M 0 0 L 10 5 L 0 10 z" />
-              </marker>
-            </defs>
-          </svg>
-        )}
-        
-        {/* Details Panel - made responsive */}
-        {detailsPanel.visible && detailsPanel.node && (
-          <div className={cn(
-            "fixed md:absolute z-10 md:z-auto",
-            "top-1/2 left-1/2 md:top-0 md:right-0 md:left-auto md:bottom-0",
-            "transform -translate-x-1/2 -translate-y-1/2 md:translate-x-0 md:translate-y-0",
-            "w-[90vw] max-w-[350px] md:w-[300px] h-auto max-h-[80vh] md:h-full",
-            "bg-background/95 backdrop-blur-sm border shadow-md rounded-lg md:rounded-none md:border-l md:border-t-0 md:border-r-0 md:border-b-0",
-            "p-4 overflow-y-auto transition-all duration-300 animate-in md:slide-in-from-right"
-          )}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-lg">{detailsPanel.node.label}</h3>
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDetailsPanel({node: null, visible: false})}>
-                ×
-              </Button>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <Badge className={cn("mb-2", getBadgeStyle(detailsPanel.node.type))}>
-                  {detailsPanel.node.type.charAt(0).toUpperCase() + detailsPanel.node.type.slice(1)}
-                </Badge>
-                <p className="text-sm text-muted-foreground">
-                  {detailsPanel.node.details || `Details about ${detailsPanel.node.label}`}
-                </p>
-              </div>
-              
-              {detailsPanel.node.module && (
-                <div>
-                  <h4 className="text-sm font-medium mb-1">Module</h4>
-                  <Badge variant="outline" className="capitalize">
-                    {detailsPanel.node.module.replace('-', ' ')}
-                  </Badge>
-                </div>
-              )}
-              
-              <div>
-                <h4 className="text-sm font-medium mb-1">Connected to</h4>
-                <div className="space-y-1">
-                  {visibleEdges
-                    .filter(edge => edge.source === detailsPanel.node?.id || edge.target === detailsPanel.node?.id)
-                    .map(edge => {
-                      const connectedNodeId = edge.source === detailsPanel.node?.id ? edge.target : edge.source;
-                      const connectedNode = findNodeById(connectedNodeId);
-                      
-                      if (!connectedNode) return null;
-                      
-                      return (
-                        <div key={edge.id} className="flex items-center text-xs">
-                          <div className={cn("w-2 h-2 rounded-full mr-2", getBadgeStyle(connectedNode.type))}></div>
-                          <span>{connectedNode.label}</span>
-                        </div>
-                      );
-                    })}
-                </div>
-              </div>
-              
-              <div className="pt-2">
-                <Button 
-                  size="sm" 
-                  className="w-full"
-                  onClick={() => {
-                    toast.info(`Navigating to ${detailsPanel.node?.label} in ${detailsPanel.node?.module?.replace('-', ' ') || 'dashboard'}...`);
-                    setDetailsPanel({node: null, visible: false});
-                  }}
-                >
-                  View Details
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {/* Legend Panel - made responsive */}
-        <div className="absolute top-2 left-2 bg-background/90 backdrop-blur-sm border rounded-md p-2 text-xs shadow-sm max-w-[180px] md:max-w-none">
-          <div className="font-medium mb-1">Legend</div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-blue-600"></div>
-              <span>Product</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-green-600"></div>
-              <span>Process</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-red-600"></div>
-              <span>Risk</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-purple-600"></div>
-              <span>Control</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-yellow-600"></div>
-              <span>Regulation</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-orange-600"></div>
-              <span>Incident</span>
-            </div>
-          </div>
-        </div>
-        
-        {/* Overlay instruction - hidden on small screens */}
-        <div className="absolute bottom-0 left-0 p-2 bg-background/80 backdrop-blur-sm text-xs text-muted-foreground hidden sm:block">
-          Click any node to drill down to related details
-        </div>
-        
-        {/* Touch indicator for mobile */}
-        <div className="absolute bottom-0 right-0 p-2 bg-background/80 backdrop-blur-sm text-xs text-muted-foreground sm:hidden flex items-center gap-1">
-          <Move className="h-3 w-3" />
-          <span>Tap to explore</span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default KnowledgeGraph;
+                const isRelated =
