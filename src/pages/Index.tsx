@@ -2,87 +2,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import KnowledgeGraph from '@/components/dashboard/KnowledgeGraph';
 import MetricCard from '@/components/dashboard/MetricCard';
 import ModuleSummary from '@/components/dashboard/ModuleSummary';
-import Chart from '@/components/dashboard/Chart';
 import RibbonNav from '@/components/dashboard/RibbonNav';
+import ModuleInsightsInfographic from '@/components/dashboard/ModuleInsightsInfographic';
 import { 
   AlertTriangle, 
   Shield, 
   DollarSign, 
   CheckCheck, 
   GitBranch, 
-  SearchX, 
-  TestTube, 
-  Presentation,
   Gauge,
   BarChart4
 } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-
-const lossEventsData = [
-  { name: 'Jan 2025', value: 4, amount: 100000, events: 2 },
-  { name: 'Feb 2025', value: 5, amount: 150000, events: 3 },
-  { name: 'Mar 2025', value: 3, amount: 250000, events: 3 },
-  { name: 'Apr 2025', value: 6, amount: 180000, events: 4 },
-  { name: 'May 2025', value: 4, amount: 120000, events: 2 },
-  { name: 'Jun 2025', value: 3, amount: 80000, events: 1 },
-];
-
-const riskDistributionData = [
-  { name: 'Operational', value: 35, count: 16, color: '#f97316' },
-  { name: 'Credit', value: 25, count: 12, color: '#8b5cf6' },
-  { name: 'Market', value: 15, count: 7, color: '#06b6d4' },
-  { name: 'Compliance', value: 15, count: 7, color: '#10b981' },
-  { name: 'Strategic', value: 10, count: 4, color: '#f59e0b' },
-];
-
-const incidentSeverityData = [
-  { name: 'Critical', value: 2 },
-  { name: 'High', value: 5 },
-  { name: 'Medium', value: 12 },
-  { name: 'Low', value: 28 },
-];
-
-const controlsHealthData = [
-  { name: 'Passing', value: 85 },
-  { name: 'Failing', value: 15 },
-];
-
-const processDiscoveryData = [
-  { name: 'Payment Processing', value: 32 },
-  { name: 'Customer Onboarding', value: 24 },
-  { name: 'Loan Applications', value: 18 },
-  { name: 'Account Management', value: 16 },
-  { name: 'Reporting', value: 10 },
-];
-
-const outlierAnalysisData = [
-  { name: 'Jan', count: 5, rate: 1.2 },
-  { name: 'Feb', count: 8, rate: 1.8 },
-  { name: 'Mar', count: 12, rate: 2.5 },
-  { name: 'Apr', count: 7, rate: 1.5 },
-  { name: 'May', count: 15, rate: 3.0 },
-  { name: 'Jun', count: 10, rate: 2.0 },
-];
-
-const predictiveRiskData = [
-  { name: 'Fraud', probability: 0.7, impact: 85 },
-  { name: 'Data Breach', probability: 0.4, impact: 95 },
-  { name: 'System Failure', probability: 0.3, impact: 80 },
-  { name: 'Compliance', probability: 0.5, impact: 70 },
-  { name: 'Operations', probability: 0.6, impact: 60 },
-];
-
-const gapAnalysisData = [
-  { name: 'PCI-DSS', current: 75, target: 100 },
-  { name: 'GDPR', current: 85, target: 100 },
-  { name: 'SOX', current: 90, target: 100 },
-  { name: 'ISO 27001', current: 65, target: 100 },
-  { name: 'Basel III', current: 70, target: 100 },
-];
 
 const moduleSummaryData = [
   {
@@ -108,7 +41,7 @@ const moduleSummaryData = [
     id: 'outlier-analysis',
     title: 'Outlier Analysis',
     description: 'Anomaly detection and unusual patterns',
-    icon: <SearchX className="h-4 w-4" />,
+    icon: <GitBranch className="h-4 w-4" />,
     metrics: [
       { label: 'Outliers', value: '18' },
       { label: 'False Positives', value: '3' },
@@ -168,7 +101,7 @@ const placeholderModuleData = [
     id: 'controls-testing',
     title: 'Controls Testing',
     description: 'Coming Soon: Automated controls testing and validation',
-    icon: <TestTube className="h-4 w-4" />,
+    icon: <GitBranch className="h-4 w-4" />,
     metrics: [
       { label: 'Controls', value: '124' },
       { label: 'Tested', value: '0' },
@@ -183,7 +116,7 @@ const placeholderModuleData = [
     id: 'scenario-analysis',
     title: 'Scenario Analysis',
     description: 'Coming Soon: Risk scenario modeling and simulation',
-    icon: <Presentation className="h-4 w-4" />,
+    icon: <GitBranch className="h-4 w-4" />,
     metrics: [
       { label: 'Scenarios', value: '0' },
       { label: 'Simulations', value: '0' },
@@ -235,30 +168,27 @@ const Index = () => {
     }, 500);
   };
   
-  const handleLossEventClick = (data: any) => {
-    const month = data.name;
-    const amount = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 0
-    }).format(data.amount);
+  const handleChartClick = (data: any, moduleType: string) => {
+    let navigationData = {};
     
-    toast.info(`Navigating to Incident Management for ${month} (${data.events} events, ${amount})`);
+    switch (moduleType) {
+      case 'process-discovery':
+        navigationData = { process: data.name };
+        break;
+      case 'outlier-analysis':
+        navigationData = { month: data.name };
+        break;
+      case 'fmea-analysis':
+        navigationData = { risk: data.name };
+        break;
+      case 'compliance-monitoring':
+        navigationData = { framework: data.name };
+        break;
+      default:
+        break;
+    }
     
-    handleNavigate('incident-management', { 
-      month: month,
-      events: data.events,
-      amount: data.amount
-    });
-  };
-  
-  const handleRiskCategoryClick = (data: any) => {
-    toast.info(`Navigating to Risk Analysis filtered by ${data.name} risks (${data.count} items)`);
-    
-    handleNavigate('fmea-analysis', { 
-      category: data.name,
-      count: data.count 
-    });
+    handleNavigate(moduleType, navigationData);
   };
   
   return (
@@ -344,169 +274,13 @@ const Index = () => {
           />
         </RibbonNav>
         
-        <div className="mb-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
-          <h2 className="text-2xl font-semibold tracking-tight mb-4">Digital Twin Overview</h2>
-          <div className="p-1 border border-primary/20 rounded-lg bg-primary/5">
-            <KnowledgeGraph className="h-[400px] rounded-lg" />
-          </div>
-          <p className="text-sm text-muted-foreground mt-2 italic">
-            This is your central data hub – all insights and interdependencies are sourced here.
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
-          <Chart 
-            title="Loss Events Over Time"
-            description="Trend of financial impact and event count by month"
-            data={lossEventsData}
-            series={[
-              { name: 'Financial Loss ($K)', dataKey: 'amount', color: '#ef4444' },
-              { name: 'Event Count', dataKey: 'events', color: '#8b5cf6' }
-            ]}
-            type="composed"
-            xAxisKey="name"
-            height={300}
-            tooltip="Click on any month to see detailed incident reports for that period"
-            onClick={handleLossEventClick}
-          />
-          
-          <Chart 
-            title="Risk Distribution by Category"
-            description="Breakdown of risks by category or business unit"
-            data={riskDistributionData}
-            series={[{ name: 'Percentage', dataKey: 'value', color: '#0ea5e9' }]}
-            type="pie"
-            showPercentages={true}
-            showLegend={true}
-            height={300}
-            tooltip="Click on any category to see detailed risk analysis for that segment"
-            onClick={handleRiskCategoryClick}
-          />
-        </div>
-        
-        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '400ms' }}>
-          Module Insights
-        </h2>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '500ms' }}>
-          <Chart 
-            title="Process Discovery: Activity Distribution"
-            data={processDiscoveryData}
-            series={[{ name: 'Activities', dataKey: 'value', color: '#22c55e' }]}
-            type="pie"
-            showPercentages={true}
-            height={300}
-            tooltip="Distribution of activities across business processes"
-            onClick={(data) => handleNavigate('process-discovery', { process: data.name })}
-          />
-          
-          <Chart 
-            title="Outlier Analysis: Anomaly Trends"
-            data={outlierAnalysisData}
-            series={[
-              { name: 'Anomaly Count', dataKey: 'count', color: '#f97316' },
-              { name: 'Anomaly Rate (%)', dataKey: 'rate', color: '#3b82f6' }
-            ]}
-            type="composed"
-            xAxisKey="name"
-            height={300}
-            tooltip="Trend of detected anomalies over time"
-            onClick={(data) => handleNavigate('outlier-analysis', { month: data.name })}
-          />
-          
-          <Chart 
-            title="Predictive Risk Analytics: Heat Map"
-            description="Bubble size represents risk severity (probability × impact)"
-            data={predictiveRiskData.map(item => ({
-              ...item,
-              size: Math.round(item.probability * item.impact)
-            }))}
-            series={[
-              { name: 'Probability', dataKey: 'probability', color: '#8b5cf6' },
-              { name: 'Impact', dataKey: 'impact', color: '#ef4444' },
-              { name: 'Size', dataKey: 'size', color: '#d946ef' }
-            ]}
-            type="composed"
-            xAxisKey="name"
-            height={300}
-            tooltip="Risk heat map showing probability vs impact"
-            onClick={(data) => handleNavigate('fmea-analysis', { risk: data.name })}
-          />
-          
-          <Chart 
-            title="Compliance Monitoring: Gap Analysis"
-            data={gapAnalysisData}
-            series={[
-              { name: 'Current Compliance', dataKey: 'current', color: '#0ea5e9' },
-              { name: 'Target', dataKey: 'target', color: '#64748b' }
-            ]}
-            type="bar"
-            xAxisKey="name"
-            height={300}
-            tooltip="Comparison of current vs. target compliance levels"
-            onClick={(data) => handleNavigate('compliance-monitoring', { framework: data.name })}
-          />
-        </div>
+        {/* Infographic replacing multiple chart sections */}
+        <ModuleInsightsInfographic 
+          className="animate-fade-in mb-8" 
+          onChartClick={handleChartClick} 
+        />
         
         <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '600ms' }}>
-          Active Module Summaries
-        </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '700ms' }}>
-          {moduleSummaryData.map(module => (
-            <ModuleSummary 
-              key={module.id} 
-              data={module} 
-              isLoading={loading}
-              onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
-            />
-          ))}
-        </div>
-        
-        <Separator className="my-8 animate-fade-in" style={{ animationDelay: '800ms' }} />
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '900ms' }}>
-          <Chart 
-            title="Incidents by Severity"
-            data={incidentSeverityData}
-            series={[
-              { name: 'Count', dataKey: 'value', color: '#f97316' }
-            ]}
-            type="bar"
-            xAxisKey="name"
-            height={300}
-            tooltip="Distribution of incidents by severity level"
-            onClick={(data) => handleNavigate('incident-management', { severity: data.name })}
-          />
-          <Chart 
-            title="Controls Health"
-            data={controlsHealthData}
-            series={[{ name: 'Percentage', dataKey: 'value', color: '#4ade80' }]}
-            type="pie"
-            showPercentages={true}
-            height={300}
-            tooltip="Current health status of control mechanisms"
-            onClick={(data) => handleNavigate('controls-testing', { status: String(data.name).toLowerCase() })}
-          />
-          <div className="bg-card rounded-lg border shadow-sm p-4">
-            <h3 className="font-semibold mb-3">Announcements & Tips</h3>
-            <div className="space-y-3 text-sm">
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark:border-blue-800">
-                <p className="font-medium text-blue-800 dark:text-blue-300 mb-1">New Feature</p>
-                <p className="text-blue-700 dark:text-blue-400">Knowledge Graph now supports interactive drilling through relationships between risks and controls.</p>
-              </div>
-              <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md border border-yellow-200 dark:border-yellow-800">
-                <p className="font-medium text-yellow-800 dark:text-yellow-300 mb-1">Tip</p>
-                <p className="text-yellow-700 dark:text-yellow-400">Use the Risk Catalog to drill into detailed risk descriptions and mitigations.</p>
-              </div>
-              <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-md border border-purple-200 dark:border-purple-800">
-                <p className="font-medium text-purple-800 dark:text-purple-300 mb-1">Training</p>
-                <p className="text-purple-700 dark:text-purple-400">New training session on FMEA Analysis scheduled for next Friday.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '1000ms' }}>
           Upcoming Modules
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
