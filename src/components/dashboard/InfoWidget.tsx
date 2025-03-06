@@ -125,6 +125,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
             
             <div className="flex-1 min-h-[180px]">
               <Chart 
+                title={`${data.title} Chart`}
                 data={data.chartData}
                 series={data.chartSeries}
                 type={data.chartType}
