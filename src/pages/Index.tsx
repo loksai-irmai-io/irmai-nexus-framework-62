@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -470,15 +471,6 @@ const Index = () => {
           </div>
         </div>
         
-        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
-          Upcoming Modules
-        </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
-          {placeholderModuleData.map(module => (
-            <ModuleSummary key={module.id} data={module} isLoading={loading} />
-          ))}
-        </div>
-        
         <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '1200ms' }}>
           Digital Twin Overview
         </h2>
@@ -489,6 +481,15 @@ const Index = () => {
           <p className="text-sm text-muted-foreground mt-2 italic">
             This is your central data hub – all insights and interdependencies are sourced here.
           </p>
+        </div>
+        
+        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
+          Upcoming Modules
+        </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
+          {placeholderModuleData.map(module => (
+            <ModuleSummary key={module.id} data={module} isLoading={loading} />
+          ))}
         </div>
       </div>
     </Layout>
