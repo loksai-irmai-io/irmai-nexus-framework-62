@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import KnowledgeGraph from '@/components/dashboard/KnowledgeGraph';
 import MetricCard from '@/components/dashboard/MetricCard';
-import CompactMetric from '@/components/dashboard/CompactMetric';
-import ModuleSummary from '@/components/dashboard/ModuleSummary';
+import InfoWidget from '@/components/dashboard/InfoWidget';
 import Chart from '@/components/dashboard/Chart';
 import RibbonNav from '@/components/dashboard/RibbonNav';
 import { 
@@ -193,6 +192,204 @@ const placeholderModuleData = [
     status: 'info' as const,
     actionText: 'Module Coming Soon',
     actionHref: '#',
+  }
+];
+
+const infoWidgetData = [
+  {
+    id: 'process-discovery',
+    title: 'Process Discovery',
+    subtitle: 'Process mining and discovery insights',
+    icon: <GitBranch className="h-5 w-5 text-primary" />,
+    metrics: [
+      { 
+        label: 'Processes', 
+        value: '24', 
+        icon: 'chart-bar',
+        tooltip: 'Total number of processes discovered through process mining',
+        trend: { direction: 'up', value: 8 }
+      },
+      { 
+        label: 'Activities', 
+        value: '158', 
+        icon: 'activity',
+        tooltip: 'Total unique activities identified across all processes'
+      },
+      { 
+        label: 'Variants', 
+        value: '42', 
+        icon: 'git-branch',
+        tooltip: 'Number of process variants or alternative paths identified'
+      },
+      { 
+        label: 'Cases', 
+        value: '2,453', 
+        icon: 'info',
+        tooltip: 'Total number of cases analyzed'
+      },
+    ],
+    insights: [
+      'Payment processing has 3 bottlenecks identified',
+      'Customer onboarding has 2 automation opportunities'
+    ],
+    chartData: processDiscoveryData,
+    chartSeries: [{ name: 'Activities', dataKey: 'value', color: '#22c55e' }],
+    chartType: 'pie',
+    status: 'info',
+    actionText: 'View Process Discovery',
+    actionHref: '/process-discovery',
+    chartHeight: 200,
+  },
+  {
+    id: 'outlier-analysis',
+    title: 'Outlier Analysis',
+    subtitle: 'Anomaly detection and unusual patterns',
+    icon: <SearchX className="h-5 w-5 text-primary" />,
+    metrics: [
+      { 
+        label: 'Outliers', 
+        value: '18', 
+        icon: 'search-x',
+        tooltip: 'Total number of outliers detected',
+        trend: { direction: 'up', value: 12 }
+      },
+      { 
+        label: 'False Positives', 
+        value: '3', 
+        icon: 'info',
+        tooltip: 'Number of outliers determined to be false positives'
+      },
+      { 
+        label: 'Accuracy', 
+        value: '94%', 
+        icon: 'check',
+        tooltip: 'Accuracy rate of anomaly detection',
+        trend: { direction: 'up', value: 3 }
+      },
+      { 
+        label: 'Cases Analyzed', 
+        value: '5,120', 
+        icon: 'activity',
+        tooltip: 'Total number of cases analyzed for anomalies'
+      },
+    ],
+    insights: [
+      '5 new anomalies detected in the payment process',
+      'Loan approval has unusual timestamp patterns'
+    ],
+    chartData: outlierAnalysisData,
+    chartSeries: [
+      { name: 'Anomaly Count', dataKey: 'count', color: '#f97316' },
+      { name: 'Anomaly Rate (%)', dataKey: 'rate', color: '#3b82f6' }
+    ],
+    chartType: 'composed',
+    xAxisKey: 'name',
+    status: 'warning',
+    actionText: 'View Outlier Analysis',
+    actionHref: '/outlier-analysis',
+    chartHeight: 200,
+  },
+  {
+    id: 'fmea-analysis',
+    title: 'Predictive Risk Analytics',
+    subtitle: 'Risk assessment and failure mode analysis',
+    icon: <Shield className="h-5 w-5 text-primary" />,
+    metrics: [
+      { 
+        label: 'Open Risks', 
+        value: '46', 
+        icon: 'alert-triangle',
+        tooltip: 'Total number of open risk items',
+        trend: { direction: 'up', value: 5 }
+      },
+      { 
+        label: 'High Severity', 
+        value: '5', 
+        icon: 'trending-up',
+        tooltip: 'Number of high severity risks',
+        trend: { direction: 'down', value: 2 }
+      },
+      { 
+        label: 'Medium Severity', 
+        value: '18', 
+        icon: 'trending-up',
+        tooltip: 'Number of medium severity risks'
+      },
+      { 
+        label: 'Low Severity', 
+        value: '23', 
+        icon: 'trending-down',
+        tooltip: 'Number of low severity risks'
+      },
+    ],
+    insights: [
+      'Payment fraud risk increased by 12% this month',
+      'Data privacy risks require immediate attention'
+    ],
+    chartData: predictiveRiskData.map(item => ({
+      ...item,
+      size: Math.round(item.probability * item.impact)
+    })),
+    chartSeries: [
+      { name: 'Probability', dataKey: 'probability', color: '#8b5cf6' },
+      { name: 'Impact', dataKey: 'impact', color: '#ef4444' },
+      { name: 'Size', dataKey: 'size', color: '#d946ef' }
+    ],
+    chartType: 'composed',
+    xAxisKey: 'name',
+    status: 'error',
+    actionText: 'View Risk Analytics',
+    actionHref: '/fmea-analysis',
+    chartHeight: 200,
+  },
+  {
+    id: 'compliance-monitoring',
+    title: 'Compliance Monitoring',
+    subtitle: 'Regulatory compliance and gap analysis',
+    icon: <CheckCheck className="h-5 w-5 text-primary" />,
+    metrics: [
+      { 
+        label: 'Compliance Score', 
+        value: '85%', 
+        icon: 'chart-line',
+        tooltip: 'Overall compliance score across all frameworks',
+        trend: { direction: 'up', value: 5 }
+      },
+      { 
+        label: 'Critical Gaps', 
+        value: '3', 
+        icon: 'alert-triangle',
+        tooltip: 'Number of critical compliance gaps',
+        trend: { direction: 'down', value: 2 }
+      },
+      { 
+        label: 'Controls', 
+        value: '124', 
+        icon: 'circle-check',
+        tooltip: 'Total number of controls implemented'
+      },
+      { 
+        label: 'Frameworks', 
+        value: '8', 
+        icon: 'check',
+        tooltip: 'Number of compliance frameworks monitored'
+      },
+    ],
+    insights: [
+      'GDPR compliance score improved by 5% this quarter',
+      'PCI-DSS has 2 new gaps requiring immediate action'
+    ],
+    chartData: gapAnalysisData,
+    chartSeries: [
+      { name: 'Current Compliance', dataKey: 'current', color: '#0ea5e9' },
+      { name: 'Target', dataKey: 'target', color: '#64748b' }
+    ],
+    chartType: 'bar',
+    xAxisKey: 'name',
+    status: 'warning',
+    actionText: 'View Compliance Monitoring',
+    actionHref: '/compliance-monitoring',
+    chartHeight: 200,
   }
 ];
 
@@ -409,11 +606,11 @@ const Index = () => {
         </div>
         
         <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '600ms' }}>
-          Active Module Summaries
+          Core Module Summaries
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '700ms' }}>
-          {moduleSummaryData.map(module => (
-            <ModuleSummary 
+          {infoWidgetData.map(module => (
+            <InfoWidget 
               key={module.id} 
               data={module} 
               isLoading={loading}
