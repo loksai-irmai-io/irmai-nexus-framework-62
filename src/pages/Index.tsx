@@ -23,8 +23,7 @@ import {
   Database,
   FileBarChart,
   Workflow,
-  ClipboardList,
-  ChevronRight
+  ClipboardList
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
