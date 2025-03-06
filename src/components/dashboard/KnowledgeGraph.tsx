@@ -178,10 +178,15 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     // Get expansion states
     const expansionStates = {...expandedNodes};
     
-    // Check if any category nodes are expanded
+    // Check if any nodes are expanded
     const hasCategoryExpanded = Object.keys(expansionStates).some(nodeId => {
       const node = findNodeById(nodeId);
       return node?.level === 'category' && expansionStates[nodeId] === 'expanded';
+    });
+    
+    const hasDetailExpanded = Object.keys(expansionStates).some(nodeId => {
+      const node = findNodeById(nodeId);
+      return node?.level === 'detail' && expansionStates[nodeId] === 'expanded';
     });
     
     // Cache to store calculated positions to maintain consistency
@@ -196,10 +201,10 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       
       let position: {x: number, y: number};
       
-      // For main node, use the center but move up when category nodes are expanded
+      // For main node, use the center but move up more when category or detail nodes are expanded
       if (node.level === 'main') {
-        // Move the main node up more when category nodes are expanded
-        const yOffset = hasCategoryExpanded ? 0.5 : 0.8;
+        // Move the main node up more when nodes are expanded
+        const yOffset = hasCategoryExpanded ? 0.4 : (hasDetailExpanded ? 0.3 : 0.8);
         position = { x: center.x, y: center.y * yOffset }; 
       }
       // For nodes with parents, position hierarchically (top to bottom)
@@ -220,7 +225,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
             
             position = {
               x: horizontalPosition,
-              y: parentPosition.y + 130 // Increased vertical distance from parent
+              y: parentPosition.y + 150 // Increased vertical distance from parent
             };
           } 
           // For detail nodes, arrange in groups under their categories
@@ -238,12 +243,12 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
             const col = nodeIndex % columns;
             
             // Determine spacing based on container size and node count
-            const horizontalSpacing = Math.min(100, dimensions.width / (columns * 1.5));
-            const verticalSpacing = Math.min(100, dimensions.height / 8);
+            const horizontalSpacing = Math.min(140, dimensions.width / (columns * 1.5));
+            const verticalSpacing = Math.min(140, dimensions.height / 8);
             
             position = {
               x: parentX + (col - Math.floor(columns/2)) * horizontalSpacing,
-              y: parentPosition.y + 120 + (row * verticalSpacing) // Increased vertical spacing
+              y: parentPosition.y + 150 + (row * verticalSpacing) // Increased vertical spacing
             };
           }
         }
@@ -261,19 +266,19 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       const calculatedPosition = calculatePosition(node, parentPosition);
       
       // Scale radius based on container size, node level, and label length
-      let radiusMultiplier = Math.min(dimensions.width, dimensions.height) / 900;
+      let radiusMultiplier = Math.min(dimensions.width, dimensions.height) / 800;
       
       // Adjust radius based on node level
-      if (node.level === 'main') radiusMultiplier *= 1.3;
-      else if (node.level === 'category') radiusMultiplier *= 1.1;
-      else radiusMultiplier *= 1.0;
+      if (node.level === 'main') radiusMultiplier *= 1.5;
+      else if (node.level === 'category') radiusMultiplier *= 1.3;
+      else radiusMultiplier *= 1.2;
       
-      // Also adjust based on label length
-      const labelLengthFactor = Math.min(1.5, Math.max(1, node.label.length / 10));
+      // Also adjust based on label length - longer labels get bigger circles
+      const labelLengthFactor = Math.min(2.0, Math.max(1.2, node.label.length / 8));
       
       // Apply zoom factor to radius but not to position
       const scaledRadius = node.radius * radiusMultiplier * labelLengthFactor * 
-                          (isZoomed ? 1.2 : 1) * 
+                          (isZoomed ? 1.3 : 1.1) * 
                           Math.max(1, Math.min(dimensions.width, dimensions.height) / 600);
       
       return {
@@ -620,31 +625,18 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     return 'fill-white font-semibold';
   };
   
-  // Calculate if an edge is related to the selected node or its descendants
-  const isEdgeRelated = (edge: GraphEdge) => {
-    if (!selectedNode) return true;
+  // Function to determine if an edge should be visible
+  const isEdgeVisible = (edge: GraphEdge) => {
+    // Always show edges connected to expanded nodes
+    const isSourceExpanded = expandedNodes[edge.source] === 'expanded';
+    const isTargetExpanded = expandedNodes[edge.target] === 'expanded';
     
-    const node = findNodeById(selectedNode);
-    if (!node) return true;
+    // Always show edges connected to the selected node
+    const isSourceSelected = edge.source === selectedNode;
+    const isTargetSelected = edge.target === selectedNode;
     
-    // If edge connects to the selected node, it's related
-    if (edge.source === selectedNode || edge.target === selectedNode) return true;
-    
-    // If the selected node is expanded, all edges connected to its children are related
-    if (expandedNodes[selectedNode] === 'expanded') {
-      // For main node, check if edge connects to any category node
-      if (node.level === 'main') {
-        const categoryNodes = allNodes.category.filter(n => n.parent === node.id);
-        const categoryIds = categoryNodes.map(n => n.id);
-        if (categoryIds.includes(edge.source) || categoryIds.includes(edge.target)) return true;
-      }
-      // For category node, check if edge connects to any detail node
-      else if (node.level === 'category' && node.children) {
-        if (node.children.includes(edge.source) || node.children.includes(edge.target)) return true;
-      }
-    }
-    
-    return false;
+    // If any node on the edge is expanded or selected, show the edge
+    return isSourceExpanded || isTargetExpanded || isSourceSelected || isTargetSelected;
   };
   
   // Enhanced path between nodes with better visibility
@@ -671,6 +663,47 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
     
     // For nodes on the same level, use straight lines
     return `M${source.x},${source.y} L${target.x},${target.y}`;
+  };
+  
+  // Get edge style based on connected nodes
+  const getEdgeStyle = (edge: GraphEdge, isHovered: boolean) => {
+    // Default styles
+    let strokeWidth = "1.5";
+    let opacity = "0.6";
+    let dashArray = "";
+    
+    // Enhance edge visibility
+    const isSourceExpanded = expandedNodes[edge.source] === 'expanded';
+    const isTargetExpanded = expandedNodes[edge.target] === 'expanded';
+    const isVisible = isEdgeVisible(edge);
+    
+    // If connected to expanded nodes, make the edge more visible
+    if (isSourceExpanded || isTargetExpanded) {
+      strokeWidth = "2";
+      opacity = "0.9";
+    }
+    
+    // If edge connects nodes on different levels, use solid line
+    // If on same level, use dashed line 
+    const sourceNode = findNodeById(edge.source);
+    const targetNode = findNodeById(edge.target);
+    
+    if (sourceNode && targetNode && sourceNode.level === targetNode.level) {
+      dashArray = "5,5";
+    }
+    
+    // If the edge is hovered or connects to selected node, make it stand out
+    if (isHovered || edge.source === selectedNode || edge.target === selectedNode) {
+      strokeWidth = "2.5";
+      opacity = "1";
+      dashArray = "";
+    }
+    
+    return {
+      strokeWidth,
+      opacity,
+      strokeDasharray: dashArray
+    };
   };
   
   // Get badge style for node type
@@ -841,23 +874,20 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                 
                 if (!source || !target) return null;
                 
-                const isRelated = isEdgeRelated(edge);
-                const isExpanded = expandedNodes[edge.source] === 'expanded' || expandedNodes[edge.target] === 'expanded';
+                const isEdgeHovered = hoveredNode === edge.source || hoveredNode === edge.target;
+                const edgeStyles = getEdgeStyle(edge, isEdgeHovered);
                 
-                // Make edges more visible when expanded
-                const edgeOpacity = isExpanded ? 0.9 : 0.5;
-                const edgeWidth = isRelated ? (isExpanded ? 2.5 : 2) : 1;
-                const edgeColor = isRelated ? (isExpanded ? '#4a5568' : '#64748b') : '#e2e8f0';
-                
+                // Always show edges, but with proper styling
                 return (
                   <g key={edge.id}>
                     <path
                       d={getEdgePath(source, target)}
-                      stroke={edgeColor}
-                      strokeWidth={edgeWidth}
+                      stroke="#4a5568"
+                      strokeWidth={edgeStyles.strokeWidth}
                       fill="none"
-                      opacity={edgeOpacity}
-                      strokeDasharray={source.level === target.level ? undefined : "none"}
+                      opacity={edgeStyles.opacity}
+                      strokeDasharray={edgeStyles.strokeDasharray}
+                      className="transition-all duration-300"
                     />
                   </g>
                 );
@@ -868,7 +898,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
               {adjustedNodes.map((node) => {
                 const isSelected = selectedNode === node.id;
                 const isHovered = hoveredNode === node.id;
-                const labelFontSize = node.level === 'main' ? 16 : (node.level === 'category' ? 14 : 12);
+                const labelFontSize = Math.min(14, Math.max(10, node.radius / 5)); // Dynamic font size based on radius
                 
                 // Ensure node click event has stopPropagation to prevent unintended behavior
                 return (
@@ -887,16 +917,17 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                       r={node.radius}
                       className={cn(
                         getNodeColor(node.type, isSelected),
-                        getNodeBorderColor(node.type, isSelected)
+                        getNodeBorderColor(node.type, isSelected),
+                        "transition-all duration-300"
                       )}
                     />
                     
                     <text
                       x="0"
-                      y="2"
+                      y="0"
                       textAnchor="middle"
                       dominantBaseline="middle"
-                      className={getNodeTextColor(node.type)}
+                      className={cn(getNodeTextColor(node.type), "transition-all duration-300")}
                       fontSize={labelFontSize}
                     >
                       {node.label}
