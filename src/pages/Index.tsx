@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import KnowledgeGraph from '@/components/dashboard/KnowledgeGraph';
 import MetricCard from '@/components/dashboard/MetricCard';
@@ -18,22 +18,21 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 
-// Sample data for charts
 const lossEventsData = [
-  { name: 'Jan', value: 4, amount: 100 },
-  { name: 'Feb', value: 5, amount: 150 },
-  { name: 'Mar', value: 3, amount: 250 },
-  { name: 'Apr', value: 6, amount: 180 },
-  { name: 'May', value: 4, amount: 120 },
-  { name: 'Jun', value: 3, amount: 80 },
+  { name: 'Jan 2025', value: 4, amount: 100000, events: 2 },
+  { name: 'Feb 2025', value: 5, amount: 150000, events: 3 },
+  { name: 'Mar 2025', value: 3, amount: 250000, events: 3 },
+  { name: 'Apr 2025', value: 6, amount: 180000, events: 4 },
+  { name: 'May 2025', value: 4, amount: 120000, events: 2 },
+  { name: 'Jun 2025', value: 3, amount: 80000, events: 1 },
 ];
 
 const riskDistributionData = [
-  { name: 'Operational', value: 35 },
-  { name: 'Credit', value: 25 },
-  { name: 'Market', value: 15 },
-  { name: 'Compliance', value: 15 },
-  { name: 'Strategic', value: 10 },
+  { name: 'Operational', value: 35, count: 16, color: '#f97316' },
+  { name: 'Credit', value: 25, count: 12, color: '#8b5cf6' },
+  { name: 'Market', value: 15, count: 7, color: '#06b6d4' },
+  { name: 'Compliance', value: 15, count: 7, color: '#10b981' },
+  { name: 'Strategic', value: 10, count: 4, color: '#f59e0b' },
 ];
 
 const incidentSeverityData = [
@@ -48,7 +47,6 @@ const controlsHealthData = [
   { name: 'Failing', value: 15 },
 ];
 
-// Process Discovery Data
 const processDiscoveryData = [
   { name: 'Payment Processing', value: 32 },
   { name: 'Customer Onboarding', value: 24 },
@@ -57,7 +55,6 @@ const processDiscoveryData = [
   { name: 'Reporting', value: 10 },
 ];
 
-// Outlier Analysis Data
 const outlierAnalysisData = [
   { name: 'Jan', count: 5, rate: 1.2 },
   { name: 'Feb', count: 8, rate: 1.8 },
@@ -67,7 +64,6 @@ const outlierAnalysisData = [
   { name: 'Jun', count: 10, rate: 2.0 },
 ];
 
-// Predictive Risk Analytics Data
 const predictiveRiskData = [
   { name: 'Fraud', probability: 0.7, impact: 85 },
   { name: 'Data Breach', probability: 0.4, impact: 95 },
@@ -76,7 +72,6 @@ const predictiveRiskData = [
   { name: 'Operations', probability: 0.6, impact: 60 },
 ];
 
-// Gap Analysis Data
 const gapAnalysisData = [
   { name: 'PCI-DSS', current: 75, target: 100 },
   { name: 'GDPR', current: 85, target: 100 },
@@ -85,7 +80,6 @@ const gapAnalysisData = [
   { name: 'Basel III', current: 70, target: 100 },
 ];
 
-// Module summary data
 const moduleSummaryData = [
   {
     id: 'process-discovery',
@@ -165,7 +159,6 @@ const moduleSummaryData = [
   }
 ];
 
-// Placeholder module data
 const placeholderModuleData = [
   {
     id: 'controls-testing',
@@ -201,17 +194,67 @@ const placeholderModuleData = [
 
 const Index = () => {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   
-  // Simulate drill-down
+  const handleNavigate = (module: string, filter?: any) => {
+    setLoading(true);
+    
+    if (filter) {
+      sessionStorage.setItem(`${module}-filter`, JSON.stringify(filter));
+    }
+    
+    toast.info(`Navigating to ${module}...`);
+    
+    setTimeout(() => {
+      setLoading(false);
+      navigate(`/${module}`);
+    }, 500);
+  };
+  
   const handleMetricClick = (title: string) => {
     setLoading(true);
     
+    const moduleMapping: Record<string, string> = {
+      "Risk Management": "fmea-analysis",
+      "High-Severity Risks": "fmea-analysis?severity=high",
+      "Potential Loss": "fmea-analysis?impact=financial",
+      "Compliance": "compliance-monitoring",
+    };
+    
+    const route = moduleMapping[title] || "fmea-analysis";
+    
     toast.info(`Navigating to ${title} details...`);
     
-    // Simulate loading
     setTimeout(() => {
       setLoading(false);
+      navigate(`/${route}`);
     }, 500);
+  };
+  
+  const handleLossEventClick = (data: any) => {
+    const month = data.name;
+    const amount = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0
+    }).format(data.amount);
+    
+    toast.info(`Navigating to Incident Management for ${month} (${data.events} events, ${amount})`);
+    
+    handleNavigate('incident-management', { 
+      month: month,
+      events: data.events,
+      amount: data.amount
+    });
+  };
+  
+  const handleRiskCategoryClick = (data: any) => {
+    toast.info(`Navigating to Risk Analysis filtered by ${data.name} risks (${data.count} items)`);
+    
+    handleNavigate('fmea-analysis', { 
+      category: data.name,
+      count: data.count 
+    });
   };
   
   return (
@@ -266,7 +309,6 @@ const Index = () => {
           />
         </div>
         
-        {/* Enhanced Digital Twin Hub Section */}
         <div className="mb-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
           <h2 className="text-2xl font-semibold tracking-tight mb-4">Digital Twin Overview</h2>
           <div className="p-1 border border-primary/20 rounded-lg bg-primary/5">
@@ -277,13 +319,41 @@ const Index = () => {
           </p>
         </div>
         
-        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '300ms' }}>
+          <Chart 
+            title="Loss Events Over Time"
+            description="Trend of financial impact and event count by month"
+            data={lossEventsData}
+            series={[
+              { name: 'Financial Loss ($K)', dataKey: 'amount', color: '#ef4444' },
+              { name: 'Event Count', dataKey: 'events', color: '#8b5cf6' }
+            ]}
+            type="composed"
+            xAxisKey="name"
+            height={300}
+            tooltip="Click on any month to see detailed incident reports for that period"
+            onClick={handleLossEventClick}
+          />
+          
+          <Chart 
+            title="Risk Distribution by Category"
+            description="Breakdown of risks by category or business unit"
+            data={riskDistributionData}
+            series={[{ name: 'Percentage', dataKey: 'value', color: '#0ea5e9' }]}
+            type="pie"
+            showPercentages={true}
+            showLegend={true}
+            height={300}
+            tooltip="Click on any category to see detailed risk analysis for that segment"
+            onClick={handleRiskCategoryClick}
+          />
+        </div>
+        
+        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '400ms' }}>
           Module Insights
         </h2>
         
-        {/* Module-specific Visualizations */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '400ms' }}>
-          {/* Process Discovery Visualization */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '500ms' }}>
           <Chart 
             title="Process Discovery: Activity Distribution"
             data={processDiscoveryData}
@@ -292,10 +362,9 @@ const Index = () => {
             showPercentages={true}
             height={300}
             tooltip="Distribution of activities across business processes"
-            onClick={(data) => handleMetricClick(`${data.name} Process Details`)}
+            onClick={(data) => handleNavigate('process-discovery', { process: data.name })}
           />
           
-          {/* Outlier Analysis Visualization */}
           <Chart 
             title="Outlier Analysis: Anomaly Trends"
             data={outlierAnalysisData}
@@ -307,10 +376,9 @@ const Index = () => {
             xAxisKey="name"
             height={300}
             tooltip="Trend of detected anomalies over time"
-            onClick={(data) => handleMetricClick(`Anomalies for ${data.name}`)}
+            onClick={(data) => handleNavigate('outlier-analysis', { month: data.name })}
           />
           
-          {/* Predictive Risk Analytics Visualization */}
           <Chart 
             title="Predictive Risk Analytics: Heat Map"
             description="Bubble size represents risk severity (probability × impact)"
@@ -327,10 +395,9 @@ const Index = () => {
             xAxisKey="name"
             height={300}
             tooltip="Risk heat map showing probability vs impact"
-            onClick={(data) => handleMetricClick(`${data.name} Risk Analysis`)}
+            onClick={(data) => handleNavigate('fmea-analysis', { risk: data.name })}
           />
           
-          {/* Gap Analysis Visualization */}
           <Chart 
             title="Compliance Monitoring: Gap Analysis"
             data={gapAnalysisData}
@@ -342,22 +409,27 @@ const Index = () => {
             xAxisKey="name"
             height={300}
             tooltip="Comparison of current vs. target compliance levels"
-            onClick={(data) => handleMetricClick(`${data.name} Compliance Details`)}
+            onClick={(data) => handleNavigate('compliance-monitoring', { framework: data.name })}
           />
         </div>
         
-        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '500ms' }}>
+        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '600ms' }}>
           Active Module Summaries
         </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '600ms' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '700ms' }}>
           {moduleSummaryData.map(module => (
-            <ModuleSummary key={module.id} data={module} isLoading={loading} />
+            <ModuleSummary 
+              key={module.id} 
+              data={module} 
+              isLoading={loading}
+              onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
+            />
           ))}
         </div>
         
-        <Separator className="my-8 animate-fade-in" style={{ animationDelay: '700ms' }} />
+        <Separator className="my-8 animate-fade-in" style={{ animationDelay: '800ms' }} />
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '800ms' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '900ms' }}>
           <Chart 
             title="Incidents by Severity"
             data={incidentSeverityData}
@@ -368,7 +440,7 @@ const Index = () => {
             xAxisKey="name"
             height={300}
             tooltip="Distribution of incidents by severity level"
-            onClick={(data) => handleMetricClick(`${data.name} Incidents`)}
+            onClick={(data) => handleNavigate('incident-management', { severity: data.name })}
           />
           <Chart 
             title="Controls Health"
@@ -378,7 +450,7 @@ const Index = () => {
             showPercentages={true}
             height={300}
             tooltip="Current health status of control mechanisms"
-            onClick={(data) => handleMetricClick(`${data.name} Controls`)}
+            onClick={(data) => handleNavigate('controls-testing', { status: data.name.toLowerCase() })}
           />
           <div className="bg-card rounded-lg border shadow-sm p-4">
             <h3 className="font-semibold mb-3">Announcements & Tips</h3>
@@ -399,10 +471,10 @@ const Index = () => {
           </div>
         </div>
         
-        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '900ms' }}>
+        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '1000ms' }}>
           Upcoming Modules
         </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '1000ms' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
           {placeholderModuleData.map(module => (
             <ModuleSummary key={module.id} data={module} isLoading={loading} />
           ))}

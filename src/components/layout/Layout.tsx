@@ -16,7 +16,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Header />
         <div className="flex flex-1">
           <Sidebar />
-          <main className="flex-1 pl-16 transition-all duration-300 animate-fade-in overflow-x-hidden">
+          <main className="flex-1 pl-16 transition-all duration-300 animate-fade-in overflow-x-hidden pb-8">
             {children}
           </main>
         </div>

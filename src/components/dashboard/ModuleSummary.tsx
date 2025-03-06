@@ -22,12 +22,14 @@ interface ModuleSummaryProps {
   data: ModuleSummaryData;
   className?: string;
   isLoading?: boolean;
+  onClick?: () => void;
 }
 
 const ModuleSummary: React.FC<ModuleSummaryProps> = ({
   data,
   className,
-  isLoading = false
+  isLoading = false,
+  onClick
 }) => {
   const statusClasses = {
     success: 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800',
@@ -42,9 +44,11 @@ const ModuleSummary: React.FC<ModuleSummaryProps> = ({
     <div 
       className={cn(
         "rounded-lg border bg-card shadow-sm overflow-hidden transition-all hover:shadow-card-hover",
+        onClick ? "cursor-pointer" : "",
         statusClass,
         className
       )}
+      onClick={onClick}
     >
       {isLoading ? (
         <div className="p-4 space-y-4">
@@ -100,13 +104,16 @@ const ModuleSummary: React.FC<ModuleSummaryProps> = ({
             
             {data.actionText && data.actionHref && (
               <div className="mt-4">
-                <a 
-                  href={data.actionHref} 
+                <div 
                   className="w-full flex items-center justify-between p-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors text-sm"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent double navigation
+                    onClick && onClick();
+                  }}
                 >
                   <span>{data.actionText}</span>
                   <ChevronRight className="h-4 w-4" />
-                </a>
+                </div>
               </div>
             )}
           </div>
