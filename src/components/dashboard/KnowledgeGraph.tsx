@@ -192,20 +192,14 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       
       // For main node, use the center
       if (node.level === 'main') {
-        position = {
-          x: center.x,
-          y: center.y
-        };
+        position = { x: center.x, y: center.y };
       }
       // For nodes with parents, position deterministically around parent
       else if (parentPosition && node.parent) {
         const parentNode = findNodeById(node.parent);
         if (!parentNode) {
           // Fallback to original position if parent not found
-          position = {
-            x: node.x,
-            y: node.y
-          };
+          position = { x: node.x, y: node.y };
         } else {
           // Use the node's index among siblings to calculate a fixed angle
           let siblings: GraphNode[] = [];
@@ -219,13 +213,15 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
           const totalSiblings = siblings.length;
           
           // Calculate angle based on position in siblings (evenly distributed)
+          // Using a fixed angle approach rather than dynamic positioning
           const angleStep = (2 * Math.PI) / Math.max(totalSiblings, 3);
           const angle = nodeIndex * angleStep;
           
-          // Distance from parent based on level and zoom
+          // Fixed distance from parent based on level and container size
+          const baseDistance = Math.min(dimensions.width, dimensions.height) * 0.2;
           const distance = parentNode.level === 'main' ? 
-            150 * (isExpanded ? 1.2 : 1) : 
-            120 * (isExpanded ? 1.2 : 1);
+            baseDistance * (isExpanded ? 1.2 : 1) : 
+            baseDistance * 0.8 * (isExpanded ? 1.2 : 1);
           
           position = {
             x: parentPosition.x + Math.cos(angle) * distance,
@@ -234,10 +230,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
         }
       } else {
         // Fallback to original position or an appropriate position based on the graph center
-        position = {
-          x: node.x,
-          y: node.y
-        };
+        position = { x: node.x, y: node.y };
       }
       
       // Store in cache for consistency
@@ -250,30 +243,25 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
       const calculatedPosition = calculatePosition(node, parentPosition);
       const isExpanded = expansionStates[node.id] === 'expanded';
       
-      // Scale position based on dimensions and zoom
-      const scaledX = calculatedPosition.x;
-      const scaledY = calculatedPosition.y;
-      
-      // Adjust position based on zoom
-      const adjustedX = center.x + (scaledX - center.x) * zoomFactor;
-      const adjustedY = center.y + (scaledY - center.y) * zoomFactor;
-      
-      // Adjust radius based on node level, zoom, and container size
+      // Scale radius based on container size and node level
       let radiusMultiplier = Math.min(dimensions.width, dimensions.height) / 1000;
       if (node.level === 'main') radiusMultiplier *= 1.2;
       else if (node.level === 'category') radiusMultiplier *= 1;
       else radiusMultiplier *= 0.9;
       
+      // Apply zoom factor to radius but not to position
+      const scaledRadius = node.radius * radiusMultiplier * (isZoomed ? 1.2 : 1) * 
+                          Math.max(1, Math.min(dimensions.width, dimensions.height) / 600);
+      
       return {
         ...node,
-        x: adjustedX,
-        y: adjustedY,
-        radius: node.radius * radiusMultiplier * (isZoomed ? 1.2 : 1) * Math.max(1, Math.min(dimensions.width, dimensions.height) / 600)
+        x: calculatedPosition.x,
+        y: calculatedPosition.y,
+        radius: scaledRadius
       };
     };
     
     // Process nodes in hierarchy order: main -> category -> detail
-    // This ensures parents have positions before their children
     const mainNodes = nodes.filter(n => n.level === 'main').map(n => 
       adjustPosition(n)
     );
@@ -556,7 +544,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
   };
   
   // Get node color based on type - modified to remove hover transformations
-  const getNodeColor = (type: NodeType, isSelected: boolean, isHovered: boolean) => {
+  const getNodeColor = (type: NodeType, isSelected: boolean) => {
     const baseColorMap: Record<NodeType, string> = {
       product: 'bg-blue-600',
       process: 'bg-green-600',
@@ -787,7 +775,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                       strokeWidth={isRelated ? 1.5 : 1}
                       fill="none"
                       opacity={isRelated ? 0.6 : 0.3}
-                      markerEnd="url(#arrowhead)"
                     />
                   </g>
                 );
@@ -798,24 +785,29 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
               {adjustedNodes.map((node) => {
                 const isSelected = selectedNode === node.id;
                 const isHovered = hoveredNode === node.id;
-                const expandable = node.level === 'main' || node.level === 'category';
+                const expandable = (node.level === 'main' || node.level === 'category') && 
+                                  node.children && node.children.length > 0; // Only show + on expandable nodes
                 const expanded = isNodeExpanded(node.id);
                 
                 return (
                   <g 
                     key={node.id}
                     transform={`translate(${node.x},${node.y})`}
-                    onClick={() => handleNodeClick(node.id)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent event bubbling
+                      handleNodeClick(node.id);
+                    }}
                     onMouseEnter={() => setHoveredNode(node.id)}
                     onMouseLeave={() => setHoveredNode(null)}
                     style={{ cursor: 'pointer' }}
+                    className="transition-transform duration-150" // Add smooth transition
                   >
                     <circle
                       cx="0"
                       cy="0"
                       r={node.radius}
                       className={cn(
-                        getNodeColor(node.type, isSelected, isHovered),
+                        getNodeColor(node.type, isSelected),
                         getNodeBorderColor(node.type, isSelected)
                       )}
                     />
@@ -831,8 +823,15 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                       {node.label}
                     </text>
                     
-                    {expandable && node.children && node.children.length > 0 && (
-                      <g transform={`translate(0, ${node.radius * 0.6})`}>
+                    {/* Only show expand/collapse button on expandable nodes */}
+                    {expandable && (
+                      <g 
+                        transform={`translate(0, ${node.radius * 0.6})`}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent event bubbling
+                          toggleNodeExpansion(node.id);
+                        }}
+                      >
                         <circle
                           cx="0"
                           cy="0"
@@ -840,9 +839,9 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ className }) => {
                           className={`fill-white/80 stroke-current ${getNodeBorderColor(node.type, false)}`}
                         />
                         {expanded ? (
-                          <Minus className="h-2 w-2 stroke-current text-gray-700" />
+                          <Minus className="h-2 w-2 stroke-current text-gray-700" style={{ transform: 'translate(-50%, -50%)' }} />
                         ) : (
-                          <Plus className="h-2 w-2 stroke-current text-gray-700" />
+                          <Plus className="h-2 w-2 stroke-current text-gray-700" style={{ transform: 'translate(-50%, -50%)' }} />
                         )}
                       </g>
                     )}
