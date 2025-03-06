@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -661,7 +662,7 @@ const Index = () => {
         </RibbonNav>
         
         <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '600ms' }}>
-          Core Module Summaries
+          Module Insights
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '700ms' }}>
           {infoWidgetData.map(module => (
