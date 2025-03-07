@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   AlertTriangle, 
@@ -36,10 +35,8 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
   const [hoveredLogIndex, setHoveredLogIndex] = useState<number | null>(null);
   const { toast } = useToast();
   
-  // Get event logs for this outlier (or empty array if not found)
   const eventLogs = mockEventLogs[outlier.id] || [];
   
-  // Format the timestamp for display
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
     return date.toLocaleString('en-US', {
@@ -51,7 +48,6 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
     });
   };
   
-  // Convert the event logs to chart data
   const chartData: ChartData[] = eventLogs.map(log => ({
     name: log.timestamp.split('T')[1].substring(0, 5),
     value: log.deviationValue,
@@ -89,7 +85,7 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
     toast({
       title: "Outlier Confirmed",
       description: `The outlier "${outlier.name}" has been confirmed.`,
-      variant: "success",
+      variant: "default",
     });
   };
   
@@ -105,7 +101,7 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
     toast({
       title: "Investigation Created",
       description: `A new investigation has been created for "${outlier.name}".`,
-      variant: "info",
+      variant: "default",
     });
   };
   
@@ -114,7 +110,7 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
       toast({
         title: "Comment Added",
         description: "Your comment has been added to this outlier event.",
-        variant: "success",
+        variant: "default",
       });
       setComment('');
       setIsAddingComment(false);
@@ -130,7 +126,6 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
   };
   
   const handleDownloadEventLog = () => {
-    // Create CSV content
     const headers = ['Timestamp', 'Activity', 'Resource', 'Deviation Value'];
     const rows = eventLogs.map(log => [
       log.timestamp,
@@ -144,7 +139,6 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
       ...rows.map(row => row.join(','))
     ].join('\n');
     
-    // Create and trigger download
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -157,7 +151,7 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
     toast({
       title: "Download Started",
       description: "Event log data is being downloaded as CSV.",
-      variant: "success",
+      variant: "default",
     });
   };
   
