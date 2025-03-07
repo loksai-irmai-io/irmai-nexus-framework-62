@@ -49,7 +49,7 @@ const mainMenuItems: MenuItem[] = [
   },
   {
     id: 'fmea-analysis',
-    label: 'FMEA Analysis',
+    label: 'Predictive Risk Analytics',
     icon: Shield,
     href: '/fmea-analysis'
   },

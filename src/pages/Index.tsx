@@ -848,8 +848,14 @@ const Index = () => {
     setLoading(true);
     
     const moduleMapping: Record<string, string> = {
+      "High-Severity Risks": "fmea-analysis",
+      "Open Risks": "outlier-analysis",
+      "Compliance Score": "gap-analysis",
+      "Critical Process Steps": "process-discovery",
+      "Total Potential Loss": "fmea-analysis?impact=financial",
+      "Control Failures": "controls-testing",
+      "Scenario Analysis": "scenario-analysis",
       "Risk Management": "fmea-analysis",
-      "High-Severity Risks": "fmea-analysis?severity=high",
       "Potential Loss": "fmea-analysis?impact=financial",
       "Compliance": "compliance-monitoring",
     };
@@ -893,7 +899,7 @@ const Index = () => {
   return (
     <Layout>
       <div className="container py-6 animate-fade-in">
-        <h1 className="text-3xl font-bold tracking-tight mb-1">Operational Risk Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight mb-1">Dashboard</h1>
         <p className="text-muted-foreground mb-6">
           Real-time insights and analytics for operational risk management
         </p>
@@ -917,7 +923,7 @@ const Index = () => {
             tooltip="Total number of open risk items across all categories"
             trend={8}
             isLoading={loading}
-            onClick={() => handleMetricClick("Risk Management")}
+            onClick={() => handleMetricClick("Open Risks")}
           />
           <MetricCard
             title="Compliance Score"
@@ -927,7 +933,7 @@ const Index = () => {
             tooltip="Overall compliance score across all regulatory frameworks"
             trend={5}
             isLoading={loading}
-            onClick={() => handleMetricClick("Compliance")}
+            onClick={() => handleMetricClick("Compliance Score")}
           />
           <MetricCard
             title="Critical Process Steps"
@@ -937,7 +943,7 @@ const Index = () => {
             tooltip="Active processes being monitored in the system"
             trend={3}
             isLoading={loading}
-            onClick={() => handleNavigate('process-discovery')}
+            onClick={() => handleMetricClick("Critical Process Steps")}
           />
           <MetricCard
             title="Total Potential Loss"
@@ -958,7 +964,7 @@ const Index = () => {
             tooltip="Percentage of control models that have failed testing"
             trend={-3}
             isLoading={loading}
-            onClick={() => handleNavigate('controls-testing')}
+            onClick={() => handleMetricClick("Control Failures")}
           />
           <MetricCard
             title="Scenario Analysis"
@@ -969,12 +975,12 @@ const Index = () => {
             tooltip="Projected loss based on current scenario analysis"
             trend={8}
             isLoading={loading}
-            onClick={() => handleNavigate('scenario-analysis')}
+            onClick={() => handleMetricClick("Scenario Analysis")}
           />
         </RibbonNav>
         
         <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '600ms' }}>
-          Module Insights
+          Risk Insights
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '700ms' }}>
           {infoWidgetData.map(module => (
