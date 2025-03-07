@@ -34,6 +34,7 @@ export interface OutlierComment {
   content: string;
 }
 
+// Updated to work with Chart component by adding index signature
 export interface OutlierTimelineData {
   date: string;
   count: number;
@@ -41,6 +42,7 @@ export interface OutlierTimelineData {
   high: number;
   medium: number;
   low: number;
+  [key: string]: string | number; // Add index signature to make compatible with ChartData
 }
 
 export interface OutlierCategoryData {
