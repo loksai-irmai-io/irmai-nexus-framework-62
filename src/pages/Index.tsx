@@ -982,30 +982,15 @@ const Index = () => {
         <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '600ms' }}>
           Risk Insights
         </h2>
-        <div className="mb-8 animate-fade-in" style={{ animationDelay: '700ms' }}>
-          {/* First row with 4 widgets */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            {infoWidgetData.slice(0, 4).map(module => (
-              <InfoWidget 
-                key={module.id} 
-                data={module} 
-                isLoading={loading}
-                onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
-              />
-            ))}
-          </div>
-          
-          {/* Second row with 3 widgets */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {infoWidgetData.slice(4, 7).map(module => (
-              <InfoWidget 
-                key={module.id} 
-                data={module} 
-                isLoading={loading}
-                onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
-              />
-            ))}
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '700ms' }}>
+          {infoWidgetData.map(module => (
+            <InfoWidget 
+              key={module.id} 
+              data={module} 
+              isLoading={loading}
+              onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
+            />
+          ))}
         </div>
         
         <Separator className="my-8 animate-fade-in" style={{ animationDelay: '800ms' }} />
