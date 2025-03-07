@@ -1,23 +1,11 @@
 
-import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { OutlierCategory, OutlierDetectionSettings } from './types';
-import { Bot, RefreshCcw, Settings2, Plus, AlertTriangle, Bell, Save } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 
 interface OutlierSettingsProps {
   open: boolean;
@@ -25,38 +13,29 @@ interface OutlierSettingsProps {
 }
 
 const OutlierSettings: React.FC<OutlierSettingsProps> = ({ open, onOpenChange }) => {
-  const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<string>("sensitivity");
-  
-  // Mock settings state
-  const [settings, setSettings] = useState<OutlierDetectionSettings>({
+  // Default settings - in a real app, these would be loaded from API/state
+  const [settings, setSettings] = React.useState<OutlierDetectionSettings>({
     sensitivityThreshold: 75,
     categoryThresholds: {
-      sequence_violation: 65,
+      sequence_violation: 70,
       time_outlier: 80,
-      resource_imbalance: 70,
-      data_quality: 60,
+      resource_imbalance: 75,
+      data_quality: 85,
       compliance_breach: 90
     },
-    enabledCategories: [
-      'sequence_violation',
-      'time_outlier',
-      'resource_imbalance', 
-      'data_quality',
-      'compliance_breach'
-    ],
+    enabledCategories: ['sequence_violation', 'time_outlier', 'resource_imbalance', 'data_quality', 'compliance_breach'],
     enablePredictiveAlerts: true,
-    alertThreshold: 70,
-    refreshInterval: 300
+    alertThreshold: 3, // Minimum severity level (e.g., 3 = medium)
+    refreshInterval: 300 // In seconds
   });
-  
+
   const handleSensitivityChange = (value: number[]) => {
     setSettings(prev => ({
       ...prev,
       sensitivityThreshold: value[0]
     }));
   };
-  
+
   const handleCategoryThresholdChange = (category: OutlierCategory, value: number[]) => {
     setSettings(prev => ({
       ...prev,
@@ -66,7 +45,7 @@ const OutlierSettings: React.FC<OutlierSettingsProps> = ({ open, onOpenChange })
       }
     }));
   };
-  
+
   const handleCategoryToggle = (category: OutlierCategory, checked: boolean) => {
     setSettings(prev => ({
       ...prev,
@@ -75,246 +54,129 @@ const OutlierSettings: React.FC<OutlierSettingsProps> = ({ open, onOpenChange })
         : prev.enabledCategories.filter(c => c !== category)
     }));
   };
-  
+
   const handlePredictiveAlertsToggle = (checked: boolean) => {
     setSettings(prev => ({
       ...prev,
       enablePredictiveAlerts: checked
     }));
   };
-  
-  const handleAlertThresholdChange = (value: number[]) => {
+
+  const handleRefreshIntervalChange = (value: number[]) => {
     setSettings(prev => ({
       ...prev,
-      alertThreshold: value[0]
+      refreshInterval: value[0]
     }));
   };
-  
-  const handleRefreshIntervalChange = (value: string) => {
-    const interval = parseInt(value);
-    if (!isNaN(interval) && interval > 0) {
-      setSettings(prev => ({
-        ...prev,
-        refreshInterval: interval
-      }));
-    }
-  };
-  
-  const handleSaveSettings = () => {
-    // This would typically save to backend
-    toast({
-      title: "Settings saved",
-      description: "Your anomaly detection settings have been updated",
-    });
+
+  const handleSave = () => {
+    // In a real app, this would save settings to API/state
     onOpenChange(false);
   };
-  
-  // Format seconds to minutes and seconds
-  const formatInterval = (seconds: number) => {
-    if (seconds < 60) {
-      return `${seconds} seconds`;
-    } else {
-      const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = seconds % 60;
-      return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes} minutes`;
-    }
-  };
-  
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Settings2 className="h-5 w-5 text-primary" />
-            Anomaly Detection Settings
-          </DialogTitle>
+          <DialogTitle>Anomaly Detection Settings</DialogTitle>
           <DialogDescription>
-            Configure how anomalies are detected, displayed, and alerted in your processes
+            Configure how anomalies are detected and alerted. Higher sensitivity will detect more anomalies but may include more false positives.
           </DialogDescription>
         </DialogHeader>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="sensitivity">Detection Sensitivity</TabsTrigger>
-            <TabsTrigger value="categories">Anomaly Categories</TabsTrigger>
-            <TabsTrigger value="alerts">Alerts & Notifications</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="sensitivity" className="space-y-4 pt-2">
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between mb-2">
-                  <Label htmlFor="overall-sensitivity">
-                    Overall Sensitivity Threshold
-                  </Label>
-                  <span className="text-sm font-medium">
-                    {settings.sensitivityThreshold}%
-                  </span>
-                </div>
-                <Slider 
-                  id="overall-sensitivity"
-                  value={[settings.sensitivityThreshold]} 
-                  min={0} 
-                  max={100} 
-                  step={5}
-                  onValueChange={handleSensitivityChange}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Higher values detect more subtle anomalies but may increase false positives
-                </p>
-              </div>
-              
-              <div className="pt-4 border-t">
-                <h3 className="text-sm font-medium mb-4">Per-Category Sensitivity</h3>
-                
-                <div className="space-y-5">
-                  {Object.entries(settings.categoryThresholds).map(([category, threshold]) => (
-                    <div key={category}>
-                      <div className="flex justify-between mb-2">
-                        <Label htmlFor={`threshold-${category}`}>
-                          {category.split('_').map(word => 
-                            word.charAt(0).toUpperCase() + word.slice(1)
-                          ).join(' ')}
-                        </Label>
-                        <span className="text-sm font-medium">{threshold}%</span>
-                      </div>
-                      <Slider 
-                        id={`threshold-${category}`}
-                        value={[threshold]} 
-                        min={0} 
-                        max={100} 
-                        step={5}
-                        onValueChange={(value) => handleCategoryThresholdChange(category as OutlierCategory, value)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
+
+        <div className="space-y-6 py-4">
+          {/* Overall sensitivity control */}
+          <div className="space-y-3">
+            <div className="flex justify-between">
+              <Label htmlFor="sensitivity">Overall Sensitivity</Label>
+              <span className="text-sm font-medium">{settings.sensitivityThreshold}%</span>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="categories" className="space-y-4 pt-2">
-            <div>
-              <h3 className="text-sm font-medium mb-3">Enabled Anomaly Categories</h3>
-              <p className="text-xs text-muted-foreground mb-4">
-                Select which types of anomalies should be detected and displayed
-              </p>
-              
-              <div className="space-y-3">
-                {Object.keys(settings.categoryThresholds).map((category) => (
-                  <div key={category} className="flex items-center space-x-2">
+            <Slider
+              id="sensitivity"
+              defaultValue={[settings.sensitivityThreshold]}
+              max={100}
+              step={5}
+              onValueChange={handleSensitivityChange}
+            />
+            <p className="text-sm text-muted-foreground">
+              Higher sensitivity detects more anomalies but may increase false positives
+            </p>
+          </div>
+
+          {/* Category-specific thresholds */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium">Category Thresholds</h3>
+            
+            {Object.entries(settings.categoryThresholds).map(([category, threshold]) => (
+              <div key={category} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
                     <Checkbox 
-                      id={`category-${category}`} 
+                      id={`enable-${category}`}
                       checked={settings.enabledCategories.includes(category as OutlierCategory)}
                       onCheckedChange={(checked) => 
                         handleCategoryToggle(category as OutlierCategory, checked as boolean)
                       }
                     />
-                    <Label
-                      htmlFor={`category-${category}`}
-                      className="text-sm font-medium cursor-pointer"
-                    >
-                      {category.split('_').map(word => 
-                        word.charAt(0).toUpperCase() + word.slice(1)
-                      ).join(' ')}
+                    <Label htmlFor={`enable-${category}`} className="text-sm capitalize">
+                      {category.replace('_', ' ')}
                     </Label>
                   </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="pt-4 border-t mt-4">
-              <h3 className="text-sm font-medium mb-3">Custom Anomaly Types</h3>
-              <p className="text-xs text-muted-foreground mb-4">
-                Add domain-specific anomaly types for your processes
-              </p>
-              
-              <Button variant="outline" size="sm" className="flex items-center">
-                <Plus className="h-4 w-4 mr-1" />
-                Add Custom Anomaly Type
-              </Button>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="alerts" className="space-y-4 pt-2">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label className="text-base" htmlFor="predictive-alerts">
-                  <div className="flex items-center">
-                    <Bot className="h-4 w-4 mr-1 text-primary" />
-                    Predictive Alerts
-                  </div>
-                </Label>
-                <p className="text-xs text-muted-foreground">
-                  Receive AI-generated alerts about predicted future anomalies
-                </p>
-              </div>
-              <Switch
-                id="predictive-alerts"
-                checked={settings.enablePredictiveAlerts}
-                onCheckedChange={handlePredictiveAlertsToggle}
-              />
-            </div>
-            
-            <div className="pt-4 space-y-3">
-              <div>
-                <div className="flex justify-between mb-2">
-                  <Label htmlFor="alert-threshold">
-                    <div className="flex items-center">
-                      <AlertTriangle className="h-4 w-4 mr-1 text-orange-500" />
-                      Alert Threshold
-                    </div>
-                  </Label>
-                  <span className="text-sm font-medium">{settings.alertThreshold}%</span>
+                  <span className="text-sm font-medium">{threshold}%</span>
                 </div>
-                <Slider 
-                  id="alert-threshold"
-                  value={[settings.alertThreshold]} 
-                  min={0} 
-                  max={100} 
+                
+                <Slider
+                  disabled={!settings.enabledCategories.includes(category as OutlierCategory)}
+                  defaultValue={[threshold]}
+                  max={100}
                   step={5}
-                  onValueChange={handleAlertThresholdChange}
+                  onValueChange={(value) => 
+                    handleCategoryThresholdChange(category as OutlierCategory, value)
+                  }
                 />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Only anomalies above this severity threshold will trigger alerts
-                </p>
               </div>
-              
-              <div className="pt-4">
-                <Label htmlFor="refresh-interval">
-                  <div className="flex items-center mb-2">
-                    <RefreshCcw className="h-4 w-4 mr-1 text-blue-500" />
-                    Refresh Interval
-                  </div>
-                </Label>
-                <div className="flex items-center space-x-2">
-                  <Input
-                    id="refresh-interval"
-                    type="number"
-                    min="30"
-                    value={settings.refreshInterval}
-                    onChange={(e) => handleRefreshIntervalChange(e.target.value)}
-                    className="w-20"
-                  />
-                  <span className="text-sm">seconds</span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Current refresh: {formatInterval(settings.refreshInterval)}
-                </p>
-              </div>
+            ))}
+          </div>
+
+          {/* Predictive alerts toggle */}
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="predictive-alerts"
+              checked={settings.enablePredictiveAlerts}
+              onCheckedChange={(checked) => handlePredictiveAlertsToggle(checked as boolean)}
+            />
+            <Label htmlFor="predictive-alerts">Enable predictive alerts</Label>
+          </div>
+
+          {/* Refresh interval */}
+          <div className="space-y-3">
+            <div className="flex justify-between">
+              <Label htmlFor="refresh">Refresh Interval</Label>
+              <span className="text-sm font-medium">
+                {settings.refreshInterval < 60 
+                  ? `${settings.refreshInterval}s` 
+                  : `${Math.floor(settings.refreshInterval / 60)}m ${settings.refreshInterval % 60}s`}
+              </span>
             </div>
-          </TabsContent>
-        </Tabs>
-        
-        <DialogFooter>
+            <Slider
+              id="refresh"
+              defaultValue={[settings.refreshInterval]}
+              min={30}
+              max={600}
+              step={30}
+              onValueChange={handleRefreshIntervalChange}
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSaveSettings} className="gap-1">
-            <Save className="h-4 w-4" />
+          <Button onClick={handleSave}>
             Save Changes
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
