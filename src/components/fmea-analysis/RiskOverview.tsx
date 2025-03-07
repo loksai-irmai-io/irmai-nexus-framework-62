@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -76,7 +77,7 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ selectedRole, onDrilldown }
       id: 'risk-exposure',
       title: 'Risk Exposure Score',
       subtitle: 'Overall risk exposure level',
-      status: riskExposureScore > 75 ? 'error' : riskExposureScore > 50 ? 'warning' : 'success',
+      status: riskExposureScore > 75 ? 'error' as const : riskExposureScore > 50 ? 'warning' as const : 'success' as const,
       metrics: [
         {
           label: 'Current Score',
@@ -122,7 +123,7 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ selectedRole, onDrilldown }
       id: 'risk-distribution',
       title: 'Risk Distribution',
       subtitle: 'Breakdown by category',
-      status: 'info',
+      status: 'info' as const,
       metrics: [
         {
           label: 'Total Risks',
