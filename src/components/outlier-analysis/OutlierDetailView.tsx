@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   AlertTriangle, 
@@ -220,11 +221,19 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
               </Button>
             </CardHeader>
             <CardContent>
-              <div className="mb-4">
+              {/* Visual Drill-Down Section - Enhanced with better highlighting */}
+              <div className="mb-6 p-4 border rounded-lg bg-slate-50">
+                <div className="flex items-center mb-2">
+                  <Activity className="h-5 w-5 text-blue-600 mr-2" />
+                  <h4 className="font-medium text-sm">Visual Drill-Down</h4>
+                </div>
+                <p className="text-xs text-muted-foreground mb-2">
+                  This chart highlights the trend around the outlier. Peaks indicate significant deviations from expected behavior.
+                </p>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div>
+                      <div className="relative border rounded-lg overflow-hidden bg-white hover:shadow-md transition-shadow">
                         <Chart
                           title="Anomaly Trend"
                           type="line"
@@ -235,6 +244,10 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
                           showLegend={false}
                           tooltip="This chart shows the trend of deviation values across the event timeline."
                         />
+                        {/* Highlight the outlier point in the chart */}
+                        <div className="absolute top-0 right-0 bg-red-600 text-white px-2 py-1 text-xs rounded-bl-md">
+                          Outlier Point
+                        </div>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent side="top" className="max-w-xs">
@@ -243,6 +256,7 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
                   </Tooltip>
                 </TooltipProvider>
               </div>
+              
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -257,7 +271,7 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
                     {eventLogs.map((log, index) => (
                       <tr 
                         key={index} 
-                        className={`border-b hover:bg-muted/20 transition-colors ${hoveredLogIndex === index ? 'bg-muted/30' : ''}`}
+                        className={`border-b hover:bg-muted/20 transition-colors ${hoveredLogIndex === index ? 'bg-muted/30' : ''} ${log.deviationValue > 5 ? 'bg-red-50' : ''}`}
                         onMouseEnter={() => handleMouseEnterLogRow(index)}
                         onMouseLeave={handleMouseLeaveLogRow}
                       >
@@ -277,8 +291,9 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
         </div>
         
         <div className="space-y-4">
-          <Card>
-            <CardHeader className="pb-2 border-b">
+          {/* AI Explanation Panel - Enhanced with better styling and tooltip */}
+          <Card className="border-blue-100 shadow-sm">
+            <CardHeader className="pb-2 border-b bg-blue-50">
               <CardTitle className="text-base font-medium flex items-center">
                 <Bot className="mr-2 h-5 w-5 text-blue-500" />
                 AI Explanation
@@ -300,7 +315,7 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
               <div className="space-y-4">
                 <div className="bg-muted/20 rounded-md p-3 text-sm">
                   <p className="mb-2">
-                    This event deviated from the norm by {outlier.deviationPercentage}%. The anomaly was detected in the
+                    This event deviated from the norm by <span className="font-medium text-red-600">{outlier.deviationPercentage}%</span>. The anomaly was detected in the
                     <span className="font-medium"> {outlier.activity}</span> process.
                   </p>
                   <p className="mb-2">
@@ -344,7 +359,8 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
             </CardContent>
           </Card>
           
-          <Card>
+          {/* User Action Buttons - Enhanced with better styling */}
+          <Card className="border-gray-200 shadow-sm">
             <CardHeader className="pb-2 border-b">
               <CardTitle className="text-base font-medium">Actions</CardTitle>
             </CardHeader>
@@ -354,7 +370,7 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button 
-                        className="w-full justify-start" 
+                        className="w-full justify-start bg-green-50 text-green-600 hover:bg-green-100 border border-green-200" 
                         variant="outline"
                         onClick={handleConfirmOutlier}
                       >
@@ -372,7 +388,7 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button 
-                        className="w-full justify-start" 
+                        className="w-full justify-start bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200" 
                         variant="outline"
                         onClick={handleCreateInvestigation}
                       >
@@ -390,7 +406,7 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button 
-                        className="w-full justify-start" 
+                        className="w-full justify-start bg-red-50 text-red-600 hover:bg-red-100 border border-red-200" 
                         variant="outline"
                         onClick={handleDismissOutlier}
                       >
@@ -414,7 +430,7 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
                       >
                         <MessageSquare className="mr-2 h-4 w-4 text-gray-500" />
                         Add Comment
-                        <ChevronDown className="ml-auto h-4 w-4" />
+                        <ChevronDown className={`ml-auto h-4 w-4 transition-transform ${isAddingComment ? 'rotate-180' : ''}`} />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="left">
@@ -424,7 +440,7 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
                 </TooltipProvider>
                 
                 {isAddingComment && (
-                  <div className="pt-2 space-y-2">
+                  <div className="pt-2 space-y-2 animate-fade-in">
                     <Textarea
                       placeholder="Add your comment..."
                       value={comment}
