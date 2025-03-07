@@ -1,4 +1,4 @@
-<lov-code>
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,7 +25,8 @@ import {
   AlertCircle,
   Gauge,
   Sparkles,
-  BarChart
+  BarChart,
+  InfoCircle
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -716,7 +717,7 @@ export const ComplianceDetail: React.FC<ComplianceDetailProps> = ({
                         
                         <div className="p-3 bg-blue-50 border border-blue-100 rounded-md text-sm">
                           <p className="text-blue-700">
-                            <InfoCircle className="h-4 w-4 inline-block mr-1" />
+                            <AlertCircle className="h-4 w-4 inline-block mr-1" />
                             Running this test will automatically collect evidence and update the control status.
                           </p>
                         </div>
@@ -800,5 +801,189 @@ export const ComplianceDetail: React.FC<ComplianceDetailProps> = ({
                               </Badge>
                             )}
                           </td>
-                          <td className="p-3">{typeof test.evidence === 'number' ? test.evidence : 1} items</td>
-                          <td className="p-3">{test.tester}
+                          <td className="p-3">{test.evidence} items</td>
+                          <td className="p-3">{test.tester}</td>
+                          <td className="p-3">
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-3.5 w-3.5 mr-1" />
+                              View
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="evidence">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-medium">Control Evidence</h3>
+                    <Button size="sm">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload Evidence
+                    </Button>
+                  </div>
+                  
+                  <div className="border rounded-lg overflow-hidden">
+                    {evidenceItems.filter(item => item.controlId === selectedControl.id).length > 0 ? (
+                      <div className="divide-y">
+                        {evidenceItems
+                          .filter(item => item.controlId === selectedControl.id)
+                          .map((item, index) => (
+                            <div key={index} className="p-4 hover:bg-gray-50">
+                              <div className="flex items-start gap-4">
+                                <div className="bg-blue-100 p-2 rounded-lg">
+                                  <FileText className="h-8 w-8 text-blue-600" />
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-medium">{item.name}</h4>
+                                  <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                                    <span>Uploaded by {item.uploadedBy}</span>
+                                    <span>•</span>
+                                    <span>{new Date(item.uploadedAt).toLocaleDateString()}</span>
+                                    <span>•</span>
+                                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-100">
+                                      {item.status}
+                                    </Badge>
+                                  </div>
+                                </div>
+                                <Button variant="ghost" size="sm">
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  View
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-10">
+                        <FileText className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                        <h3 className="text-lg font-semibold">No Evidence Found</h3>
+                        <p className="text-muted-foreground">Upload evidence to support this control</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="workflow">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Control Approval Workflow</h3>
+                      <div className="space-y-4">
+                        <div className="p-4 border rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-medium">Current Status</h4>
+                            {getStatusBadge(selectedControl.status)}
+                          </div>
+                          
+                          <div className="space-y-3 mt-4">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Last Reviewer</span>
+                              <span className="font-medium">Alex Thompson</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Reviewed On</span>
+                              <span className="font-medium">April 12, 2024</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Next Review</span>
+                              <span className="font-medium">July 12, 2024</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="p-4 border rounded-lg">
+                          <h4 className="font-medium mb-2">Remediation Actions</h4>
+                          
+                          {selectedControl.status !== 'compliant' ? (
+                            <div className="space-y-4">
+                              <div className="p-3 bg-amber-50 border border-amber-200 rounded-md text-sm">
+                                <p className="text-amber-800">
+                                  <AlertTriangle className="h-4 w-4 inline-block mr-1" />
+                                  This control requires remediation actions to achieve compliance.
+                                </p>
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium">Action Plan</label>
+                                <Textarea placeholder="Describe remediation steps..." />
+                              </div>
+                              
+                              <div className="flex justify-between gap-2">
+                                <Button variant="outline" className="flex-1">
+                                  Set Reminder
+                                </Button>
+                                <Button className="flex-1">
+                                  Submit for Review
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-center py-3">
+                              <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                              <p className="text-sm font-medium">No remediation needed</p>
+                              <p className="text-xs text-muted-foreground">Control is currently compliant</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Approval History</h3>
+                      
+                      <div className="relative pl-6 border-l-2 border-muted space-y-5">
+                        <div className="relative">
+                          <div className="absolute -left-[25px] p-1 rounded-full bg-green-500 border-4 border-background">
+                            <CheckCircle2 className="h-4 w-4 text-white" />
+                          </div>
+                          <div className="space-y-1">
+                            <h4 className="font-medium">Approved</h4>
+                            <p className="text-sm text-muted-foreground">Apr 12, 2024 - Alex Thompson</p>
+                            <p className="text-sm">
+                              Control verified and approved during quarterly assessment.
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="relative">
+                          <div className="absolute -left-[25px] p-1 rounded-full bg-blue-500 border-4 border-background">
+                            <FileText className="h-4 w-4 text-white" />
+                          </div>
+                          <div className="space-y-1">
+                            <h4 className="font-medium">Evidence Collected</h4>
+                            <p className="text-sm text-muted-foreground">Apr 10, 2024 - Automated System</p>
+                            <p className="text-sm">
+                              Automated evidence collection completed successfully.
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="relative">
+                          <div className="absolute -left-[25px] p-1 rounded-full bg-purple-500 border-4 border-background">
+                            <MessageSquare className="h-4 w-4 text-white" />
+                          </div>
+                          <div className="space-y-1">
+                            <h4 className="font-medium">Comment Added</h4>
+                            <p className="text-sm text-muted-foreground">Apr 05, 2024 - Diana Lawson</p>
+                            <p className="text-sm">
+                              "Please ensure updated policy documentation is collected during next test."
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+};
