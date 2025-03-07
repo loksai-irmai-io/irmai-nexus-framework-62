@@ -42,7 +42,10 @@ export interface OutlierTimelineData {
   high: number;
   medium: number;
   low: number;
-  [key: string]: string | number; // Add index signature to make compatible with ChartData
+  topProcess?: string;
+  percentChange?: number;
+  hasAlert?: boolean;
+  [key: string]: string | number | boolean | undefined; // Add index signature for Chart component
 }
 
 export interface OutlierCategoryData {

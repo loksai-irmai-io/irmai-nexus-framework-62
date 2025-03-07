@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { ArrowRight, Clock, GitBranch, Scale, Users, AlertTriangle } from 'lucide-react';
+import { Clock, GitBranch, Scale, Users, AlertTriangle, FileWarning, Shield } from 'lucide-react';
 import { OutlierCategory } from './types';
 import CompactMetric from '@/components/dashboard/CompactMetric';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface OutlierMetricsPanelProps {
   onCategoryClick: (category: OutlierCategory, count: number) => void;
@@ -12,67 +13,73 @@ interface OutlierMetricsPanelProps {
 const OutlierMetricsPanel: React.FC<OutlierMetricsPanelProps> = ({ onCategoryClick }) => {
   const { toast } = useToast();
   
-  // Mock metrics data
+  // Enhanced metrics data with proper icons and better tooltips
   const metrics = [
     {
       id: 'total_outliers',
       label: 'Total Outliers Detected',
       value: 87,
-      icon: 'trending-up',
+      icon: 'alert-triangle',
       trend: { direction: 'up' as const, value: 12 },
-      tooltip: 'Total number of outlier events detected across all processes',
+      tooltip: 'Total number of outlier events detected across all processes. Click to view all outliers.',
       category: null,
-      drilldownHint: 'Click to view all outliers'
+      drilldownHint: 'View all outliers',
+      className: 'border-l-4 border-l-red-500 hover:bg-red-50 dark:hover:bg-red-900/10'
     },
     {
       id: 'sequence_violations',
       label: 'Sequence Violations',
       value: 23,
-      icon: 'chart-bar',
+      icon: 'git-branch',
       trend: { direction: 'up' as const, value: 8 },
-      tooltip: 'Activities performed out of expected sequence or order',
+      tooltip: 'Activities performed out of expected sequence or order. These may indicate process compliance issues.',
       category: 'sequence_violation' as OutlierCategory,
-      drilldownHint: 'Click to view sequence violations'
+      drilldownHint: 'View sequence violations',
+      className: 'border-l-4 border-l-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10'
     },
     {
       id: 'time_outliers',
       label: 'Time-based Outliers',
       value: 36,
-      icon: 'gauge',
+      icon: 'clock',
       trend: { direction: 'up' as const, value: 15 },
-      tooltip: 'Activities that took significantly longer or shorter than expected',
+      tooltip: 'Activities that took significantly longer or shorter than expected. May indicate bottlenecks or inefficiencies.',
       category: 'time_outlier' as OutlierCategory,
-      drilldownHint: 'Click to view time outliers'
+      drilldownHint: 'View time outliers',
+      className: 'border-l-4 border-l-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/10'
     },
     {
       id: 'resource_imbalances',
       label: 'Resource Imbalances',
       value: 18,
-      icon: 'activity',
+      icon: 'scale',
       trend: { direction: 'down' as const, value: 5 },
-      tooltip: 'Uneven distribution of work among resources or teams',
+      tooltip: 'Uneven distribution of work among resources or teams. May indicate staffing or allocation issues.',
       category: 'resource_imbalance' as OutlierCategory,
-      drilldownHint: 'Click to view resource imbalances'
+      drilldownHint: 'View resource imbalances',
+      className: 'border-l-4 border-l-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/10'
     },
     {
       id: 'data_quality',
       label: 'Data Quality Issues',
       value: 7,
-      icon: 'info',
+      icon: 'file-warning',
       trend: { direction: 'down' as const, value: 12 },
-      tooltip: 'Missing, incorrect, or inconsistent data in process execution',
+      tooltip: 'Missing, incorrect, or inconsistent data in process execution. May lead to compliance or reporting issues.',
       category: 'data_quality' as OutlierCategory,
-      drilldownHint: 'Click to view data quality issues'
+      drilldownHint: 'View data quality issues',
+      className: 'border-l-4 border-l-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/10'
     },
     {
       id: 'compliance_breaches',
       label: 'Compliance Breaches',
       value: 3,
-      icon: 'circle-check',
+      icon: 'shield',
       trend: { direction: 'down' as const, value: 25 },
-      tooltip: 'Violations of compliance rules or regulatory requirements',
+      tooltip: 'Violations of compliance rules or regulatory requirements. Require immediate attention.',
       category: 'compliance_breach' as OutlierCategory,
-      drilldownHint: 'Click to view compliance breaches'
+      drilldownHint: 'View compliance breaches',
+      className: 'border-l-4 border-l-red-500 hover:bg-red-50 dark:hover:bg-red-900/10'
     }
   ];
 
@@ -101,7 +108,10 @@ const OutlierMetricsPanel: React.FC<OutlierMetricsPanelProps> = ({ onCategoryCli
           trend={metric.trend}
           tooltip={metric.tooltip}
           variant="card"
-          className="hover:border-primary hover:bg-primary/5 transition-colors"
+          className={cn(
+            "hover:border-primary hover:shadow-md transition-all duration-200 animate-fade-in",
+            metric.className
+          )}
           onClick={() => handleClick(metric.id)}
           drilldownHint={metric.drilldownHint}
         />
