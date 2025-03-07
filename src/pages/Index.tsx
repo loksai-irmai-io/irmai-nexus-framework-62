@@ -983,8 +983,7 @@ const Index = () => {
           Risk Insights
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '700ms' }}>
-          {/* First 7 modules */}
-          {infoWidgetData.slice(0, 7).map(module => (
+          {infoWidgetData.map(module => (
             <InfoWidget 
               key={module.id} 
               data={module} 
@@ -992,17 +991,6 @@ const Index = () => {
               onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
             />
           ))}
-          
-          {/* Last module (Scenario Analysis) + AIRiskSummary side by side */}
-          {infoWidgetData.slice(7, 8).map(module => (
-            <InfoWidget 
-              key={module.id} 
-              data={module} 
-              isLoading={loading}
-              onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
-            />
-          ))}
-          <AIRiskSummary />
         </div>
         
         <Separator className="my-8 animate-fade-in" style={{ animationDelay: '800ms' }} />
@@ -1042,8 +1030,8 @@ const Index = () => {
         <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
           Digital Twin Overview
         </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '1300ms' }}>
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '1300ms' }}>
+          <div className="w-full">
             <div className="p-1 border border-primary/20 rounded-lg bg-primary/5">
               <div className="relative w-full aspect-video sm:aspect-[16/9] xl:aspect-[21/9] overflow-hidden rounded-lg">
                 <KnowledgeGraph className="w-full h-full" />
@@ -1052,10 +1040,6 @@ const Index = () => {
             <p className="text-sm text-muted-foreground mt-2 italic">
               <span>This is your central data hub – all insights and interdependencies are sourced here.</span>
             </p>
-          </div>
-          
-          <div className="lg:col-span-1">
-            {/* AIRiskSummary removed from here */}
           </div>
         </div>
         

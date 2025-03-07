@@ -80,7 +80,7 @@ const AIRiskSummary: React.FC<AIRiskSummaryProps> = ({ className }) => {
   };
   
   return (
-    <Card className={cn("h-full", className)}>
+    <Card className={cn("w-full", className)}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl flex items-center">
