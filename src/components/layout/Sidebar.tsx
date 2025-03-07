@@ -133,7 +133,8 @@ const Sidebar: React.FC = () => {
         </div>
         <nav className="flex-1 p-3 space-y-2 overflow-y-auto">
           {mainMenuItems.map((item) => {
-            const isActive = currentPath === item.href;
+            const isActive = currentPath === item.href || 
+                           (item.href !== '/' && currentPath.startsWith(item.href));
             
             return (
               <TooltipProvider key={item.id}>
