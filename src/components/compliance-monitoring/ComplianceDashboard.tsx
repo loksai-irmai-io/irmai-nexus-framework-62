@@ -142,7 +142,7 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
         <CompactMetric
           label="Active Frameworks"
           value={mockFrameworks.length}
-          icon="layers"
+          icon="chart-bar"
           tooltip="Number of compliance frameworks being monitored"
           variant="card"
         />
@@ -150,7 +150,7 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
         <CompactMetric
           label="Open Alerts"
           value={totalAlerts}
-          icon="bell"
+          icon="info"
           trend={{
             direction: criticalAlerts > 0 ? 'down' : 'up',
             value: criticalAlerts > 0 ? criticalAlerts : 0
@@ -162,7 +162,7 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
         <CompactMetric
           label="Controls Monitored"
           value={totalControls}
-          icon="shield"
+          icon="check"
           tooltip="Total number of unique controls across all frameworks"
           variant="card"
         />
