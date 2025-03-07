@@ -325,300 +325,297 @@ const ProcessDiscovery = () => {
             </TooltipProvider>
           </div>
           
-          {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Process Visualization Panel (takes 2/3 of the width on large screens) */}
-            <div className="lg:col-span-2 space-y-4">
-              <Card>
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-center">
-                    <CardTitle>Process Map</CardTitle>
-                    <div className="flex items-center space-x-2">
-                      <Badge variant={showRawEvents ? "outline" : "secondary"} className="cursor-pointer" onClick={() => setShowRawEvents(!showRawEvents)}>
-                        <FileText className="h-3 w-3 mr-1" />
-                        {showRawEvents ? "Hide" : "View"} Raw Events
-                      </Badge>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="outline" size="sm" onClick={handleFilterChange}>
-                              <Filter className="h-3 w-3 mr-1" />
-                              Filter
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Filter processes by various criteria</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                  </div>
-                  
-                  {/* Filter row that appears when filter button is clicked */}
-                  <div className="grid grid-cols-3 gap-3 mt-3">
-                    <Select value={timeframe} onValueChange={setTimeframe}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select timeframe" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Time</SelectItem>
-                        <SelectItem value="today">Today</SelectItem>
-                        <SelectItem value="week">This Week</SelectItem>
-                        <SelectItem value="month">This Month</SelectItem>
-                        <SelectItem value="quarter">This Quarter</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    
-                    <Select value={caseVariant} onValueChange={setCaseVariant}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select case variant" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Variants</SelectItem>
-                        <SelectItem value="standard">Standard Flow</SelectItem>
-                        <SelectItem value="credit">Credit Card Only</SelectItem>
-                        <SelectItem value="bank">Bank Transfer Only</SelectItem>
-                        <SelectItem value="error">With Errors</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    
-                    <Select value={orgUnit} onValueChange={setOrgUnit}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select org unit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Units</SelectItem>
-                        <SelectItem value="sales">Sales</SelectItem>
-                        <SelectItem value="finance">Finance</SelectItem>
-                        <SelectItem value="operations">Operations</SelectItem>
-                        <SelectItem value="customer">Customer Service</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CardHeader>
+          {/* Process Map (Full View) */}
+          <Card className="w-full">
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-center">
+                <CardTitle>Process Map</CardTitle>
+                <div className="flex items-center space-x-2">
+                  <Badge variant={showRawEvents ? "outline" : "secondary"} className="cursor-pointer" onClick={() => setShowRawEvents(!showRawEvents)}>
+                    <FileText className="h-3 w-3 mr-1" />
+                    {showRawEvents ? "Hide" : "View"} Raw Events
+                  </Badge>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="sm" onClick={handleFilterChange}>
+                          <Filter className="h-3 w-3 mr-1" />
+                          Filter
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Filter processes by various criteria</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              </div>
+              
+              {/* Filter row that appears when filter button is clicked */}
+              <div className="grid grid-cols-3 gap-3 mt-3">
+                <Select value={timeframe} onValueChange={setTimeframe}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select timeframe" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Time</SelectItem>
+                    <SelectItem value="today">Today</SelectItem>
+                    <SelectItem value="week">This Week</SelectItem>
+                    <SelectItem value="month">This Month</SelectItem>
+                    <SelectItem value="quarter">This Quarter</SelectItem>
+                  </SelectContent>
+                </Select>
                 
-                <CardContent className="pt-0">
-                  <Tabs defaultValue="bpmn" value={viewType} onValueChange={setViewType}>
-                    <TabsList className="mb-4">
-                      <TabsTrigger value="bpmn">BPMN Diagram</TabsTrigger>
-                      <TabsTrigger value="petri">Petri Net</TabsTrigger>
-                      <TabsTrigger value="tree">Process Tree</TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="bpmn">
-                      {renderBPMN()}
-                    </TabsContent>
-                    
-                    <TabsContent value="petri">
-                      {renderPetriNet()}
-                    </TabsContent>
-                    
-                    <TabsContent value="tree">
-                      {renderProcessTree()}
-                    </TabsContent>
-                  </Tabs>
-                </CardContent>
-              </Card>
-              
-              {/* Raw Events Panel (conditionally displayed) */}
-              {showRawEvents && (
-                <Card>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-center">
-                      <CardTitle className="text-lg">Raw Event Logs</CardTitle>
-                      <Badge variant="outline">{filteredLogs.length} events</Badge>
-                    </div>
-                    {selectedNode && (
-                      <CardDescription>
-                        Showing events for: {processData.nodes.find(n => n.id === selectedNode)?.label}
-                      </CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent>
-                    <div className="overflow-auto rounded-md border">
-                      <table className="min-w-full divide-y divide-border">
-                        <thead className="bg-muted">
-                          <tr>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Timestamp</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Activity</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Case ID</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">User</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Duration</th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-card divide-y divide-border">
-                          {filteredLogs.map((log) => (
-                            <tr key={log.id}>
-                              <td className="px-4 py-2 text-sm">{new Date(log.timestamp).toLocaleString()}</td>
-                              <td className="px-4 py-2 text-sm font-medium">{log.activity}</td>
-                              <td className="px-4 py-2 text-sm">{log.caseId}</td>
-                              <td className="px-4 py-2 text-sm">{log.user}</td>
-                              <td className="px-4 py-2 text-sm">{log.duration}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+                <Select value={caseVariant} onValueChange={setCaseVariant}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select case variant" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Variants</SelectItem>
+                    <SelectItem value="standard">Standard Flow</SelectItem>
+                    <SelectItem value="credit">Credit Card Only</SelectItem>
+                    <SelectItem value="bank">Bank Transfer Only</SelectItem>
+                    <SelectItem value="error">With Errors</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select value={orgUnit} onValueChange={setOrgUnit}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select org unit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Units</SelectItem>
+                    <SelectItem value="sales">Sales</SelectItem>
+                    <SelectItem value="finance">Finance</SelectItem>
+                    <SelectItem value="operations">Operations</SelectItem>
+                    <SelectItem value="customer">Customer Service</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
             
-            {/* AI Insights Panel */}
-            <div className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Process Insights</CardTitle>
-                  <CardDescription>AI-detected anomalies, optimization opportunities and compliance issues</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {insights.map((insight) => (
-                      <div 
-                        key={insight.id} 
-                        className={`p-3 rounded-lg border ${
-                          insight.severity === 'critical' ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800' :
-                          insight.severity === 'high' ? 'bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800' :
-                          insight.severity === 'medium' ? 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800' :
-                          'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800'
-                        }`}
-                      >
-                        <div className="flex justify-between items-start gap-2">
-                          <div 
-                            className="flex-1 cursor-pointer" 
-                            onClick={() => handleInsightClick(insight.nodeId)}
-                          >
-                            <div className="flex items-center mb-1">
-                              {insight.type === 'anomaly' && <AlertCircle className="h-4 w-4 text-orange-500 mr-1" />}
-                              {insight.type === 'compliance' && <Info className="h-4 w-4 text-blue-500 mr-1" />}
-                              {insight.type === 'optimization' && <Activity className="h-4 w-4 text-green-500 mr-1" />}
-                              <span className="text-sm font-medium capitalize">{insight.type}</span>
-                              <Badge 
-                                variant="outline" 
-                                className="ml-2 text-xs"
-                              >
-                                {insight.severity}
-                              </Badge>
-                            </div>
-                            <p className="text-sm">{insight.description}</p>
+            <CardContent className="pt-0">
+              <Tabs defaultValue="bpmn" value={viewType} onValueChange={setViewType}>
+                <TabsList className="mb-4">
+                  <TabsTrigger value="bpmn">BPMN Diagram</TabsTrigger>
+                  <TabsTrigger value="petri">Petri Net</TabsTrigger>
+                  <TabsTrigger value="tree">Process Tree</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="bpmn">
+                  {renderBPMN()}
+                </TabsContent>
+                
+                <TabsContent value="petri">
+                  {renderPetriNet()}
+                </TabsContent>
+                
+                <TabsContent value="tree">
+                  {renderProcessTree()}
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+          
+          {/* Raw Events Panel (conditionally displayed) */}
+          {showRawEvents && (
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-lg">Raw Event Logs</CardTitle>
+                  <Badge variant="outline">{filteredLogs.length} events</Badge>
+                </div>
+                {selectedNode && (
+                  <CardDescription>
+                    Showing events for: {processData.nodes.find(n => n.id === selectedNode)?.label}
+                  </CardDescription>
+                )}
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-auto rounded-md border">
+                  <table className="min-w-full divide-y divide-border">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Timestamp</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Activity</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Case ID</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">User</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Duration</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-card divide-y divide-border">
+                      {filteredLogs.map((log) => (
+                        <tr key={log.id}>
+                          <td className="px-4 py-2 text-sm">{new Date(log.timestamp).toLocaleString()}</td>
+                          <td className="px-4 py-2 text-sm font-medium">{log.activity}</td>
+                          <td className="px-4 py-2 text-sm">{log.caseId}</td>
+                          <td className="px-4 py-2 text-sm">{log.user}</td>
+                          <td className="px-4 py-2 text-sm">{log.duration}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* Level 2: Process Insights and Process Statistics (side by side) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Process Insights */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Process Insights</CardTitle>
+                <CardDescription>AI-detected anomalies, optimization opportunities and compliance issues</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {insights.map((insight) => (
+                    <div 
+                      key={insight.id} 
+                      className={`p-3 rounded-lg border ${
+                        insight.severity === 'critical' ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800' :
+                        insight.severity === 'high' ? 'bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800' :
+                        insight.severity === 'medium' ? 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800' :
+                        'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800'
+                      }`}
+                    >
+                      <div className="flex justify-between items-start gap-2">
+                        <div 
+                          className="flex-1 cursor-pointer" 
+                          onClick={() => handleInsightClick(insight.nodeId)}
+                        >
+                          <div className="flex items-center mb-1">
+                            {insight.type === 'anomaly' && <AlertCircle className="h-4 w-4 text-orange-500 mr-1" />}
+                            {insight.type === 'compliance' && <Info className="h-4 w-4 text-blue-500 mr-1" />}
+                            {insight.type === 'optimization' && <Activity className="h-4 w-4 text-green-500 mr-1" />}
+                            <span className="text-sm font-medium capitalize">{insight.type}</span>
+                            <Badge 
+                              variant="outline" 
+                              className="ml-2 text-xs"
+                            >
+                              {insight.severity}
+                            </Badge>
                           </div>
-                          
-                          <div>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon" 
-                                    className="h-7 w-7"
-                                    onClick={() => handleValidateInsight(insight.id)}
-                                  >
-                                    {insight.status === 'validated' ? (
-                                      <CheckCheck className="h-4 w-4 text-green-500" />
-                                    ) : (
-                                      <CheckCircle2 className="h-4 w-4" />
-                                    )}
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent side="left">
-                                  <p>
-                                    {insight.status === 'validated' 
-                                      ? 'This insight has been validated' 
-                                      : 'Click to validate this AI-generated insight'}
-                                  </p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </div>
+                          <p className="text-sm">{insight.description}</p>
+                        </div>
+                        
+                        <div>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-7 w-7"
+                                  onClick={() => handleValidateInsight(insight.id)}
+                                >
+                                  {insight.status === 'validated' ? (
+                                    <CheckCheck className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <CheckCircle2 className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent side="left">
+                                <p>
+                                  {insight.status === 'validated' 
+                                    ? 'This insight has been validated' 
+                                    : 'Click to validate this AI-generated insight'}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </div>
                       </div>
-                    ))}
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="mt-4 border-t pt-4">
+                  <h4 className="text-sm font-medium mb-2">Compliance Summary</h4>
+                  <div className="space-y-2">
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Overall Compliance</span>
+                        <span className="font-medium">85%</span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2.5">
+                        <div className="bg-green-500 h-2.5 rounded-full" style={{ width: '85%' }}></div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center">
+                        <CheckCircle2 className="h-4 w-4 text-green-500 mr-1" />
+                        <span>Compliant steps</span>
+                      </div>
+                      <span>7</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center">
+                        <XCircle className="h-4 w-4 text-red-500 mr-1" />
+                        <span>Non-compliant steps</span>
+                      </div>
+                      <span>2</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Process Statistics */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Process Statistics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <Activity className="h-4 w-4 text-primary mr-2" />
+                      <span className="text-sm">Activities</span>
+                    </div>
+                    <span className="font-medium">6</span>
                   </div>
                   
-                  <div className="mt-4 border-t pt-4">
-                    <h4 className="text-sm font-medium mb-2">Compliance Summary</h4>
-                    <div className="space-y-2">
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Overall Compliance</span>
-                          <span className="font-medium">85%</span>
-                        </div>
-                        <div className="w-full bg-muted rounded-full h-2.5">
-                          <div className="bg-green-500 h-2.5 rounded-full" style={{ width: '85%' }}></div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 text-green-500 mr-1" />
-                          <span>Compliant steps</span>
-                        </div>
-                        <span>7</span>
-                      </div>
-                      
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center">
-                          <XCircle className="h-4 w-4 text-red-500 mr-1" />
-                          <span>Non-compliant steps</span>
-                        </div>
-                        <span>2</span>
-                      </div>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <GitBranch className="h-4 w-4 text-primary mr-2" />
+                      <span className="text-sm">Decision Points</span>
                     </div>
+                    <span className="font-medium">2</span>
                   </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Process Statistics</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <Activity className="h-4 w-4 text-primary mr-2" />
-                        <span className="text-sm">Activities</span>
-                      </div>
-                      <span className="font-medium">6</span>
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <Clock className="h-4 w-4 text-primary mr-2" />
+                      <span className="text-sm">Avg. Process Duration</span>
                     </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <GitBranch className="h-4 w-4 text-primary mr-2" />
-                        <span className="text-sm">Decision Points</span>
-                      </div>
-                      <span className="font-medium">2</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 text-primary mr-2" />
-                        <span className="text-sm">Avg. Process Duration</span>
-                      </div>
-                      <span className="font-medium">8m 20s</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <BarChart className="h-4 w-4 text-primary mr-2" />
-                        <span className="text-sm">Cases Analyzed</span>
-                      </div>
-                      <span className="font-medium">1,253</span>
-                    </div>
-                    
-                    <Separator className="my-2" />
-                    
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <Info className="h-4 w-4 text-orange-500 mr-2" />
-                        <span className="text-sm">Variant Coverage</span>
-                      </div>
-                      <span className="font-medium">92%</span>
-                    </div>
+                    <span className="font-medium">8m 20s</span>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <BarChart className="h-4 w-4 text-primary mr-2" />
+                      <span className="text-sm">Cases Analyzed</span>
+                    </div>
+                    <span className="font-medium">1,253</span>
+                  </div>
+                  
+                  <Separator className="my-2" />
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <Info className="h-4 w-4 text-orange-500 mr-2" />
+                      <span className="text-sm">Variant Coverage</span>
+                    </div>
+                    <span className="font-medium">92%</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
