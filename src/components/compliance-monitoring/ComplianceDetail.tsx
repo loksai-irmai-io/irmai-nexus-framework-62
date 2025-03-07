@@ -1,4 +1,4 @@
-
+<lov-code>
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -189,14 +189,14 @@ export const ComplianceDetail: React.FC<ComplianceDetailProps> = ({
     }
   };
 
-  // Generate historical test result data
+  // Generate historical test result data with consistent properties
   const testHistoryData = [
-    { date: '01/15/2023', result: 'pass' },
-    { date: '04/20/2023', result: 'pass' },
-    { date: '07/25/2023', result: 'fail' },
-    { date: '10/30/2023', result: 'pass' },
-    { date: '01/05/2024', result: 'pass' },
-    { date: '04/10/2024', result: 'pass' },
+    { date: '01/15/2023', result: 'pass', evidence: 1, tester: 'Automated System' },
+    { date: '04/20/2023', result: 'pass', evidence: 1, tester: 'Automated System' },
+    { date: '07/25/2023', result: 'fail', evidence: 2, tester: 'Automated System' },
+    { date: '10/30/2023', result: 'pass', evidence: 1, tester: 'Automated System' },
+    { date: '01/05/2024', result: 'pass', evidence: 1, tester: 'Automated System' },
+    { date: '04/10/2024', result: 'pass', evidence: 1, tester: 'Automated System' },
   ];
   
   // Control status distribution data
@@ -801,192 +801,4 @@ export const ComplianceDetail: React.FC<ComplianceDetailProps> = ({
                             )}
                           </td>
                           <td className="p-3">{typeof test.evidence === 'number' ? test.evidence : 1} items</td>
-                          <td className="p-3">{test.tester}</td>
-                          <td className="p-3">
-                            <Button variant="ghost" size="sm" className="h-8 px-2">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                
-                {selectedControl.status === 'non-compliant' && (
-                  <Card className="border-red-200 bg-red-50/50">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg text-red-800 flex items-center">
-                        <AlertTriangle className="h-5 w-5 mr-2 text-red-600" />
-                        Failed Test Details
-                      </CardTitle>
-                      <CardDescription className="text-red-700">
-                        This control failed its most recent test on {new Date(selectedControl.lastTested).toLocaleDateString()}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-0 space-y-4">
-                      <div className="p-3 border border-red-200 rounded bg-white">
-                        <h4 className="font-medium mb-1">Failure Reason</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Password policy does not enforce minimum length and complexity requirements.
-                          Current settings only require 6 characters with no complexity rules.
-                        </p>
-                      </div>
-                      
-                      <div className="bg-white p-4 border border-red-200 rounded-md">
-                        <h4 className="font-medium mb-2">Approval Workflow</h4>
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">Escalation Comments</label>
-                            <Textarea placeholder="Provide details about this compliance failure..." />
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">Assign To</label>
-                            <Input placeholder="Enter email or username" />
-                          </div>
-                          
-                          <div className="flex space-x-2">
-                            <Button variant="outline" className="flex-1">
-                              Re-Run Test
-                            </Button>
-                            <Button className="flex-1 bg-red-600 hover:bg-red-700">
-                              Escalate
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-                
-                {selectedControl.status === 'compliant' && (
-                  <Card className="border-green-200 bg-green-50/50">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg text-green-800 flex items-center">
-                        <CheckCircle2 className="h-5 w-5 mr-2 text-green-600" />
-                        Test Passing Successfully
-                      </CardTitle>
-                      <CardDescription className="text-green-700">
-                        This control passed its most recent test on {new Date(selectedControl.lastTested).toLocaleDateString()}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="p-3 border border-green-200 rounded bg-white">
-                        <h4 className="font-medium mb-1">Test Details</h4>
-                        <p className="text-sm text-muted-foreground">
-                          All requirements are being met. Password policy enforces 12+ character passwords with complexity requirements.
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="evidence">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium">Evidence Items</h3>
-                    <Button size="sm">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Add Evidence
-                    </Button>
-                  </div>
-                  
-                  <EvidenceVaultPanel 
-                    evidenceItems={evidenceItems.filter(e => e.controlId === selectedControl.id)}
-                    onEvidenceClick={() => {}}
-                  />
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="workflow">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Workflow Activity</h3>
-                  
-                  <div className="relative pl-6 border-l-2 border-muted space-y-6">
-                    <div className="relative">
-                      <div className="absolute -left-[25px] p-1 rounded-full bg-blue-500 border-4 border-background">
-                        <FileText className="h-4 w-4 text-white" />
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="font-semibold">Evidence Collected</h4>
-                        <p className="text-sm text-muted-foreground">Today at 10:45 AM</p>
-                        <p className="text-sm">Automated system collected new evidence for this control.</p>
-                        
-                        <div className="mt-2 flex items-center space-x-2">
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-3.5 w-3.5 mr-1.5" />
-                            View Evidence
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
-                            Comment
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="relative">
-                      <div className="absolute -left-[25px] p-1 rounded-full bg-green-500 border-4 border-background">
-                        <CheckCircle2 className="h-4 w-4 text-white" />
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="font-semibold">Control Tested</h4>
-                        <p className="text-sm text-muted-foreground">Yesterday at 2:30 PM</p>
-                        <p className="text-sm">Automated test run completed with a passing result.</p>
-                      </div>
-                    </div>
-                    
-                    <div className="relative">
-                      <div className="absolute -left-[25px] p-1 rounded-full bg-purple-500 border-4 border-background">
-                        <RotateCw className="h-4 w-4 text-white" />
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="font-semibold">Testing Scheduled</h4>
-                        <p className="text-sm text-muted-foreground">Apr 10, 2024 at 9:00 AM</p>
-                        <p className="text-sm">Scheduled automated test for quarterly compliance verification.</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="pt-4 border-t">
-                    <div className="space-y-3">
-                      <h4 className="font-medium">Add Comment</h4>
-                      <Textarea placeholder="Add a comment about this control..." />
-                      <div className="flex justify-end">
-                        <Button>Post Comment</Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-};
-
-// Added these icons that are referenced in the component
-const InfoCircle = (props) => {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 16v-4" />
-      <path d="M12 8h.01" />
-    </svg>
-  )
-}
+                          <td className="p-3">{test.tester}
