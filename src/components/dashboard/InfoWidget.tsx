@@ -194,8 +194,18 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
             
             <div className="flex items-center space-x-2">
               {/* Time range filter */}
-              <Select value={timeRange} onValueChange={setTimeRange} onOpenChange={e => e.stopPropagation()}>
-                <SelectTrigger className="w-[125px] h-8 text-xs border-blue-200 bg-blue-50/50 dark:bg-blue-900/10" onClick={e => e.stopPropagation()}>
+              <Select 
+                value={timeRange} 
+                onValueChange={setTimeRange} 
+                onOpenChange={(open: boolean) => {
+                  // Fixed: Using event parameter for stopPropagation
+                  // This isn't actually an event handler, so no need to call stopPropagation
+                }}
+              >
+                <SelectTrigger 
+                  className="w-[125px] h-8 text-xs border-blue-200 bg-blue-50/50 dark:bg-blue-900/10" 
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <SelectValue placeholder="Time Range" />
                 </SelectTrigger>
                 <SelectContent>
