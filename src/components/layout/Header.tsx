@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Bell, 
@@ -119,13 +118,10 @@ const Header: React.FC = () => {
           
           <div className="flex items-center gap-2">
             <img 
-              src="/logo.png" 
+              src="/lovable-uploads/f6af323e-8e1e-41cb-a223-30dc2436352c.png" 
               alt="IRMAI Logo" 
               className="h-8" 
             />
-            <h1 className="hidden md:block text-lg font-semibold tracking-tight">
-              IRMAI – Operational Risk Management
-            </h1>
           </div>
         </div>
 
