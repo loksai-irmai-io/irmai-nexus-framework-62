@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Bot, Filter, Send } from 'lucide-react';
+import { Bot, Filter, Send, HelpCircle } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import OutlierMetricsPanel from './OutlierMetricsPanel';
 import OutlierTimeline from './OutlierTimeline';
@@ -10,6 +10,8 @@ import OutlierHeatmap from './OutlierHeatmap';
 import OutlierDistribution from './OutlierDistribution';
 import { OutlierEvent } from './types';
 import { mockOutlierEvents, mockAIInsights } from './mockData';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface OutlierDashboardProps {
   onSelectOutlier: (outlier: OutlierEvent) => void;
@@ -19,15 +21,41 @@ const OutlierDashboard: React.FC<OutlierDashboardProps> = ({ onSelectOutlier }) 
   const [activeTab, setActiveTab] = useState('overview');
   const [aiQuery, setAiQuery] = useState('');
   const [aiResponse, setAiResponse] = useState(mockAIInsights.text);
+  const [aiRecommendations, setAiRecommendations] = useState(mockAIInsights.recommendations);
   const [timeframe, setTimeframe] = useState('week');
   const [filtering, setFiltering] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
   const handleAskAI = () => {
     if (!aiQuery.trim()) return;
     
-    // Simulate AI response
-    setAiResponse(`Analysis of your query "${aiQuery}": ${mockAIInsights.text}`);
-    setAiQuery('');
+    // Simulate AI response with loading state
+    setIsTyping(true);
+    
+    setTimeout(() => {
+      setAiResponse(`Analysis of your query "${aiQuery}": ${mockAIInsights.text}`);
+      setAiRecommendations([
+        'Consider reviewing the approval workflow for efficiency',
+        'Investigate the resource allocation during peak hours',
+        'Analyze the sequence pattern for potential optimization'
+      ]);
+      setAiQuery('');
+      setIsTyping(false);
+    }, 1000);
+  };
+
+  const handleCategoryClick = (category: string) => {
+    console.log(`Category clicked: ${category}`);
+    // Filter the outliers based on the category
+    const filteredOutliers = mockOutlierEvents.filter(
+      outlier => category === 'all' || outlier.category === category
+    );
+    
+    // Navigate to the appropriate section or update the UI
+    setActiveTab('overview');
+    
+    // Show a toast or notification about the filtered results
+    console.log(`Showing ${filteredOutliers.length} ${category} outliers`);
   };
 
   return (
@@ -141,7 +169,7 @@ const OutlierDashboard: React.FC<OutlierDashboardProps> = ({ onSelectOutlier }) 
         </div>
       )}
 
-      <OutlierMetricsPanel onCardClick={(category) => console.log(`View ${category} outliers`)} />
+      <OutlierMetricsPanel onCardClick={handleCategoryClick} />
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
@@ -154,26 +182,76 @@ const OutlierDashboard: React.FC<OutlierDashboardProps> = ({ onSelectOutlier }) 
           <OutlierTimeline />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <OutlierHeatmap />
-            <div className="border rounded-lg p-4 bg-card shadow-sm">
-              <h3 className="font-semibold mb-2 flex items-center">
-                <Bot className="mr-2 h-5 w-5 text-blue-500" />
-                AI Insights
-              </h3>
-              <div className="p-3 bg-muted/30 rounded-md text-sm mb-4">
-                {aiResponse}
-              </div>
-              <div className="flex gap-2 items-end">
-                <Textarea 
-                  placeholder="Ask a question about outlier patterns..." 
-                  value={aiQuery}
-                  onChange={(e) => setAiQuery(e.target.value)}
-                  className="text-sm min-h-[60px]"
-                />
-                <Button onClick={handleAskAI} className="shrink-0">
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+            <Card className="shadow-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Bot className="mr-2 h-5 w-5 text-blue-500" />
+                    AI Insights
+                  </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="cursor-help">
+                          <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p>Type a query to receive AI insights on outlier patterns</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="p-3 bg-muted/30 rounded-md text-sm">
+                    <div className="font-medium mb-2">Analysis:</div>
+                    <p>{aiResponse}</p>
+                    
+                    {aiRecommendations.length > 0 && (
+                      <div className="mt-3">
+                        <div className="font-medium mb-1">Recommendations:</div>
+                        <ul className="list-disc pl-5 space-y-1">
+                          {aiRecommendations.map((rec, index) => (
+                            <li key={index}>{rec}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {isTyping && (
+                      <div className="mt-2 flex space-x-1 animate-pulse">
+                        <div className="w-2 h-2 rounded-full bg-primary"></div>
+                        <div className="w-2 h-2 rounded-full bg-primary" style={{ animationDelay: '0.2s' }}></div>
+                        <div className="w-2 h-2 rounded-full bg-primary" style={{ animationDelay: '0.4s' }}></div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex gap-2 items-end">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Textarea 
+                            placeholder="Ask a question about outlier patterns..." 
+                            value={aiQuery}
+                            onChange={(e) => setAiQuery(e.target.value)}
+                            className="text-sm min-h-[60px]"
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" align="start">
+                          <p>Type a query to receive AI insights on outlier patterns</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <Button onClick={handleAskAI} className="shrink-0" disabled={isTyping}>
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
         

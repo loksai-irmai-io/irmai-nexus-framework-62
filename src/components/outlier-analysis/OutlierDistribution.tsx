@@ -1,8 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Chart, { ChartDataSeries } from '../dashboard/Chart';
 import { mockActivityDistribution, mockResourceDistribution } from './mockData';
 import type { ChartData } from '../dashboard/Chart';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
 
 interface OutlierDistributionProps {
   type: 'activity' | 'resource';
@@ -11,6 +14,7 @@ interface OutlierDistributionProps {
 
 const OutlierDistribution: React.FC<OutlierDistributionProps> = ({ type, height = 300 }) => {
   const distributionData = type === 'activity' ? mockActivityDistribution : mockResourceDistribution;
+  const [hoveredItem, setHoveredItem] = useState<ChartData | null>(null);
   
   // Convert the mock data to the format expected by the Chart component
   const chartData: ChartData[] = distributionData.map(item => ({
@@ -36,22 +40,70 @@ const OutlierDistribution: React.FC<OutlierDistributionProps> = ({ type, height 
     console.log(`${type} distribution data clicked:`, data);
   };
 
+  const handleDataHover = (data: any) => {
+    if (data && data.activePayload && data.activePayload.length > 0) {
+      const item = data.activePayload[0].payload;
+      setHoveredItem(item);
+    } else {
+      setHoveredItem(null);
+    }
+  };
+
   return (
-    <Chart
-      title={type === 'activity' ? 'Activity Distribution' : 'Resource Distribution'}
-      description={type === 'activity' 
-        ? 'Visualization of event frequencies across different activities' 
-        : 'Analysis of workload and resource usage trends'
-      }
-      type="bar"
-      data={chartData}
-      series={series}
-      xAxisKey="name"
-      height={height}
-      showLegend={true}
-      onClick={handleDataClick}
-      tooltip={`This chart shows the distribution of events and their deviation percentages across ${type === 'activity' ? 'different activities' : 'resource types'}. Click on any bar for more details.`}
-    />
+    <Card className="shadow-sm">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg flex items-center justify-between">
+          {type === 'activity' ? 'Activity Distribution' : 'Resource Distribution'}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help">
+                  <Info className="h-4 w-4 text-muted-foreground" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p>
+                  {type === 'activity' 
+                    ? 'Visualizes event frequencies across different activities. Hover over bars to see detailed statistics.' 
+                    : 'Analysis of workload and resource usage trends. Hover over bars to see detailed statistics.'
+                  }
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Chart
+          title=""
+          description=""
+          type="bar"
+          data={chartData}
+          series={series}
+          xAxisKey="name"
+          height={height}
+          showLegend={true}
+          onClick={handleDataClick}
+          onMouseMove={handleDataHover}
+          onMouseLeave={() => setHoveredItem(null)}
+          tooltip={`This chart shows the distribution of events and their deviation percentages across ${type === 'activity' ? 'different activities' : 'resource types'}. Click on any bar for more details.`}
+        />
+        
+        {hoveredItem && (
+          <div className="mt-2 p-2 border border-border rounded-md bg-muted/30 text-sm animate-fade-in">
+            <p className="font-medium">{hoveredItem.name}</p>
+            <div className="grid grid-cols-2 gap-2 mt-1">
+              <div>
+                <span className="text-muted-foreground">Occurrences:</span> {hoveredItem.value}
+              </div>
+              <div>
+                <span className="text-muted-foreground">Deviation:</span> {hoveredItem.deviation}%
+              </div>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
