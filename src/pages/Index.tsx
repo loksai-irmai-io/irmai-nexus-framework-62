@@ -1,4 +1,4 @@
-<lov-code>
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -865,4 +865,149 @@ const Index = () => {
     toast.info(`Navigating to ${title} details...`);
     
     setTimeout(() => {
-      
+      setLoading(false);
+      navigate(`/${route}`);
+    }, 500);
+  };
+
+  return (
+    <Layout>
+      <div className="space-y-6">
+        <div className="flex flex-col space-y-1.5">
+          <h1 className="text-2xl font-semibold">Risk Insights Dashboard</h1>
+          <p className="text-muted-foreground">
+            Comprehensive overview of your risk management program
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <MetricCard
+            title="High-Severity Risks"
+            value="5"
+            trend={-12}
+            severity="high"
+            icon={<Shield className="h-5 w-5" />}
+            tooltip="Number of high-severity risks identified"
+            onClick={() => handleMetricClick("High-Severity Risks")}
+          />
+          <MetricCard
+            title="Compliance Score"
+            value="85%"
+            trend={5}
+            severity="medium"
+            icon={<CheckCheck className="h-5 w-5" />}
+            tooltip="Overall compliance score across frameworks"
+            onClick={() => handleMetricClick("Compliance Score")}
+          />
+          <MetricCard
+            title="Control Failures"
+            value="15%"
+            trend={-3}
+            severity="medium"
+            icon={<Gauge className="h-5 w-5" />}
+            tooltip="Percentage of controls that failed testing"
+            onClick={() => handleMetricClick("Control Failures")}
+          />
+          <MetricCard
+            title="Potential Loss"
+            value="$960K"
+            trend={8}
+            severity="critical"
+            icon={<DollarSign className="h-5 w-5" />}
+            tooltip="Estimated potential financial loss"
+            onClick={() => handleMetricClick("Potential Loss")}
+          />
+        </div>
+
+        <Separator />
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold">Risk Insights</h2>
+          </div>
+
+          <RibbonNav>
+            {[
+              infoWidgetData.find(w => w.id === 'fmea-analysis'),
+              infoWidgetData.find(w => w.id === 'outlier-analysis'),
+              infoWidgetData.find(w => w.id === 'compliance-monitoring'),
+              infoWidgetData.find(w => w.id === 'process-discovery'),
+              infoWidgetData.find(w => w.id === 'controls-testing'),
+              infoWidgetData.find(w => w.id === 'incident-management'),
+              infoWidgetData.find(w => w.id === 'scenario-analysis'),
+            ].map((widget) => 
+              widget && (
+                <InfoWidget
+                  key={widget.id}
+                  data={widget}
+                  onClick={() => handleNavigate(widget.id)}
+                  className="min-w-[350px] max-w-[350px]"
+                />
+              )
+            )}
+          </RibbonNav>
+        </div>
+
+        <Separator />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Risk Distribution</h2>
+            <div className="border rounded-lg p-4">
+              <Chart
+                title="Risk Distribution by Type"
+                data={riskDistributionData}
+                series={[{ name: 'Percentage', dataKey: 'value', color: '#8b5cf6' }]}
+                type="pie"
+                height={280}
+                showPercentages={true}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Knowledge Graph</h2>
+            <KnowledgeGraph />
+          </div>
+        </div>
+
+        <Separator />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Incident Severity Distribution</h2>
+            <div className="border rounded-lg p-4">
+              <Chart
+                title="Incident Severity"
+                data={incidentSeverityData}
+                series={[{ name: 'Count', dataKey: 'value', color: '#f97316' }]}
+                type="pie"
+                height={280}
+                showPercentages={true}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Loss Events Trend</h2>
+            <div className="border rounded-lg p-4">
+              <Chart
+                title="Loss Events Over Time"
+                data={lossEventsData}
+                series={[
+                  { name: 'Event Count', dataKey: 'value', color: '#3b82f6' },
+                  { name: 'Financial Impact ($K)', dataKey: 'amount', color: '#ef4444', type: 'line' }
+                ]}
+                type="composed"
+                height={280}
+                xAxisKey="name"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default Index;
