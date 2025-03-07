@@ -10,11 +10,13 @@ import CompactMetric from '@/components/dashboard/CompactMetric';
 import { ComplianceFrameworkCard } from './ComplianceFrameworkCard';
 import { ComplianceHeatmap } from './ComplianceHeatmap';
 import { ComplianceAlertPanel } from './ComplianceAlertPanel';
+import { EvidenceVaultPanel } from './EvidenceVaultPanel';
 import { 
   mockFrameworks, 
   mockBusinessUnits, 
   mockAlerts, 
-  mockHeatmapData
+  mockHeatmapData,
+  mockEvidenceItems
 } from './mockData';
 import { 
   Settings, 
@@ -24,9 +26,11 @@ import {
   FileText, 
   BarChart3, 
   Calendar, 
-  Filter
+  Filter,
+  Database
 } from 'lucide-react';
 import { UserRole } from './types';
+import { Separator } from '@/components/ui/separator';
 
 interface ComplianceDashboardProps {
   onFrameworkSelect: (frameworkId: string) => void;
@@ -41,7 +45,7 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
   userRole,
   onRoleChange
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'heatmap' | 'alerts'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'heatmap' | 'alerts' | 'evidence'>('overview');
   const [searchQuery, setSearchQuery] = useState('');
   const [frameworkFilter, setFrameworkFilter] = useState<string>('all');
   
@@ -95,12 +99,25 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
   const frameworkChartSeries = [
     { name: 'Compliance Score', dataKey: 'score', color: '#8b5cf6' }
   ];
+
+  // Evidence data for chart
+  const evidenceChartData = [
+    { name: 'Document', value: 35 },
+    { name: 'Screenshot', value: 25 },
+    { name: 'Log', value: 20 },
+    { name: 'Report', value: 15 },
+    { name: 'Certification', value: 5 }
+  ];
+
+  const evidenceChartSeries = [
+    { name: 'Evidence Type', dataKey: 'value', color: '#60a5fa' }
+  ];
   
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Compliance Monitoring</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">Compliance & Continuous Monitoring</h1>
           <p className="text-muted-foreground mt-1">Unified view of compliance status, gaps, and evidence</p>
         </div>
         
@@ -182,6 +199,10 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
             <TabsTrigger value="alerts">
               <AlertTriangle className="h-4 w-4 mr-2" />
               Alerts
+            </TabsTrigger>
+            <TabsTrigger value="evidence">
+              <FileText className="h-4 w-4 mr-2" />
+              Evidence Vault
             </TabsTrigger>
           </TabsList>
           
@@ -295,6 +316,65 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
                 alerts={mockAlerts}
                 onAlertClick={(frameworkId) => frameworkId && onFrameworkSelect(frameworkId)}
               />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="evidence">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div>
+                <CardTitle>Evidence Vault</CardTitle>
+                <CardDescription>
+                  Automated evidence collection for compliance verification
+                </CardDescription>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className="ml-2">
+                  <Database className="h-3.5 w-3.5 mr-1" />
+                  {mockEvidenceItems.length} items
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Recent Evidence</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Evidence is collected automatically via integrations and uploaded by control owners
+                  </p>
+                  
+                  <EvidenceVaultPanel 
+                    evidenceItems={mockEvidenceItems.slice(0, 5)}
+                    onEvidenceClick={(controlId) => {
+                      // Find a framework containing this control
+                      const framework = mockFrameworks.find(f => 
+                        f.id.includes(controlId.split('-')[0])
+                      );
+                      if (framework) {
+                        onFrameworkSelect(framework.id);
+                      }
+                    }}
+                  />
+                  
+                  <Button variant="outline" className="w-full mt-2">
+                    <FileText className="h-4 w-4 mr-2" />
+                    View All Evidence
+                  </Button>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Evidence Distribution</h3>
+                  <Chart
+                    title=""
+                    data={evidenceChartData}
+                    series={evidenceChartSeries}
+                    type="pie"
+                    height={250}
+                    showPercentages={true}
+                  />
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

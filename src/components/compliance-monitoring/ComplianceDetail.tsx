@@ -1,42 +1,47 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   ArrowLeft, 
-  Search, 
-  Filter, 
-  ShieldCheck, 
-  Shield, 
-  Folder, 
-  ArrowUpDown,
-  Clock,
-  CalendarClock,
-  Users,
-  AlertTriangle,
-  CircleAlert,
-  FileText,
-  CheckCircle,
-  XCircle,
-  Layers,
+  CheckCircle2, 
+  XCircle, 
+  AlertTriangle, 
+  Clock, 
+  FileText, 
+  Eye, 
+  RotateCw, 
+  Upload, 
+  ChevronUp, 
+  ChevronDown, 
+  Shield,
+  ShieldCheck,
+  ShieldAlert,
   Play,
+  ChevronRight,
+  ExternalLink,
   MessageSquare,
-  Download,
-  LightbulbIcon,
-  PlusCircle
+  Calendar,
+  AlertCircle,
+  Gauge,
+  Sparkles,
+  BarChart
 } from 'lucide-react';
-import { UserRole } from './types';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { mockFrameworks, mockControls, mockEvidenceItems } from './mockData';
+import { ComplianceFramework, ComplianceControl, EvidenceItem, UserRole } from './types';
+import { EvidenceVaultPanel } from './EvidenceVaultPanel';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { 
-  getFrameworkById, 
-  getControlsByFramework, 
-  getGapsByFramework,
-  getAlertsByFramework,
-  getEvidenceByControl 
-} from './mockData';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import Chart from '@/components/dashboard/Chart';
 
 interface ComplianceDetailProps {
@@ -50,610 +55,938 @@ export const ComplianceDetail: React.FC<ComplianceDetailProps> = ({
   onBack,
   userRole
 }) => {
-  const [activeTab, setActiveTab] = useState<'controls' | 'gaps' | 'evidence' | 'mapping'>('controls');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedControlId, setSelectedControlId] = useState<string | null>(null);
-  
-  const framework = getFrameworkById(frameworkId);
-  const controls = getControlsByFramework(frameworkId);
-  const gaps = getGapsByFramework(frameworkId);
-  const alerts = getAlertsByFramework(frameworkId);
-  
-  if (!framework) {
-    return (
-      <div className="text-center py-8">
-        <p>Framework not found</p>
-        <Button onClick={onBack} className="mt-4">Go Back</Button>
-      </div>
-    );
-  }
-  
-  const filteredControls = controls.filter(control => 
-    control.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    control.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'compliant':
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case 'non-compliant':
-        return <XCircle className="h-5 w-5 text-red-600" />;
-      case 'partially-compliant':
-        return <AlertTriangle className="h-5 w-5 text-amber-600" />;
-      case 'not-tested':
-        return <CircleAlert className="h-5 w-5 text-blue-600" />;
-      default:
-        return null;
+  const [framework, setFramework] = useState<ComplianceFramework | null>(null);
+  const [controls, setControls] = useState<ComplianceControl[]>([]);
+  const [evidenceItems, setEvidenceItems] = useState<EvidenceItem[]>([]);
+  const [selectedControl, setSelectedControl] = useState<ComplianceControl | null>(null);
+  const [isRunningTest, setIsRunningTest] = useState(false);
+  const [testProgress, setTestProgress] = useState(0);
+
+  useEffect(() => {
+    // Find the framework
+    const foundFramework = mockFrameworks.find(f => f.id === frameworkId);
+    if (foundFramework) {
+      setFramework(foundFramework);
     }
+    
+    // Filter controls related to this framework
+    const relatedControls = mockControls.filter(control => 
+      control.frameworks.includes(frameworkId)
+    );
+    setControls(relatedControls);
+    
+    // Get related evidence items
+    const relatedEvidence = mockEvidenceItems.filter(item => 
+      relatedControls.some(control => control.id === item.controlId)
+    );
+    setEvidenceItems(relatedEvidence);
+    
+    // Set the first control as selected by default
+    if (relatedControls.length > 0) {
+      setSelectedControl(relatedControls[0]);
+    }
+  }, [frameworkId]);
+
+  const handleRunTest = () => {
+    setIsRunningTest(true);
+    setTestProgress(0);
+    
+    // Simulate progress updates
+    const interval = setInterval(() => {
+      setTestProgress(prev => {
+        const newProgress = prev + 10;
+        if (newProgress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            setIsRunningTest(false);
+            // Update control status based on test result
+            if (selectedControl) {
+              const updatedControl = { ...selectedControl };
+              // Simulate a random test result
+              const testPassed = Math.random() > 0.3;
+              updatedControl.status = testPassed ? 'compliant' : 'non-compliant';
+              updatedControl.lastTested = new Date().toISOString();
+              setSelectedControl(updatedControl);
+              
+              // Create a new evidence item for this test
+              const newEvidence: EvidenceItem = {
+                id: `evidence-${Date.now()}`,
+                controlId: selectedControl.id,
+                name: `Automated Test Result - ${new Date().toLocaleString()}`,
+                type: 'report',
+                uploadedBy: 'Automated System',
+                uploadedAt: new Date().toISOString(),
+                status: 'verified',
+                url: '#'
+              };
+              
+              setEvidenceItems(prev => [newEvidence, ...prev]);
+            }
+          }, 500);
+        }
+        return newProgress;
+      });
+    }, 300);
   };
-  
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'compliant':
-        return <Badge variant="success">Compliant</Badge>;
+        return (
+          <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
+            <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
+            Compliant
+          </Badge>
+        );
       case 'non-compliant':
-        return <Badge variant="destructive">Non-Compliant</Badge>;
+        return (
+          <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200">
+            <XCircle className="h-3.5 w-3.5 mr-1.5" />
+            Non-Compliant
+          </Badge>
+        );
       case 'partially-compliant':
-        return <Badge variant="warning">Partially Compliant</Badge>;
+        return (
+          <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5 mr-1.5" />
+            Partially Compliant
+          </Badge>
+        );
       case 'not-tested':
-        return <Badge variant="info">Not Tested</Badge>;
+        return (
+          <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">
+            <Clock className="h-3.5 w-3.5 mr-1.5" />
+            Not Tested
+          </Badge>
+        );
       default:
         return null;
     }
   };
-  
+
   const getAutomationBadge = (level: string) => {
     switch (level) {
       case 'full':
-        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Automated</Badge>;
+        return (
+          <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
+            Fully Automated
+          </Badge>
+        );
       case 'partial':
-        return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">Semi-Automated</Badge>;
+        return (
+          <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-200">
+            Partially Automated
+          </Badge>
+        );
       case 'manual':
-        return <Badge variant="outline">Manual</Badge>;
+        return (
+          <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200">
+            Manual
+          </Badge>
+        );
       default:
         return null;
     }
   };
-  
-  const getRiskBadge = (risk: string) => {
-    switch (risk) {
-      case 'high':
-        return <Badge variant="destructive">High Risk</Badge>;
-      case 'medium':
-        return <Badge variant="warning">Medium Risk</Badge>;
-      case 'low':
-        return <Badge variant="outline">Low Risk</Badge>;
-      default:
-        return null;
-    }
-  };
-  
-  // Generate control status chart data
-  const controlStatusChartData = [
-    { name: 'Compliant', value: framework.passedControls },
-    { name: 'Non-Compliant', value: framework.failedControls },
-    { name: 'Not Tested', value: framework.notTestedControls }
+
+  // Generate historical test result data
+  const testHistoryData = [
+    { date: '01/15/2023', result: 'pass' },
+    { date: '04/20/2023', result: 'pass' },
+    { date: '07/25/2023', result: 'fail' },
+    { date: '10/30/2023', result: 'pass' },
+    { date: '01/05/2024', result: 'pass' },
+    { date: '04/10/2024', result: 'pass' },
   ];
   
-  const controlStatusChartSeries = [
-    { name: 'Status', dataKey: 'value', color: '#10b981' }
+  // Control status distribution data
+  const controlStatusData = [
+    { name: 'Compliant', value: controls.filter(c => c.status === 'compliant').length },
+    { name: 'Non-Compliant', value: controls.filter(c => c.status === 'non-compliant').length },
+    { name: 'Partially Compliant', value: controls.filter(c => c.status === 'partially-compliant').length },
+    { name: 'Not Tested', value: controls.filter(c => c.status === 'not-tested').length }
   ];
   
+  const controlStatusSeries = [
+    { name: 'Controls', dataKey: 'value', color: '#8b5cf6' }
+  ];
+
+  if (!framework) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Loading framework details...</h2>
+          <p className="text-muted-foreground">Please wait while we load the data</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div>
-          <div className="flex items-center mb-1">
-            <Button variant="ghost" size="sm" onClick={onBack} className="mr-2 h-8">
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              Back
-            </Button>
-            <Badge variant="outline" className="mr-2">{framework.priority} Priority</Badge>
-            {framework.complianceScore >= 90 ? (
-              <Badge variant="success">High Compliance</Badge>
-            ) : framework.complianceScore >= 70 ? (
-              <Badge variant="warning">Medium Compliance</Badge>
-            ) : (
-              <Badge variant="destructive">Low Compliance</Badge>
-            )}
-          </div>
-          
-          <h1 className="text-2xl md:text-3xl font-bold">{framework.name}</h1>
-          <p className="text-muted-foreground">{framework.description}</p>
-          
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-2 text-sm">
-            <div className="flex items-center">
-              <Shield className="h-4 w-4 mr-1 text-muted-foreground" />
-              <span>{framework.totalControls} Controls</span>
-            </div>
-            <div className="flex items-center">
-              <Users className="h-4 w-4 mr-1 text-muted-foreground" />
-              <span>Owner: {framework.owners.join(', ')}</span>
-            </div>
-            <div className="flex items-center">
-              <CalendarClock className="h-4 w-4 mr-1 text-muted-foreground" />
-              <span>Next Assessment: {new Date(framework.nextAssessment).toLocaleDateString()}</span>
-            </div>
-            {alerts.length > 0 && (
-              <div className="flex items-center text-amber-600">
-                <AlertTriangle className="h-4 w-4 mr-1" />
-                <span>{alerts.length} Active Alerts</span>
-              </div>
-            )}
-          </div>
+      <div className="flex justify-between items-center">
+        <div className="flex items-center">
+          <Button variant="ghost" onClick={onBack} className="mr-2">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Button>
+          <h1 className="text-2xl font-bold">{framework.name}</h1>
+          {getStatusBadge(framework.passedControls > framework.failedControls ? 'compliant' : 'partially-compliant')}
         </div>
         
-        <div className="flex flex-col items-end">
-          <div className="bg-card p-4 rounded-lg shadow-sm border">
-            <p className="text-sm text-muted-foreground mb-1">Compliance Score</p>
-            <div className="flex items-baseline">
-              <span className={`text-3xl font-bold ${
-                framework.complianceScore >= 90 ? 'text-green-600' : 
-                framework.complianceScore >= 70 ? 'text-amber-600' : 
-                'text-red-600'
-              }`}>
-                {framework.complianceScore}%
-              </span>
-              
-              <span className={`ml-2 text-sm ${
-                framework.trend === 'up' ? 'text-emerald-600' : 
-                framework.trend === 'down' ? 'text-red-600' : 
-                'text-muted-foreground'
-              }`}>
-                {framework.trend === 'up' ? '↗' : framework.trend === 'down' ? '↘' : '→'}
-                {Math.abs(framework.complianceScore - framework.previousScore)}%
-              </span>
-            </div>
-            
-            <div className="flex gap-4 mt-3 text-sm">
-              <div>
-                <div className="flex items-center">
-                  <div className="h-2 w-2 rounded-full bg-green-500 mr-1.5"></div>
-                  <span className="text-muted-foreground">Passing:</span>
-                </div>
-                <span className="font-medium">{framework.passedControls}</span>
-              </div>
-              <div>
-                <div className="flex items-center">
-                  <div className="h-2 w-2 rounded-full bg-red-500 mr-1.5"></div>
-                  <span className="text-muted-foreground">Failing:</span>
-                </div>
-                <span className="font-medium">{framework.failedControls}</span>
-              </div>
-              <div>
-                <div className="flex items-center">
-                  <div className="h-2 w-2 rounded-full bg-gray-300 mr-1.5"></div>
-                  <span className="text-muted-foreground">Not Tested:</span>
-                </div>
-                <span className="font-medium">{framework.notTestedControls}</span>
-              </div>
-            </div>
-          </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="font-normal">
+            <Calendar className="h-3.5 w-3.5 mr-1" />
+            Last Updated: {new Date(framework.lastUpdated).toLocaleDateString()}
+          </Badge>
           
-          <div className="flex gap-2 mt-4">
-            <Button>
-              <FileText className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
-            <Button variant="outline">
-              <CalendarClock className="h-4 w-4 mr-2" />
-              Schedule Assessment
-            </Button>
-          </div>
+          <Button variant="outline" size="sm">
+            <FileText className="h-4 w-4 mr-2" />
+            Export Report
+          </Button>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3">
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
-            <div className="flex justify-between items-center mb-4">
-              <TabsList>
-                <TabsTrigger value="controls">
-                  <ShieldCheck className="h-4 w-4 mr-2" />
-                  Controls
-                </TabsTrigger>
-                <TabsTrigger value="gaps">
-                  <AlertTriangle className="h-4 w-4 mr-2" />
-                  Gaps
-                </TabsTrigger>
-                <TabsTrigger value="evidence">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Evidence Vault
-                </TabsTrigger>
-                <TabsTrigger value="mapping">
-                  <Layers className="h-4 w-4 mr-2" />
-                  Framework Mapping
-                </TabsTrigger>
-              </TabsList>
-              
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="Search..."
-                    className="pl-9 w-[200px] md:w-[260px]"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1 space-y-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Framework Overview</CardTitle>
+              <CardDescription>{framework.description}</CardDescription>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col">
+                  <span className="text-xs text-muted-foreground">Compliance Score</span>
+                  <span className="text-2xl font-bold text-blue-600">{framework.complianceScore}%</span>
                 </div>
                 
-                <Button variant="outline" size="icon">
-                  <Filter className="h-4 w-4" />
-                </Button>
-                
-                <Button variant="outline" size="icon">
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
+                <div className="flex flex-col">
+                  <span className="text-xs text-muted-foreground">Next Assessment</span>
+                  <span className="font-semibold">
+                    {new Date(framework.nextAssessment).toLocaleDateString()}
+                  </span>
+                </div>
               </div>
-            </div>
+              
+              <Separator />
+              
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-muted-foreground">Control Status</span>
+                  <span className="text-xs font-semibold">
+                    {framework.passedControls} / {framework.totalControls} Controls Passing
+                  </span>
+                </div>
+                <Progress value={(framework.passedControls / framework.totalControls) * 100} className="h-2" />
+              </div>
+              
+              <div className="flex flex-col space-y-2 pt-2">
+                <div className="flex items-center text-sm">
+                  <ShieldCheck className="h-4 w-4 mr-2 text-green-600" />
+                  <span>{framework.passedControls} Passing</span>
+                </div>
+                <div className="flex items-center text-sm">
+                  <ShieldAlert className="h-4 w-4 mr-2 text-red-600" />
+                  <span>{framework.failedControls} Failing</span>
+                </div>
+                <div className="flex items-center text-sm">
+                  <Clock className="h-4 w-4 mr-2 text-gray-500" />
+                  <span>{framework.notTestedControls} Not Tested</span>
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div>
+                <h4 className="text-sm font-medium mb-2">Owners</h4>
+                <div className="space-y-1">
+                  {framework.owners.map((owner, index) => (
+                    <div key={index} className="text-sm flex items-center">
+                      <span className="w-2 h-2 rounded-full bg-blue-500 mr-2"></span>
+                      {owner}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <Button className="w-full">
+                <BarChart className="h-4 w-4 mr-2" />
+                View Framework Analytics
+              </Button>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Control Status</CardTitle>
+              <CardDescription>Distribution of control compliance</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Chart
+                title=""
+                data={controlStatusData}
+                series={controlStatusSeries}
+                type="pie"
+                height={200}
+                showPercentages={true}
+              />
+              
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center">
+                    <span className="w-3 h-3 rounded-full bg-green-500 mr-2"></span>
+                    <span>Compliant</span>
+                  </div>
+                  <span className="font-semibold">{controls.filter(c => c.status === 'compliant').length}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center">
+                    <span className="w-3 h-3 rounded-full bg-red-500 mr-2"></span>
+                    <span>Non-Compliant</span>
+                  </div>
+                  <span className="font-semibold">{controls.filter(c => c.status === 'non-compliant').length}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center">
+                    <span className="w-3 h-3 rounded-full bg-amber-500 mr-2"></span>
+                    <span>Partially Compliant</span>
+                  </div>
+                  <span className="font-semibold">{controls.filter(c => c.status === 'partially-compliant').length}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center">
+                    <span className="w-3 h-3 rounded-full bg-gray-400 mr-2"></span>
+                    <span>Not Tested</span>
+                  </div>
+                  <span className="font-semibold">{controls.filter(c => c.status === 'not-tested').length}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="lg:col-span-2">
+          <Tabs defaultValue="controls">
+            <TabsList className="mb-4">
+              <TabsTrigger value="controls">
+                <Shield className="h-4 w-4 mr-2" />
+                Controls
+              </TabsTrigger>
+              <TabsTrigger value="evidence">
+                <FileText className="h-4 w-4 mr-2" />
+                Evidence
+              </TabsTrigger>
+              <TabsTrigger value="gaps">
+                <AlertCircle className="h-4 w-4 mr-2" />
+                Gaps
+              </TabsTrigger>
+              <TabsTrigger value="timeline">
+                <Calendar className="h-4 w-4 mr-2" />
+                Timeline
+              </TabsTrigger>
+            </TabsList>
             
             <TabsContent value="controls" className="space-y-4">
-              {filteredControls.map(control => (
-                <Card 
-                  key={control.id} 
-                  className={`transition-shadow hover:shadow-md cursor-pointer ${
-                    selectedControlId === control.id ? 'ring-2 ring-offset-2 ring-blue-500' : ''
-                  }`}
-                  onClick={() => setSelectedControlId(
-                    selectedControlId === control.id ? null : control.id
-                  )}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start">
-                      <div className="mr-4 mt-1">
-                        {getStatusIcon(control.status)}
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold">Controls ({controls.length})</h2>
+                <div className="flex items-center gap-2">
+                  <Input 
+                    placeholder="Search controls..." 
+                    className="w-[200px]" 
+                  />
+                  <Button variant="outline" size="sm">
+                    <Eye className="h-4 w-4 mr-2" />
+                    All Controls
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-4">
+                {controls.map((control) => (
+                  <Card 
+                    key={control.id}
+                    className={`hover:shadow-md transition-shadow cursor-pointer ${selectedControl?.id === control.id ? 'border-blue-500 shadow-md' : ''}`}
+                    onClick={() => setSelectedControl(control)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold">{control.name}</h3>
+                          <p className="text-sm text-muted-foreground">{control.description}</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {getStatusBadge(control.status)}
+                          {getAutomationBadge(control.automationLevel)}
+                        </div>
                       </div>
                       
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-semibold">{control.name}</h3>
-                          <div className="flex items-center gap-2">
-                            {getStatusBadge(control.status)}
-                            {getAutomationBadge(control.automationLevel)}
-                            {getRiskBadge(control.risk)}
-                          </div>
+                      <div className="mt-3 grid grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <p className="text-xs text-muted-foreground">Owner</p>
+                          <p className="font-medium">{control.owner}</p>
                         </div>
-                        
-                        <p className="text-sm text-muted-foreground mt-1 mb-3">
-                          {control.description}
-                        </p>
-                        
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
-                          <div className="flex items-center">
-                            <Users className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                            <span>Owner: {control.owner}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <Clock className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                            <span>Last Tested: {new Date(control.lastTested).toLocaleDateString()}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <CalendarClock className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                            <span>Next Test: {new Date(control.nextTest).toLocaleDateString()}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <FileText className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                            <span>{control.evidenceCount} Evidence Items</span>
-                          </div>
-                          {control.frameworks.length > 1 && (
-                            <div className="flex items-center">
-                              <Layers className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                              <span>Maps to {control.frameworks.length} frameworks</span>
-                            </div>
-                          )}
+                        <div>
+                          <p className="text-xs text-muted-foreground">Last Tested</p>
+                          <p className="font-medium">{new Date(control.lastTested).toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Evidence</p>
+                          <p className="font-medium">{control.evidenceCount} items</p>
                         </div>
                       </div>
-                    </div>
-                    
-                    {selectedControlId === control.id && (
-                      <div className="mt-4 pt-4 border-t">
-                        <div className="flex justify-between items-center mb-4">
-                          <h4 className="font-medium">Evidence & Testing</h4>
-                          <div className="flex gap-2">
-                            <Button size="sm" variant="outline">
-                              <FileText className="h-4 w-4 mr-1" />
-                              View All Evidence
-                            </Button>
-                            <Button size="sm">
-                              <Play className="h-4 w-4 mr-1" />
-                              Run Test
-                            </Button>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                          {getEvidenceByControl(control.id).map(evidence => (
-                            <div key={evidence.id} className="border rounded-md p-3 bg-muted/30">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <h5 className="font-medium text-sm">{evidence.name}</h5>
-                                  <div className="text-xs text-muted-foreground mt-1 mb-2">
-                                    Uploaded by {evidence.uploadedBy} on {new Date(evidence.uploadedAt).toLocaleDateString()}
-                                  </div>
-                                </div>
-                                <Badge 
-                                  variant={
-                                    evidence.status === 'verified' ? 'success' : 
-                                    evidence.status === 'pending' ? 'warning' : 'destructive'
-                                  }
-                                  className="text-[10px]"
-                                >
-                                  {evidence.status}
-                                </Badge>
-                              </div>
-                              <div className="flex justify-between">
-                                <div className="flex items-center text-xs text-blue-600">
-                                  <FileText className="h-3 w-3 mr-1" />
-                                  <span>View Document</span>
-                                </div>
-                                <div className="flex items-center text-xs text-blue-600">
-                                  <Download className="h-3 w-3 mr-1" />
-                                  <span>Download</span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        
-                        {control.status === 'non-compliant' && (
-                          <div className="mt-4 bg-blue-50 dark:bg-blue-950/30 p-3 rounded-md border border-blue-200 dark:border-blue-800">
-                            <div className="flex items-start">
-                              <LightbulbIcon className="h-4 w-4 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
-                              <div>
-                                <div className="flex items-center mb-1">
-                                  <Badge variant="info" className="bg-blue-600 text-[10px] h-4 mr-2">AI Insight</Badge>
-                                  <span className="text-xs text-blue-700 dark:text-blue-400">Remediation Suggestion</span>
-                                </div>
-                                <p className="text-sm text-blue-900 dark:text-blue-300">
-                                  Based on evidence and test results, this control requires updated documentation and more frequent testing. Consider implementing automated testing on a bi-weekly schedule.
-                                </p>
-                                <div className="flex gap-2 mt-2">
-                                  <Button size="sm" variant="outline" className="h-7 text-xs bg-white">
-                                    <CheckCircle className="h-3 w-3 mr-1" />
-                                    Accept Suggestion
-                                  </Button>
-                                  <Button size="sm" variant="ghost" className="h-7 text-xs">
-                                    <MessageSquare className="h-3 w-3 mr-1" />
-                                    Provide Feedback
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </TabsContent>
-            
-            <TabsContent value="gaps" className="space-y-4">
-              {gaps.length === 0 ? (
-                <Card>
-                  <CardContent className="text-center py-8">
-                    <CheckCircle className="h-10 w-10 mx-auto mb-2 text-green-600" />
-                    <p>No compliance gaps identified</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                gaps.map(gap => (
-                  <Card key={gap.id} className="transition-shadow hover:shadow-md">
-                    <CardContent className="p-4">
-                      <div className="flex items-start">
-                        <CircleAlert className="h-5 w-5 mr-4 mt-1 text-amber-600" />
-                        
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <h3 className="font-semibold">{gap.requirement}</h3>
-                            <div className="flex items-center gap-2">
-                              <Badge 
-                                variant={
-                                  gap.status === 'resolved' ? 'success' : 
-                                  gap.status === 'in-progress' ? 'warning' : 'destructive'
-                                }
-                              >
-                                {gap.status}
-                              </Badge>
-                              <Badge 
-                                variant={
-                                  gap.impact === 'high' ? 'destructive' : 
-                                  gap.impact === 'medium' ? 'warning' : 'outline'
-                                }
-                              >
-                                {gap.impact} Impact
-                              </Badge>
-                            </div>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 mb-3">
-                            <div className="bg-muted/30 p-3 rounded-md">
-                              <p className="text-xs font-medium mb-1">Current State</p>
-                              <p className="text-sm">{gap.currentState}</p>
-                            </div>
-                            
-                            <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-md">
-                              <p className="text-xs font-medium mb-1 text-blue-800 dark:text-blue-300">Expected State</p>
-                              <p className="text-sm text-blue-900 dark:text-blue-200">{gap.expectedState}</p>
-                            </div>
-                          </div>
-                          
-                          {gap.remediation && (
-                            <div className="mb-3">
-                              <p className="text-xs font-medium mb-1">Remediation Plan</p>
-                              <p className="text-sm">{gap.remediation}</p>
-                            </div>
-                          )}
-                          
-                          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
-                            {gap.assignedTo && (
-                              <div className="flex items-center">
-                                <Users className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                                <span>Assigned to: {gap.assignedTo}</span>
-                              </div>
-                            )}
-                            
-                            {gap.dueDate && (
-                              <div className="flex items-center">
-                                <CalendarClock className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                                <span>Due by: {new Date(gap.dueDate).toLocaleDateString()}</span>
-                              </div>
-                            )}
-                            
-                            {gap.controlId && (
-                              <div className="flex items-center">
-                                <Shield className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                                <span>Related Control: {gap.controlId}</span>
-                              </div>
-                            )}
-                          </div>
-                          
-                          <div className="flex items-center justify-end gap-2 mt-3">
-                            <Button size="sm" variant="outline">
-                              <MessageSquare className="h-3.5 w-3.5 mr-1" />
-                              Add Comment
-                            </Button>
-                            
-                            {gap.status !== 'resolved' && (
-                              <Button size="sm">
-                                <PlusCircle className="h-3.5 w-3.5 mr-1" />
-                                {gap.status === 'in-progress' ? 'Update Progress' : 'Start Remediation'}
-                              </Button>
-                            )}
-                          </div>
-                        </div>
+                      
+                      <div className="mt-2 flex items-center justify-end text-xs text-blue-600">
+                        <ChevronRight className="h-4 w-4" />
                       </div>
                     </CardContent>
                   </Card>
-                ))
-              )}
+                ))}
+              </div>
             </TabsContent>
             
-            <TabsContent value="evidence" className="space-y-4">
+            <TabsContent value="evidence">
               <Card>
                 <CardHeader>
                   <CardTitle>Evidence Vault</CardTitle>
-                  <CardDescription>
-                    Centralized repository of all compliance evidence
-                  </CardDescription>
+                  <CardDescription>All evidence items for {framework.name}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Folder className="h-10 w-10 mx-auto mb-2" />
-                    <p>Evidence Vault content will be displayed here</p>
-                    <p className="text-sm mt-2">This section is under development</p>
+                  <EvidenceVaultPanel 
+                    evidenceItems={evidenceItems}
+                    onEvidenceClick={(controlId) => {
+                      const foundControl = controls.find(c => c.id === controlId);
+                      if (foundControl) {
+                        setSelectedControl(foundControl);
+                      }
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="gaps">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Compliance Gaps</CardTitle>
+                  <CardDescription>Identified gaps in compliance with {framework.name}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {controls.filter(c => c.status !== 'compliant').map((control) => (
+                      <Card key={control.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="font-semibold">{control.name}</h3>
+                              <p className="text-sm text-muted-foreground">{control.description}</p>
+                            </div>
+                            {getStatusBadge(control.status)}
+                          </div>
+                          
+                          <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded text-sm">
+                            <div className="flex items-start">
+                              <Sparkles className="h-5 w-5 text-amber-500 mr-2 mt-0.5" />
+                              <div>
+                                <p className="font-medium text-amber-800">AI Analysis</p>
+                                <p className="text-amber-700">
+                                  This control requires additional evidence to meet {framework.name} compliance standards. 
+                                  Consider implementing automated monitoring for real-time verification.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="mt-4 grid grid-cols-2 gap-4">
+                            <Button variant="outline" className="w-full">
+                              <FileText className="h-4 w-4 mr-2" />
+                              View Control Details
+                            </Button>
+                            <Button className="w-full">
+                              <Upload className="h-4 w-4 mr-2" />
+                              Upload Evidence
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    
+                    {controls.filter(c => c.status !== 'compliant').length === 0 && (
+                      <div className="text-center py-10">
+                        <CheckCircle2 className="h-10 w-10 text-green-500 mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold">No Gaps Found</h3>
+                        <p className="text-muted-foreground">All controls are currently compliant</p>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
             
-            <TabsContent value="mapping" className="space-y-4">
+            <TabsContent value="timeline">
               <Card>
                 <CardHeader>
-                  <CardTitle>Framework Mapping</CardTitle>
-                  <CardDescription>
-                    Cross-reference controls with other compliance frameworks
-                  </CardDescription>
+                  <CardTitle>Compliance Timeline</CardTitle>
+                  <CardDescription>History of compliance activities for {framework.name}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Layers className="h-10 w-10 mx-auto mb-2" />
-                    <p>Framework mapping visualization will be displayed here</p>
-                    <p className="text-sm mt-2">This section is under development</p>
+                  <div className="space-y-6">
+                    {/* Timeline events */}
+                    <div className="relative pl-6 border-l-2 border-muted space-y-8">
+                      <div className="relative">
+                        <div className="absolute -left-[25px] p-1 rounded-full bg-green-500 border-4 border-background">
+                          <CheckCircle2 className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center">
+                            <h4 className="font-semibold">Framework Assessment Completed</h4>
+                            <Badge variant="outline" className="ml-2">Latest</Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">Apr 15, 2024 - 11:30 AM</p>
+                          <p className="text-sm">
+                            Quarterly assessment completed with a compliance score of {framework.complianceScore}%. 
+                            {framework.complianceScore > framework.previousScore 
+                              ? ` Improved by ${framework.complianceScore - framework.previousScore}% from previous assessment.`
+                              : ` Decreased by ${framework.previousScore - framework.complianceScore}% from previous assessment.`
+                            }
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="relative">
+                        <div className="absolute -left-[25px] p-1 rounded-full bg-blue-500 border-4 border-background">
+                          <FileText className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="space-y-1">
+                          <h4 className="font-semibold">Evidence Collection</h4>
+                          <p className="text-sm text-muted-foreground">Apr 10, 2024 - 02:45 PM</p>
+                          <p className="text-sm">
+                            15 new evidence items collected for various controls. 
+                            3 items flagged for manual review.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="relative">
+                        <div className="absolute -left-[25px] p-1 rounded-full bg-amber-500 border-4 border-background">
+                          <AlertTriangle className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="space-y-1">
+                          <h4 className="font-semibold">Control Failure Detected</h4>
+                          <p className="text-sm text-muted-foreground">Mar 28, 2024 - 09:15 AM</p>
+                          <p className="text-sm">
+                            Password policy control failed automated testing. 
+                            Remediation plan created and assigned to IT Security team.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="relative">
+                        <div className="absolute -left-[25px] p-1 rounded-full bg-purple-500 border-4 border-background">
+                          <RotateCw className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="space-y-1">
+                          <h4 className="font-semibold">Framework Testing Initiated</h4>
+                          <p className="text-sm text-muted-foreground">Mar 15, 2024 - 10:00 AM</p>
+                          <p className="text-sm">
+                            Quarterly automated testing cycle initiated for all {framework.totalControls} controls.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
         </div>
-        
-        <div className="space-y-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Control Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Chart
-                title=""
-                data={controlStatusChartData}
-                series={[{ name: 'Controls', dataKey: 'value', color: '#10b981' }]}
-                type="pie"
-                xAxisKey="name"
-                height={180}
-                showLegend={true}
-              />
-            </CardContent>
-          </Card>
+      </div>
+      
+      {selectedControl && (
+        <Card className="border-blue-200 shadow-md">
+          <CardHeader className="bg-blue-50 border-b border-blue-100">
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle className="text-xl">Control Details - {selectedControl.id}</CardTitle>
+                <CardDescription className="mt-1">{selectedControl.name}</CardDescription>
+              </div>
+              {getStatusBadge(selectedControl.status)}
+            </div>
+          </CardHeader>
           
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Recent Alerts</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {alerts.length === 0 ? (
-                <div className="text-center py-4 text-muted-foreground">
-                  <p>No active alerts</p>
-                </div>
-              ) : (
-                alerts.slice(0, 3).map(alert => (
-                  <div 
-                    key={alert.id} 
-                    className="border rounded-md p-3 hover:bg-muted/20 transition-colors cursor-pointer"
-                  >
-                    <div className="flex items-start">
-                      <AlertTriangle className={`h-4 w-4 mr-2 mt-0.5 ${
-                        alert.severity === 'critical' ? 'text-red-600' : 'text-amber-600'
-                      }`} />
-                      <div>
-                        <p className="text-sm font-medium">{alert.title}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {new Date(alert.timestamp).toLocaleDateString()}
-                        </p>
+          <CardContent className="p-6">
+            <Tabs defaultValue="details">
+              <TabsList className="mb-4">
+                <TabsTrigger value="details">Control Information</TabsTrigger>
+                <TabsTrigger value="test">Test Results</TabsTrigger>
+                <TabsTrigger value="evidence">Evidence ({selectedControl.evidenceCount})</TabsTrigger>
+                <TabsTrigger value="workflow">Workflow</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="details" className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-2">Control Description</h3>
+                    <p className="text-sm">{selectedControl.description}</p>
+                    
+                    <h3 className="text-sm font-medium text-muted-foreground mt-4 mb-2">Related Frameworks</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedControl.frameworks.map((fw, index) => {
+                        const framework = mockFrameworks.find(f => f.id === fw);
+                        return (
+                          <Badge key={index} variant="secondary">
+                            {framework ? framework.name : fw}
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                    
+                    <h3 className="text-sm font-medium text-muted-foreground mt-4 mb-2">Testing Schedule</h3>
+                    <div className="flex items-center">
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">Last Tested</p>
+                        <p className="font-semibold text-sm">{new Date(selectedControl.lastTested).toLocaleDateString()}</p>
+                      </div>
+                      <div className="mx-4 h-6 border-l border-gray-200"></div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">Next Test</p>
+                        <p className="font-semibold text-sm">{new Date(selectedControl.nextTest).toLocaleDateString()}</p>
                       </div>
                     </div>
                   </div>
-                ))
-              )}
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground mb-2">Control Metadata</h3>
+                      <dl className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <dt className="text-xs text-muted-foreground">Control ID</dt>
+                          <dd className="font-medium">{selectedControl.id}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-muted-foreground">Owner</dt>
+                          <dd className="font-medium">{selectedControl.owner}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-muted-foreground">Risk Level</dt>
+                          <dd className="font-medium capitalize">{selectedControl.risk}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-muted-foreground">Automation</dt>
+                          <dd className="font-medium capitalize">{selectedControl.automationLevel}</dd>
+                        </div>
+                      </dl>
+                    </div>
+                    
+                    {selectedControl.automationLevel !== 'manual' && (
+                      <div className="space-y-3">
+                        <h3 className="text-sm font-medium text-muted-foreground">Automated Testing</h3>
+                        <div className="flex space-x-2">
+                          <Button 
+                            onClick={handleRunTest} 
+                            disabled={isRunningTest}
+                            className="flex-1"
+                          >
+                            {isRunningTest ? (
+                              <>
+                                <RotateCw className="h-4 w-4 mr-2 animate-spin" />
+                                Testing...
+                              </>
+                            ) : (
+                              <>
+                                <Play className="h-4 w-4 mr-2" />
+                                Run Test Now
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                        
+                        {isRunningTest && (
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center text-xs">
+                              <span>Collecting evidence...</span>
+                              <span>{testProgress}%</span>
+                            </div>
+                            <Progress value={testProgress} className="h-2" />
+                          </div>
+                        )}
+                        
+                        <div className="p-3 bg-blue-50 border border-blue-100 rounded-md text-sm">
+                          <p className="text-blue-700">
+                            <InfoCircle className="h-4 w-4 inline-block mr-1" />
+                            Running this test will automatically collect evidence and update the control status.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="requirements">
+                    <AccordionTrigger className="text-sm font-medium">
+                      Regulatory Requirements
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-3 text-sm">
+                        <div className="p-3 border rounded-md">
+                          <h4 className="font-medium">ISO 27001 - A.9.4.3</h4>
+                          <p className="text-muted-foreground">
+                            Password management system shall be interactive and shall ensure quality passwords.
+                          </p>
+                        </div>
+                        
+                        <div className="p-3 border rounded-md">
+                          <h4 className="font-medium">SOC 2 - CC6.1</h4>
+                          <p className="text-muted-foreground">
+                            The entity implements logical access security software, infrastructure, and architectures for 
+                            authentication and authorization of users.
+                          </p>
+                        </div>
+                        
+                        <div className="p-3 border rounded-md">
+                          <h4 className="font-medium">NIST 800-53 - IA-5</h4>
+                          <p className="text-muted-foreground">
+                            The organization manages information system authenticators by establishing and implementing
+                            authenticator content and requirements.
+                          </p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </TabsContent>
               
-              {alerts.length > 3 && (
-                <div className="text-center">
-                  <Button variant="ghost" size="sm" className="text-xs">
-                    View all {alerts.length} alerts
-                  </Button>
+              <TabsContent value="test" className="space-y-4">
+                <h3 className="text-lg font-medium">Test History</h3>
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="p-3 text-left font-medium">Date</th>
+                        <th className="p-3 text-left font-medium">Result</th>
+                        <th className="p-3 text-left font-medium">Evidence</th>
+                        <th className="p-3 text-left font-medium">Tester</th>
+                        <th className="p-3 text-left font-medium">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {[
+                        {
+                          date: new Date().toLocaleDateString(),
+                          result: selectedControl.status === 'compliant' ? 'pass' : 'fail',
+                          evidence: 2,
+                          tester: 'Automated System',
+                        },
+                        ...testHistoryData
+                      ].map((test, index) => (
+                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                          <td className="p-3">{test.date}</td>
+                          <td className="p-3">
+                            {test.result === 'pass' ? (
+                              <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
+                                <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+                                Pass
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200">
+                                <XCircle className="h-3.5 w-3.5 mr-1" />
+                                Fail
+                              </Badge>
+                            )}
+                          </td>
+                          <td className="p-3">{typeof test.evidence === 'number' ? test.evidence : 1} items</td>
+                          <td className="p-3">{test.tester}</td>
+                          <td className="p-3">
+                            <Button variant="ghost" size="sm" className="h-8 px-2">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Related Frameworks</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="border rounded-md p-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">SOC 2</span>
-                  <Badge variant="outline">85% Match</Badge>
+                
+                {selectedControl.status === 'non-compliant' && (
+                  <Card className="border-red-200 bg-red-50/50">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg text-red-800 flex items-center">
+                        <AlertTriangle className="h-5 w-5 mr-2 text-red-600" />
+                        Failed Test Details
+                      </CardTitle>
+                      <CardDescription className="text-red-700">
+                        This control failed its most recent test on {new Date(selectedControl.lastTested).toLocaleDateString()}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0 space-y-4">
+                      <div className="p-3 border border-red-200 rounded bg-white">
+                        <h4 className="font-medium mb-1">Failure Reason</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Password policy does not enforce minimum length and complexity requirements.
+                          Current settings only require 6 characters with no complexity rules.
+                        </p>
+                      </div>
+                      
+                      <div className="bg-white p-4 border border-red-200 rounded-md">
+                        <h4 className="font-medium mb-2">Approval Workflow</h4>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Escalation Comments</label>
+                            <Textarea placeholder="Provide details about this compliance failure..." />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Assign To</label>
+                            <Input placeholder="Enter email or username" />
+                          </div>
+                          
+                          <div className="flex space-x-2">
+                            <Button variant="outline" className="flex-1">
+                              Re-Run Test
+                            </Button>
+                            <Button className="flex-1 bg-red-600 hover:bg-red-700">
+                              Escalate
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
+                {selectedControl.status === 'compliant' && (
+                  <Card className="border-green-200 bg-green-50/50">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg text-green-800 flex items-center">
+                        <CheckCircle2 className="h-5 w-5 mr-2 text-green-600" />
+                        Test Passing Successfully
+                      </CardTitle>
+                      <CardDescription className="text-green-700">
+                        This control passed its most recent test on {new Date(selectedControl.lastTested).toLocaleDateString()}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="p-3 border border-green-200 rounded bg-white">
+                        <h4 className="font-medium mb-1">Test Details</h4>
+                        <p className="text-sm text-muted-foreground">
+                          All requirements are being met. Password policy enforces 12+ character passwords with complexity requirements.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="evidence">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-medium">Evidence Items</h3>
+                    <Button size="sm">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Add Evidence
+                    </Button>
+                  </div>
+                  
+                  <EvidenceVaultPanel 
+                    evidenceItems={evidenceItems.filter(e => e.controlId === selectedControl.id)}
+                    onEvidenceClick={() => {}}
+                  />
                 </div>
-              </div>
-              <div className="border rounded-md p-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">NIST CSF</span>
-                  <Badge variant="outline">62% Match</Badge>
+              </TabsContent>
+              
+              <TabsContent value="workflow">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Workflow Activity</h3>
+                  
+                  <div className="relative pl-6 border-l-2 border-muted space-y-6">
+                    <div className="relative">
+                      <div className="absolute -left-[25px] p-1 rounded-full bg-blue-500 border-4 border-background">
+                        <FileText className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="font-semibold">Evidence Collected</h4>
+                        <p className="text-sm text-muted-foreground">Today at 10:45 AM</p>
+                        <p className="text-sm">Automated system collected new evidence for this control.</p>
+                        
+                        <div className="mt-2 flex items-center space-x-2">
+                          <Button variant="outline" size="sm">
+                            <Eye className="h-3.5 w-3.5 mr-1.5" />
+                            View Evidence
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
+                            Comment
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="relative">
+                      <div className="absolute -left-[25px] p-1 rounded-full bg-green-500 border-4 border-background">
+                        <CheckCircle2 className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="font-semibold">Control Tested</h4>
+                        <p className="text-sm text-muted-foreground">Yesterday at 2:30 PM</p>
+                        <p className="text-sm">Automated test run completed with a passing result.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="relative">
+                      <div className="absolute -left-[25px] p-1 rounded-full bg-purple-500 border-4 border-background">
+                        <RotateCw className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="font-semibold">Testing Scheduled</h4>
+                        <p className="text-sm text-muted-foreground">Apr 10, 2024 at 9:00 AM</p>
+                        <p className="text-sm">Scheduled automated test for quarterly compliance verification.</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 border-t">
+                    <div className="space-y-3">
+                      <h4 className="font-medium">Add Comment</h4>
+                      <Textarea placeholder="Add a comment about this control..." />
+                      <div className="flex justify-end">
+                        <Button>Post Comment</Button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="border rounded-md p-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">GDPR</span>
-                  <Badge variant="outline">45% Match</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
+
+// Added these icons that are referenced in the component
+const InfoCircle = (props) => {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4" />
+      <path d="M12 8h.01" />
+    </svg>
+  )
+}
