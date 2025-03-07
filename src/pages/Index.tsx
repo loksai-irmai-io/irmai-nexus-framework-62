@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -1040,6 +1039,33 @@ const Index = () => {
           </div>
           
           <div className="lg:col-span-1">
+            <AIRiskSummary className="h-full" />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight mb-4 animate-fade-in">
+              Scenario Analysis
+            </h2>
+            <div className="bg-card rounded-lg border shadow-sm p-4">
+              <p className="text-sm text-muted-foreground mb-4">
+                Explore potential risk scenarios and their simulated impacts on your business.
+              </p>
+              <div className="space-y-3">
+                <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-md border border-amber-200 dark:border-amber-800">
+                  <p className="font-medium text-amber-800 dark:text-amber-300 mb-1">Data Breach Scenario</p>
+                  <p className="text-amber-700 dark:text-amber-400">20% potential revenue impact, 3 new simulations pending.</p>
+                </div>
+                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark:border-blue-800">
+                  <p className="font-medium text-blue-800 dark:text-blue-300 mb-1">System Failure</p>
+                  <p className="text-blue-700 dark:text-blue-400">65% impact score with 50% probability of occurrence.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div>
             <AIRiskSummary className="h-full" />
           </div>
         </div>
