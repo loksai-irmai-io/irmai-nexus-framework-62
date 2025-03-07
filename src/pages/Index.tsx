@@ -995,6 +995,10 @@ const Index = () => {
         
         <Separator className="my-8 animate-fade-in" style={{ animationDelay: '800ms' }} />
         
+        <div className="mb-6 animate-fade-in" style={{ animationDelay: '900ms' }}>
+          <AIRiskSummary className="mb-6" />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '900ms' }}>
           <Chart 
             title="Controls Health"
