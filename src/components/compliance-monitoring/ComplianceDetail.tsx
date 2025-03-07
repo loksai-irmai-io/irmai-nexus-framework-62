@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,7 +25,7 @@ import {
   Gauge,
   Sparkles,
   BarChart,
-  InfoCircle
+  Info
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -64,25 +63,21 @@ export const ComplianceDetail: React.FC<ComplianceDetailProps> = ({
   const [testProgress, setTestProgress] = useState(0);
 
   useEffect(() => {
-    // Find the framework
     const foundFramework = mockFrameworks.find(f => f.id === frameworkId);
     if (foundFramework) {
       setFramework(foundFramework);
     }
     
-    // Filter controls related to this framework
     const relatedControls = mockControls.filter(control => 
       control.frameworks.includes(frameworkId)
     );
     setControls(relatedControls);
     
-    // Get related evidence items
     const relatedEvidence = mockEvidenceItems.filter(item => 
       relatedControls.some(control => control.id === item.controlId)
     );
     setEvidenceItems(relatedEvidence);
     
-    // Set the first control as selected by default
     if (relatedControls.length > 0) {
       setSelectedControl(relatedControls[0]);
     }
@@ -92,7 +87,6 @@ export const ComplianceDetail: React.FC<ComplianceDetailProps> = ({
     setIsRunningTest(true);
     setTestProgress(0);
     
-    // Simulate progress updates
     const interval = setInterval(() => {
       setTestProgress(prev => {
         const newProgress = prev + 10;
@@ -100,16 +94,13 @@ export const ComplianceDetail: React.FC<ComplianceDetailProps> = ({
           clearInterval(interval);
           setTimeout(() => {
             setIsRunningTest(false);
-            // Update control status based on test result
             if (selectedControl) {
               const updatedControl = { ...selectedControl };
-              // Simulate a random test result
               const testPassed = Math.random() > 0.3;
               updatedControl.status = testPassed ? 'compliant' : 'non-compliant';
               updatedControl.lastTested = new Date().toISOString();
               setSelectedControl(updatedControl);
               
-              // Create a new evidence item for this test
               const newEvidence: EvidenceItem = {
                 id: `evidence-${Date.now()}`,
                 controlId: selectedControl.id,
@@ -190,7 +181,6 @@ export const ComplianceDetail: React.FC<ComplianceDetailProps> = ({
     }
   };
 
-  // Generate historical test result data with consistent properties
   const testHistoryData = [
     { date: '01/15/2023', result: 'pass', evidence: 1, tester: 'Automated System' },
     { date: '04/20/2023', result: 'pass', evidence: 1, tester: 'Automated System' },
@@ -199,15 +189,14 @@ export const ComplianceDetail: React.FC<ComplianceDetailProps> = ({
     { date: '01/05/2024', result: 'pass', evidence: 1, tester: 'Automated System' },
     { date: '04/10/2024', result: 'pass', evidence: 1, tester: 'Automated System' },
   ];
-  
-  // Control status distribution data
+
   const controlStatusData = [
     { name: 'Compliant', value: controls.filter(c => c.status === 'compliant').length },
     { name: 'Non-Compliant', value: controls.filter(c => c.status === 'non-compliant').length },
     { name: 'Partially Compliant', value: controls.filter(c => c.status === 'partially-compliant').length },
     { name: 'Not Tested', value: controls.filter(c => c.status === 'not-tested').length }
   ];
-  
+
   const controlStatusSeries = [
     { name: 'Controls', dataKey: 'value', color: '#8b5cf6' }
   ];
@@ -535,7 +524,6 @@ export const ComplianceDetail: React.FC<ComplianceDetailProps> = ({
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {/* Timeline events */}
                     <div className="relative pl-6 border-l-2 border-muted space-y-8">
                       <div className="relative">
                         <div className="absolute -left-[25px] p-1 rounded-full bg-green-500 border-4 border-background">
