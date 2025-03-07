@@ -983,7 +983,7 @@ const Index = () => {
           Risk Insights
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '700ms' }}>
-          {infoWidgetData.map(module => (
+          {infoWidgetData.slice(0, 7).map(module => (
             <InfoWidget 
               key={module.id} 
               data={module} 
@@ -991,14 +991,20 @@ const Index = () => {
               onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
             />
           ))}
+          
+          {infoWidgetData.slice(7, 8).map(module => (
+            <InfoWidget 
+              key={module.id} 
+              data={module} 
+              isLoading={loading}
+              onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
+            />
+          ))}
+          <AIRiskSummary />
         </div>
         
         <Separator className="my-8 animate-fade-in" style={{ animationDelay: '800ms' }} />
         
-        <div className="mb-6 animate-fade-in" style={{ animationDelay: '900ms' }}>
-          <AIRiskSummary className="mb-6" />
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '900ms' }}>
           <Chart 
             title="Controls Health"
