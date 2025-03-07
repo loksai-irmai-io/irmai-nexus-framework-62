@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -485,7 +486,7 @@ const infoWidgetData: InfoWidgetData[] = [
   {
     id: 'fmea-analysis',
     title: 'Predictive Risk Analytics',
-    subtitle: 'Risk assessment and failure mode analysis',
+    subtitle: 'Risk Assessment Insights',  // Updated subtitle with proper capitalization
     icon: <Shield className="h-5 w-5 text-primary" />,
     metrics: [
       { 
@@ -538,34 +539,34 @@ const infoWidgetData: InfoWidgetData[] = [
   {
     id: 'outlier-analysis',
     title: 'Outlier Analysis',
-    subtitle: 'Anomaly detection and unusual patterns',
+    subtitle: 'Anomaly Detection and Unusual Patterns', // Capitalized properly
     icon: <SearchX className="h-5 w-5 text-primary" />,
     metrics: [
       { 
-        label: 'Outliers', 
+        label: 'Sequence Fails', // Renamed from 'Outliers'
         value: '18', 
         icon: 'search-x',
-        tooltip: 'Total number of outliers detected',
+        tooltip: 'Total number of outliers detected in process sequences',
         trend: { direction: 'up', value: 12 }
       },
       { 
-        label: 'False Positives', 
+        label: 'Timing Fails', // Renamed from 'False Positives'
         value: '3', 
         icon: 'info',
-        tooltip: 'Number of outliers determined to be false positives'
+        tooltip: 'Number of timing anomalies detected'
       },
       { 
-        label: 'Accuracy', 
+        label: 'Rework Fails', // Renamed from 'Accuracy'
         value: '94%', 
         icon: 'check',
-        tooltip: 'Accuracy rate of anomaly detection',
+        tooltip: 'Percentage of rework detected in processes',
         trend: { direction: 'up', value: 3 }
       },
       { 
-        label: 'Cases Analyzed', 
+        label: 'Resource Outliers', // Renamed from 'Cases Analyzed'
         value: '5,120', 
         icon: 'activity',
-        tooltip: 'Total number of cases analyzed for anomalies'
+        tooltip: 'Unusual resource allocation patterns detected'
       },
     ],
     insights: [
@@ -587,7 +588,7 @@ const infoWidgetData: InfoWidgetData[] = [
   {
     id: 'compliance-monitoring',
     title: 'Compliance Monitoring',
-    subtitle: 'Regulatory compliance and gap analysis',
+    subtitle: 'Regulatory, Industry & Internal Policy Gaps', // Updated subtitle
     icon: <CheckCheck className="h-5 w-5 text-primary" />,
     metrics: [
       { 
@@ -636,7 +637,7 @@ const infoWidgetData: InfoWidgetData[] = [
   {
     id: 'process-discovery',
     title: 'Process Discovery',
-    subtitle: 'Process mining and discovery insights',
+    subtitle: 'End-End Process Insights', // Updated subtitle
     icon: <GitBranch className="h-5 w-5 text-primary" />,
     metrics: [
       { 
@@ -647,16 +648,16 @@ const infoWidgetData: InfoWidgetData[] = [
         trend: { direction: 'up', value: 8 }
       },
       { 
-        label: 'Activities', 
+        label: 'Critical Activities', // Renamed from 'Activities' 
         value: '158', 
         icon: 'activity',
-        tooltip: 'Total unique activities identified across all processes'
+        tooltip: 'Total unique critical activities identified across all processes'
       },
       { 
-        label: 'Variants', 
+        label: 'Objects', // Renamed from 'Variants'
         value: '42', 
         icon: 'git-branch',
-        tooltip: 'Number of process variants or alternative paths identified'
+        tooltip: 'Number of objects involved in processes'
       },
       { 
         label: 'Cases', 
@@ -680,7 +681,7 @@ const infoWidgetData: InfoWidgetData[] = [
   {
     id: 'controls-testing',
     title: 'Controls Testing',
-    subtitle: 'Automated controls testing and validation',
+    subtitle: 'Automated Controls Testing and Validation', // Capitalized properly
     icon: <TestTube className="h-5 w-5 text-primary" />,
     metrics: [
       { 
@@ -727,7 +728,7 @@ const infoWidgetData: InfoWidgetData[] = [
   {
     id: 'incident-management',
     title: 'Incident Management',
-    subtitle: 'Loss events and issue tracking',
+    subtitle: 'Loss Events and Issue Tracking', // Capitalized properly
     icon: <AlertTriangle className="h-5 w-5 text-primary" />,
     metrics: [
       { 
@@ -776,7 +777,7 @@ const infoWidgetData: InfoWidgetData[] = [
   {
     id: 'scenario-analysis',
     title: 'Scenario Analysis',
-    subtitle: 'Risk scenario modeling and simulation',
+    subtitle: 'Risk Scenario Modeling and Simulation', // Capitalized properly
     icon: <Presentation className="h-5 w-5 text-primary" />,
     metrics: [
       { 
