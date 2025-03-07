@@ -72,7 +72,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
     <div 
       className={cn(
         "rounded-lg border shadow-sm overflow-hidden transition-all hover:shadow-lg",
-        "flex flex-col h-full",
+        "flex flex-col h-full w-full", // Added w-full to ensure consistent width
         statusColors[data.status],
         "hover:scale-[1.01] transition-transform duration-200",
         onClick ? "cursor-pointer" : "",
