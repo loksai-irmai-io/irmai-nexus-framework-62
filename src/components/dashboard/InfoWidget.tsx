@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
@@ -72,7 +73,9 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
   const handleActionClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (data.actionHref) {
+      // Ensure we use navigate instead of direct URL changes to prevent full page reload
       navigate(data.actionHref);
+      console.log("Navigating to:", data.actionHref);
     } else if (onClick) {
       onClick();
     }

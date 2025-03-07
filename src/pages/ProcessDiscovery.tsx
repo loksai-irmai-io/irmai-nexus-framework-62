@@ -1,304 +1,416 @@
 
 import React, { useState } from 'react';
 import Layout from '@/components/layout/Layout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Upload, Filter, List, Check, AlertTriangle, Star } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { 
+  AlertCircle, 
+  Check, 
+  Eye, 
+  Filter, 
+  UploadCloud, 
+  Workflow,
+  Activity,
+  FileText,
+  ChevronRight,
+  Database
+} from 'lucide-react';
 import { 
   Tooltip, 
   TooltipContent, 
   TooltipProvider, 
   TooltipTrigger 
-} from "@/components/ui/tooltip";
+} from '@/components/ui/tooltip';
+import { 
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
-// Sample process data for visualization
-const processInsights = [
-  {
-    id: 'insight-1',
-    type: 'warning',
-    text: 'Unusual delay after "Review Invoice" – 20% longer than average',
-    validated: false,
-    nodeId: 'review-invoice'
+// Mock data for the process visualization
+const mockInsights = [
+  { 
+    id: 1, 
+    text: 'Unusual delay after "Review Invoice" – 20% longer than average', 
+    severity: 'warning',
+    validated: false 
   },
-  {
-    id: 'insight-2',
-    type: 'compliance',
-    text: 'Potential compliance violation: "Approve Payment" skips "Verify Vendor"',
-    validated: false,
-    nodeId: 'approve-payment'
+  { 
+    id: 2, 
+    text: 'Potential compliance violation: "Process Payment" sometimes skips "Manager Approval"', 
+    severity: 'error',
+    validated: false 
   },
-  {
-    id: 'insight-3',
-    type: 'anomaly',
-    text: 'Process path from "Create PO" to "Goods Receipt" used only in 5% of cases',
-    validated: true,
-    nodeId: 'create-po'
+  { 
+    id: 3, 
+    text: '30% of cases bypass "Document Verification" after initial rejection', 
+    severity: 'warning',
+    validated: true 
   },
-  {
-    id: 'insight-4',
-    type: 'warning',
-    text: 'Bottleneck detected at "Finance Review" - average wait time of 48 hours',
-    validated: false,
-    nodeId: 'finance-review'
+  { 
+    id: 4, 
+    text: 'Process bottleneck identified in "Compliance Check" - avg waiting time 3.5 days', 
+    severity: 'info',
+    validated: false 
   },
-  {
-    id: 'insight-5',
-    type: 'anomaly',
-    text: 'Unusual process variant: 12% of cases skip "Quality Check"',
-    validated: false,
-    nodeId: 'quality-check'
-  }
+  { 
+    id: 5, 
+    text: 'Duplicate processing detected in "Data Entry" and "Update Records" steps', 
+    severity: 'warning',
+    validated: false 
+  },
 ];
 
-const ProcessDiscovery = () => {
-  const [activeTab, setActiveTab] = useState('bpmn');
-  const [insights, setInsights] = useState(processInsights);
-  const [highlightedNode, setHighlightedNode] = useState<string | null>(null);
-  const [showRawEvents, setShowRawEvents] = useState(false);
+const mockEventLogs = [
+  { id: 1, timestamp: '2023-06-15 09:13:22', activity: 'Receive Invoice', caseid: 'INV-2023-12345', performer: 'System', duration: '0 mins' },
+  { id: 2, timestamp: '2023-06-15 09:14:05', activity: 'Extract Data', caseid: 'INV-2023-12345', performer: 'AI Bot', duration: '1 min' },
+  { id: 3, timestamp: '2023-06-15 09:20:18', activity: 'Validate Invoice', caseid: 'INV-2023-12345', performer: 'John Smith', duration: '6 mins' },
+  { id: 4, timestamp: '2023-06-15 09:45:33', activity: 'Approval Request', caseid: 'INV-2023-12345', performer: 'System', duration: '0 mins' },
+  { id: 5, timestamp: '2023-06-15 11:30:45', activity: 'Manager Approval', caseid: 'INV-2023-12345', performer: 'Sarah Johnson', duration: '105 mins' },
+  { id: 6, timestamp: '2023-06-15 13:10:12', activity: 'Process Payment', caseid: 'INV-2023-12345', performer: 'Finance System', duration: '10 mins' },
+  { id: 7, timestamp: '2023-06-15 13:15:27', activity: 'Send Confirmation', caseid: 'INV-2023-12345', performer: 'System', duration: '0 mins' },
+  { id: 8, timestamp: '2023-06-15 13:15:28', activity: 'Archive Invoice', caseid: 'INV-2023-12345', performer: 'System', duration: '0 mins' },
+];
 
-  // Handle insight validation
-  const handleValidateInsight = (id: string) => {
+const ProcessDiscovery: React.FC = () => {
+  const [activeNotation, setActiveNotation] = useState('bpmn');
+  const [timeframe, setTimeframe] = useState('all');
+  const [department, setDepartment] = useState('all');
+  const [showEvents, setShowEvents] = useState(false);
+  const [insights, setInsights] = useState(mockInsights);
+
+  const handleValidateInsight = (id: number) => {
     setInsights(insights.map(insight => 
-      insight.id === id ? { ...insight, validated: true } : insight
+      insight.id === id ? { ...insight, validated: !insight.validated } : insight
     ));
   };
 
-  // Handle insight click - highlight corresponding node
-  const handleInsightClick = (nodeId: string) => {
-    setHighlightedNode(nodeId);
-    console.log(`Highlighting node: ${nodeId}`);
-    // In a real implementation, this would scroll/zoom to the node in the visualization
-  };
-
-  // Toggle raw events view
-  const toggleRawEvents = () => {
-    setShowRawEvents(!showRawEvents);
-  };
-
-  // Render icon based on insight type
-  const renderInsightIcon = (type: string) => {
-    switch (type) {
+  const getSeverityIcon = (severity: string, validated: boolean) => {
+    if (validated) return <Check className="w-5 h-5 text-green-500" />;
+    
+    switch(severity) {
+      case 'error':
+        return <AlertCircle className="w-5 h-5 text-red-500" />;
       case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-amber-500" />;
-      case 'compliance':
-        return <AlertTriangle className="h-4 w-4 text-red-500" />;
-      case 'anomaly':
-        return <Star className="h-4 w-4 text-blue-500" />;
+        return <AlertCircle className="w-5 h-5 text-yellow-500" />;
       default:
-        return <AlertTriangle className="h-4 w-4 text-gray-500" />;
+        return <Activity className="w-5 h-5 text-blue-500" />;
     }
   };
-
+  
   return (
     <Layout>
-      <div className="container px-6 py-8 max-w-7xl mx-auto">
-        {/* Header Section */}
-        <div className="mb-8 border-b pb-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Process Discovery</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
-                Visualize your end-to-end processes with AI insights
-              </p>
-            </div>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Upload className="h-4 w-4" />
-                    Upload Event Log
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Upload your event log to start process mining</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+      <div className="container mx-auto p-6">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Process Discovery</h1>
+          <p className="text-muted-foreground">
+            Visualize your end-to-end processes with AI insights.
+          </p>
         </div>
-
-        {/* Main Content Area - Split Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Process Visualization Panel - Takes 2/3 of the width on large screens */}
-          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border">
-            {/* View Controls */}
-            <div className="flex justify-between items-center mb-4">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
-                <TabsList>
-                  <TabsTrigger value="bpmn">BPMN</TabsTrigger>
-                  <TabsTrigger value="petri">Petri Net</TabsTrigger>
-                  <TabsTrigger value="tree">Process Tree</TabsTrigger>
-                </TabsList>
-              </Tabs>
-              
-              <div className="flex gap-2">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" size="sm" className="flex items-center gap-2">
-                        <Filter className="h-4 w-4" />
-                        Filter
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Filter processes by timeframe, variant, or department</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+        
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Left Panel - Process Visualization */}
+          <div className="flex-1">
+            <Card className="h-full">
+              <CardHeader className="pb-0">
+                <div className="flex justify-between items-center mb-4">
+                  <CardTitle>Process Map</CardTitle>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button size="sm" variant="outline">
+                          <UploadCloud className="h-4 w-4 mr-2" />
+                          Upload Event Log
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Upload your event log to start process mining</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
                 
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex items-center gap-2"
-                        onClick={toggleRawEvents}
-                      >
-                        <List className="h-4 w-4" />
-                        View Raw Events
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>View underlying event log entries</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </div>
-            
-            {/* Process Visualization Content */}
-            <TabsContent value="bpmn" className="mt-0">
-              <div className="bg-gray-50 dark:bg-gray-900 border border-dashed rounded-md p-8 min-h-[500px] flex items-center justify-center">
-                <div className="text-center">
-                  <p className="text-gray-500 dark:text-gray-400 mb-2">BPMN Process Visualization</p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500">
-                    [Interactive] Clicking a process node opens a detailed view with raw log data and feedback options.
-                  </p>
+                <div className="flex justify-between items-center">
+                  <Tabs value={activeNotation} onValueChange={setActiveNotation}>
+                    <TabsList>
+                      <TabsTrigger value="bpmn">
+                        <Workflow className="h-4 w-4 mr-2" />
+                        BPMN
+                      </TabsTrigger>
+                      <TabsTrigger value="petri">
+                        <Activity className="h-4 w-4 mr-2" />
+                        Petri Net
+                      </TabsTrigger>
+                      <TabsTrigger value="tree">
+                        <FileText className="h-4 w-4 mr-2" />
+                        Process Tree
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                  
+                  <div className="flex space-x-2">
+                    <Select value={timeframe} onValueChange={setTimeframe}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select timeframe" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="all">All time</SelectItem>
+                          <SelectItem value="last-week">Last week</SelectItem>
+                          <SelectItem value="last-month">Last month</SelectItem>
+                          <SelectItem value="last-quarter">Last quarter</SelectItem>
+                          <SelectItem value="last-year">Last year</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    
+                    <Select value={department} onValueChange={setDepartment}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="all">All departments</SelectItem>
+                          <SelectItem value="finance">Finance</SelectItem>
+                          <SelectItem value="operations">Operations</SelectItem>
+                          <SelectItem value="compliance">Compliance</SelectItem>
+                          <SelectItem value="sales">Sales</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="outline" size="icon">
+                            <Filter className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>More filter options</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                 </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="petri" className="mt-0">
-              <div className="bg-gray-50 dark:bg-gray-900 border border-dashed rounded-md p-8 min-h-[500px] flex items-center justify-center">
-                <div className="text-center">
-                  <p className="text-gray-500 dark:text-gray-400 mb-2">Petri Net Process Visualization</p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500">
-                    [Interactive] Clicking a process node opens a detailed view with raw log data and feedback options.
-                  </p>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="tree" className="mt-0">
-              <div className="bg-gray-50 dark:bg-gray-900 border border-dashed rounded-md p-8 min-h-[500px] flex items-center justify-center">
-                <div className="text-center">
-                  <p className="text-gray-500 dark:text-gray-400 mb-2">Process Tree Visualization</p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500">
-                    [Interactive] Clicking a process node opens a detailed view with raw log data and feedback options.
-                  </p>
-                </div>
-              </div>
-            </TabsContent>
-            
-            {/* Raw Events Modal/Section - Conditionally rendered */}
-            {showRawEvents && (
-              <div className="mt-4 bg-white dark:bg-gray-800 border rounded-md p-4">
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="font-medium">Raw Event Log Entries</h3>
-                  <Button variant="ghost" size="sm" onClick={toggleRawEvents}>Close</Button>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead className="bg-gray-50 dark:bg-gray-900">
-                      <tr>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Case ID</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Activity</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Timestamp</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Resource</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                      {[1, 2, 3, 4, 5].map((row) => (
-                        <tr key={row} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                          <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">PO-{1000 + row}</td>
-                          <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">Create Purchase Order</td>
-                          <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">2023-06-{10 + row} 09:15:22</td>
-                          <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">John Smith</td>
-                          <td className="px-3 py-2 whitespace-nowrap text-sm">
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                              Completed
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          {/* AI Insights Sidebar - Takes 1/3 of the width on large screens */}
-          <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border">
-              <h2 className="text-lg font-medium mb-4 border-b pb-2">Process Insights</h2>
+              </CardHeader>
               
-              <div className="space-y-3">
-                {insights.map((insight) => (
-                  <div 
-                    key={insight.id}
-                    className={`p-3 rounded-md border cursor-pointer transition-colors ${
-                      highlightedNode === insight.nodeId 
-                        ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-800' 
-                        : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800'
-                    }`}
-                    onClick={() => handleInsightClick(insight.nodeId)}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5 flex-shrink-0">
-                        {renderInsightIcon(insight.type)}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-800 dark:text-gray-200 mb-2">{insight.text}</p>
-                        <div className="flex justify-between items-center">
-                          {insight.validated ? (
-                            <span className="inline-flex items-center text-xs text-green-600 dark:text-green-400 font-medium">
-                              <Check className="h-3 w-3 mr-1" /> Validated
-                            </span>
-                          ) : (
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="text-xs"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleValidateInsight(insight.id);
-                                    }}
-                                  >
-                                    Validate
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Confirm this insight if accurate, or provide feedback to adjust</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          )}
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            Click to highlight
-                          </span>
-                        </div>
-                      </div>
+              <CardContent className="pt-6">
+                <TabsContent value="bpmn" className="m-0">
+                  <div className="bg-muted/30 border rounded-md flex items-center justify-center p-4 h-[500px] relative">
+                    <div className="text-center max-w-lg">
+                      <img
+                        src="/placeholder.svg"
+                        alt="BPMN Diagram"
+                        className="mx-auto w-full max-w-[400px] opacity-75"
+                      />
+                      <p className="text-sm text-muted-foreground mt-4">
+                        [Interactive] This area displays the BPMN diagram generated from your event logs. 
+                        Hover over nodes to see details and click to drill down.
+                      </p>
+                    </div>
+
+                    {/* Process nodes would be mapped here in a real implementation */}
+                    <div className="absolute left-1/4 top-1/3 bg-green-100 border border-green-500 rounded-md p-2 hover:shadow-md hover:bg-green-50 cursor-pointer transition-all">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger className="flex items-center text-sm">
+                            <Activity className="h-4 w-4 mr-2 text-green-600" />
+                            <span>Approve Payment</span>
+                          </TooltipTrigger>
+                          <TooltipContent className="w-72">
+                            <div className="space-y-2">
+                              <p className="font-medium">Task: Approve Payment</p>
+                              <div className="grid grid-cols-2 gap-x-4 text-xs">
+                                <div>Frequency:</div>
+                                <div>120 occurrences</div>
+                                <div>Avg Duration:</div>
+                                <div>3 mins</div>
+                                <div>Compliance:</div>
+                                <div className="text-green-600 font-medium">✓ Compliant</div>
+                              </div>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+
+                    <div className="absolute right-1/4 top-1/2 bg-red-100 border border-red-500 rounded-md p-2 hover:shadow-md hover:bg-red-50 cursor-pointer transition-all">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger className="flex items-center text-sm">
+                            <Activity className="h-4 w-4 mr-2 text-red-600" />
+                            <span>Process Payment</span>
+                          </TooltipTrigger>
+                          <TooltipContent className="w-72">
+                            <div className="space-y-2">
+                              <p className="font-medium">Task: Process Payment</p>
+                              <div className="grid grid-cols-2 gap-x-4 text-xs">
+                                <div>Frequency:</div>
+                                <div>85 occurrences</div>
+                                <div>Avg Duration:</div>
+                                <div>12 mins</div>
+                                <div>Compliance:</div>
+                                <div className="text-red-600 font-medium">✗ Non-compliant</div>
+                                <div className="col-span-2 pt-1 text-red-600">
+                                  Issue: Approval step sometimes skipped
+                                </div>
+                              </div>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
+                  
+                  <div className="mt-4 flex justify-between">
+                    <Dialog open={showEvents} onOpenChange={setShowEvents}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline">
+                          <Eye className="h-4 w-4 mr-2" />
+                          View Raw Events
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl">
+                        <DialogHeader>
+                          <DialogTitle>Raw Event Log Data</DialogTitle>
+                        </DialogHeader>
+                        <div className="overflow-x-auto">
+                          <table className="w-full border-collapse">
+                            <thead>
+                              <tr className="bg-muted/50">
+                                <th className="border px-4 py-2 text-left">Timestamp</th>
+                                <th className="border px-4 py-2 text-left">Activity</th>
+                                <th className="border px-4 py-2 text-left">Case ID</th>
+                                <th className="border px-4 py-2 text-left">Performer</th>
+                                <th className="border px-4 py-2 text-left">Duration</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {mockEventLogs.map(log => (
+                                <tr key={log.id} className="hover:bg-muted/30">
+                                  <td className="border px-4 py-2">{log.timestamp}</td>
+                                  <td className="border px-4 py-2">{log.activity}</td>
+                                  <td className="border px-4 py-2">{log.caseid}</td>
+                                  <td className="border px-4 py-2">{log.performer}</td>
+                                  <td className="border px-4 py-2">{log.duration}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    
+                    <div className="text-sm text-muted-foreground flex items-center">
+                      <Database className="h-4 w-4 mr-2" />
+                      Data source: SAP ERP Event Logs (Last updated: Today, 10:45 AM)
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="petri" className="m-0">
+                  <div className="bg-muted/30 border rounded-md flex items-center justify-center p-4 h-[500px]">
+                    <div className="text-center max-w-lg">
+                      <img
+                        src="/placeholder.svg"
+                        alt="Petri Net Diagram"
+                        className="mx-auto w-full max-w-[400px] opacity-75"
+                      />
+                      <p className="text-sm text-muted-foreground mt-4">
+                        [Interactive] This area displays the Petri Net representation of your process.
+                        This notation is useful for formal verification of process properties.
+                      </p>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="tree" className="m-0">
+                  <div className="bg-muted/30 border rounded-md flex items-center justify-center p-4 h-[500px]">
+                    <div className="text-center max-w-lg">
+                      <img
+                        src="/placeholder.svg"
+                        alt="Process Tree Diagram"
+                        className="mx-auto w-full max-w-[400px] opacity-75"
+                      />
+                      <p className="text-sm text-muted-foreground mt-4">
+                        [Interactive] This area displays the Process Tree view, showing the hierarchical
+                        structure of your process with operators like sequence, choice, and parallel execution.
+                      </p>
+                    </div>
+                  </div>
+                </TabsContent>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Right Panel - AI Insights */}
+          <div className="w-full lg:w-1/3">
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>Process Insights</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[calc(100vh-260px)]">
+                  <div className="space-y-4">
+                    {insights.map((insight) => (
+                      <div 
+                        key={insight.id} 
+                        className={`p-3 rounded-md border hover:bg-muted/30 cursor-pointer transition-all ${
+                          insight.severity === 'error' ? 'border-red-200 bg-red-50/30' : 
+                          insight.severity === 'warning' ? 'border-yellow-200 bg-yellow-50/30' : 
+                          'border-blue-200 bg-blue-50/30'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 mt-1">
+                            {getSeverityIcon(insight.severity, insight.validated)}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm">{insight.text}</p>
+                            <div className="flex justify-end mt-2">
+                              <Button 
+                                variant={insight.validated ? "outline" : "secondary"} 
+                                size="sm"
+                                className="text-xs"
+                                onClick={() => handleValidateInsight(insight.id)}
+                              >
+                                {insight.validated ? 'Validated ✓' : 'Validate'}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    <Separator className="my-6" />
+                    
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground mb-4">
+                        All insights have been analyzed based on the selected process data.
+                      </p>
+                      <Button variant="outline" size="sm" className="w-full">
+                        <span>Generate More Insights</span>
+                        <ChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
