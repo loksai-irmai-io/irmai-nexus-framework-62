@@ -983,7 +983,8 @@ const Index = () => {
           Risk Insights
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '700ms' }}>
-          {infoWidgetData.map(module => (
+          {/* First 7 modules */}
+          {infoWidgetData.slice(0, 7).map(module => (
             <InfoWidget 
               key={module.id} 
               data={module} 
@@ -991,6 +992,17 @@ const Index = () => {
               onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
             />
           ))}
+          
+          {/* Last module (Scenario Analysis) + AIRiskSummary side by side */}
+          {infoWidgetData.slice(7, 8).map(module => (
+            <InfoWidget 
+              key={module.id} 
+              data={module} 
+              isLoading={loading}
+              onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
+            />
+          ))}
+          <AIRiskSummary />
         </div>
         
         <Separator className="my-8 animate-fade-in" style={{ animationDelay: '800ms' }} />
@@ -1043,7 +1055,7 @@ const Index = () => {
           </div>
           
           <div className="lg:col-span-1">
-            <AIRiskSummary className="h-full" />
+            {/* AIRiskSummary removed from here */}
           </div>
         </div>
         
