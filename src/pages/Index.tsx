@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -719,40 +718,23 @@ const Index = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
-          <div className="lg:col-span-2">
-            <h2 className="text-2xl font-semibold tracking-tight mb-4 animate-fade-in">
-              Upcoming Modules
-            </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {placeholderModuleData.map(module => (
-                <InfoWidget 
-                  key={module.id} 
-                  data={module as any} 
-                  isLoading={loading} 
-                />
-              ))}
-            </div>
-          </div>
-          
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight mb-4 animate-fade-in">
-              Announcements & Tips
-            </h2>
-            <div className="bg-card rounded-lg border shadow-sm p-4 h-full">
-              <div className="space-y-3 text-sm">
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark:border-blue-800">
-                  <p className="font-medium text-blue-800 dark:text-blue-300 mb-1">New Feature</p>
-                  <p className="text-blue-700 dark:text-blue-400">Knowledge Graph now supports interactive drilling through relationships between risks and controls.</p>
-                </div>
-                <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md border border-yellow-200 dark:border-yellow-800">
-                  <p className="font-medium text-yellow-800 dark:text-yellow-300 mb-1">Tip</p>
-                  <p className="text-yellow-700 dark:text-yellow-400">Use the Risk Catalog to drill into detailed risk descriptions and mitigations.</p>
-                </div>
-                <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-md border border-purple-200 dark:border-purple-800">
-                  <p className="font-medium text-purple-800 dark:text-purple-300 mb-1">Training</p>
-                  <p className="text-purple-700 dark:text-purple-400">New training session on FMEA Analysis scheduled for next Friday.</p>
-                </div>
+        <div className="mb-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
+          <h2 className="text-2xl font-semibold tracking-tight mb-4 animate-fade-in">
+            Announcements & Tips
+          </h2>
+          <div className="bg-card rounded-lg border shadow-sm p-4">
+            <div className="space-y-3 text-sm">
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark:border-blue-800">
+                <p className="font-medium text-blue-800 dark:text-blue-300 mb-1">New Feature</p>
+                <p className="text-blue-700 dark:text-blue-400">Knowledge Graph now supports interactive drilling through relationships between risks and controls.</p>
+              </div>
+              <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md border border-yellow-200 dark:border-yellow-800">
+                <p className="font-medium text-yellow-800 dark:text-yellow-300 mb-1">Tip</p>
+                <p className="text-yellow-700 dark:text-yellow-400">Use the Risk Catalog to drill into detailed risk descriptions and mitigations.</p>
+              </div>
+              <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-md border border-purple-200 dark:border-purple-800">
+                <p className="font-medium text-purple-800 dark:text-purple-300 mb-1">Training</p>
+                <p className="text-purple-700 dark:text-purple-400">New training session on FMEA Analysis scheduled for next Friday.</p>
               </div>
             </div>
           </div>
