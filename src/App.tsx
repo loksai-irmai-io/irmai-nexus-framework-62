@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProcessDiscovery from "./pages/ProcessDiscovery";
 
+// Create a new QueryClient for React Query
 const queryClient = new QueryClient();
 
 const App = () => (
