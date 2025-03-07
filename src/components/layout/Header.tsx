@@ -118,9 +118,11 @@ const Header: React.FC = () => {
           </TooltipProvider>
           
           <div className="flex items-center gap-2">
-            <div className="bg-irmai-500 text-white font-bold rounded-lg h-8 w-8 flex items-center justify-center">
-              IR
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="IRMAI Logo" 
+              className="h-8" 
+            />
             <h1 className="hidden md:block text-lg font-semibold tracking-tight">
               IRMAI – Operational Risk Management
             </h1>
