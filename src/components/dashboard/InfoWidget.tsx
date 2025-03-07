@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
@@ -10,6 +9,7 @@ import {
 } from "@/components/ui/tooltip";
 import Chart from './Chart';
 import CompactMetric from './CompactMetric';
+import { useNavigate } from 'react-router-dom';
 
 export interface InfoWidgetData {
   id: string;
@@ -54,6 +54,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
   isLoading = false,
   onClick
 }) => {
+  const navigate = useNavigate();
   const statusColors = {
     success: 'border-green-500 dark:border-green-600',
     warning: 'border-yellow-500 dark:border-yellow-600',
@@ -66,6 +67,15 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
     warning: 'bg-yellow-50 dark:bg-yellow-950/20',
     error: 'bg-red-50 dark:bg-red-950/20',
     info: 'bg-blue-50 dark:bg-blue-950/20',
+  };
+  
+  const handleActionClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (data.actionHref) {
+      navigate(data.actionHref);
+    } else if (onClick) {
+      onClick();
+    }
   };
   
   return (
@@ -155,10 +165,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
                   <TooltipTrigger asChild>
                     <button 
                       className="w-full flex items-center justify-between p-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors text-sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onClick && onClick();
-                      }}
+                      onClick={handleActionClick}
                     >
                       <span>{data.actionText}</span>
                       <ChevronRight className="h-4 w-4" />
