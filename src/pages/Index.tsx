@@ -484,6 +484,99 @@ const placeholderModuleData = [
 
 const infoWidgetData: InfoWidgetData[] = [
   {
+    id: 'process-discovery',
+    title: 'Process Discovery',
+    subtitle: 'Process mining and discovery insights',
+    icon: <GitBranch className="h-5 w-5 text-primary" />,
+    metrics: [
+      { 
+        label: 'Processes', 
+        value: '24', 
+        icon: 'chart-bar',
+        tooltip: 'Total number of processes discovered through process mining',
+        trend: { direction: 'up' as const, value: 8 }
+      },
+      { 
+        label: 'Activities', 
+        value: '158', 
+        icon: 'activity',
+        tooltip: 'Total unique activities identified across all processes'
+      },
+      { 
+        label: 'Variants', 
+        value: '42', 
+        icon: 'git-branch',
+        tooltip: 'Number of process variants or alternative paths identified'
+      },
+      { 
+        label: 'Cases', 
+        value: '2,453', 
+        icon: 'info',
+        tooltip: 'Total number of cases analyzed'
+      },
+    ],
+    insights: [
+      'Payment processing has 3 bottlenecks identified',
+      'Customer onboarding has 2 automation opportunities'
+    ],
+    chartData: processDiscoveryData,
+    chartSeries: [{ name: 'Activities', dataKey: 'value', color: '#22c55e' }],
+    chartType: 'pie',
+    status: 'info',
+    actionText: 'View Process Discovery',
+    actionHref: '/process-discovery',
+    chartHeight: 200,
+  },
+  {
+    id: 'outlier-analysis',
+    title: 'Outlier Analysis',
+    subtitle: 'Anomaly detection and unusual patterns',
+    icon: <SearchX className="h-5 w-5 text-primary" />,
+    metrics: [
+      { 
+        label: 'Outliers', 
+        value: '18', 
+        icon: 'search-x',
+        tooltip: 'Total number of outliers detected',
+        trend: { direction: 'up' as const, value: 12 }
+      },
+      { 
+        label: 'False Positives', 
+        value: '3', 
+        icon: 'info',
+        tooltip: 'Number of outliers determined to be false positives'
+      },
+      { 
+        label: 'Accuracy', 
+        value: '94%', 
+        icon: 'check',
+        tooltip: 'Accuracy rate of anomaly detection',
+        trend: { direction: 'up' as const, value: 3 }
+      },
+      { 
+        label: 'Cases Analyzed', 
+        value: '5,120', 
+        icon: 'activity',
+        tooltip: 'Total number of cases analyzed for anomalies'
+      },
+    ],
+    insights: [
+      '5 new anomalies detected in the payment process',
+      'Loan approval has unusual timestamp patterns'
+    ],
+    chartData: outlierAnalysisData,
+    chartSeries: [
+      { name: 'Anomaly Count', dataKey: 'count', color: '#f97316' },
+      { name: 'Anomaly Rate (%)', dataKey: 'rate', color: '#3b82f6' }
+    ],
+    chartType: 'composed',
+    xAxisKey: 'name',
+    status: 'warning',
+    actionText: 'View Outlier Analysis',
+    actionHref: '/outlier-analysis',
+    chartHeight: 200,
+  },
+  {
     id: 'fmea-analysis',
     title: 'Predictive Risk Analytics',
     subtitle: 'Risk assessment and failure mode analysis',
@@ -537,55 +630,6 @@ const infoWidgetData: InfoWidgetData[] = [
     chartHeight: 200,
   },
   {
-    id: 'outlier-analysis',
-    title: 'Outlier Analysis',
-    subtitle: 'Anomaly detection and unusual patterns',
-    icon: <SearchX className="h-5 w-5 text-primary" />,
-    metrics: [
-      { 
-        label: 'Outliers', 
-        value: '18', 
-        icon: 'search-x',
-        tooltip: 'Total number of outliers detected',
-        trend: { direction: 'up' as const, value: 12 }
-      },
-      { 
-        label: 'False Positives', 
-        value: '3', 
-        icon: 'info',
-        tooltip: 'Number of outliers determined to be false positives'
-      },
-      { 
-        label: 'Accuracy', 
-        value: '94%', 
-        icon: 'check',
-        tooltip: 'Accuracy rate of anomaly detection',
-        trend: { direction: 'up' as const, value: 3 }
-      },
-      { 
-        label: 'Cases Analyzed', 
-        value: '5,120', 
-        icon: 'activity',
-        tooltip: 'Total number of cases analyzed for anomalies'
-      },
-    ],
-    insights: [
-      '5 new anomalies detected in the payment process',
-      'Loan approval has unusual timestamp patterns'
-    ],
-    chartData: outlierAnalysisData,
-    chartSeries: [
-      { name: 'Anomaly Count', dataKey: 'count', color: '#f97316' },
-      { name: 'Anomaly Rate (%)', dataKey: 'rate', color: '#3b82f6' }
-    ],
-    chartType: 'composed',
-    xAxisKey: 'name',
-    status: 'warning',
-    actionText: 'View Outlier Analysis',
-    actionHref: '/outlier-analysis',
-    chartHeight: 200,
-  },
-  {
     id: 'compliance-monitoring',
     title: 'Compliance Monitoring',
     subtitle: 'Regulatory compliance and gap analysis',
@@ -632,50 +676,6 @@ const infoWidgetData: InfoWidgetData[] = [
     status: 'warning',
     actionText: 'View Compliance Monitoring',
     actionHref: '/compliance-monitoring',
-    chartHeight: 200,
-  },
-  {
-    id: 'process-discovery',
-    title: 'Process Discovery',
-    subtitle: 'Process mining and discovery insights',
-    icon: <GitBranch className="h-5 w-5 text-primary" />,
-    metrics: [
-      { 
-        label: 'Processes', 
-        value: '24', 
-        icon: 'chart-bar',
-        tooltip: 'Total number of processes discovered through process mining',
-        trend: { direction: 'up' as const, value: 8 }
-      },
-      { 
-        label: 'Activities', 
-        value: '158', 
-        icon: 'activity',
-        tooltip: 'Total unique activities identified across all processes'
-      },
-      { 
-        label: 'Variants', 
-        value: '42', 
-        icon: 'git-branch',
-        tooltip: 'Number of process variants or alternative paths identified'
-      },
-      { 
-        label: 'Cases', 
-        value: '2,453', 
-        icon: 'info',
-        tooltip: 'Total number of cases analyzed'
-      },
-    ],
-    insights: [
-      'Payment processing has 3 bottlenecks identified',
-      'Customer onboarding has 2 automation opportunities'
-    ],
-    chartData: processDiscoveryData,
-    chartSeries: [{ name: 'Activities', dataKey: 'value', color: '#22c55e' }],
-    chartType: 'pie',
-    status: 'info',
-    actionText: 'View Process Discovery',
-    actionHref: '/process-discovery',
     chartHeight: 200,
   },
   {
@@ -869,139 +869,192 @@ const Index = () => {
       navigate(`/${route}`);
     }, 500);
   };
-
+  
+  const handleLossEventClick = (data: any) => {
+    const month = data.name;
+    const amount = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0
+    }).format(data.amount);
+    
+    toast.info(`Navigating to Incident Management for ${month} (${data.events} events, ${amount})`);
+    
+    handleNavigate('incident-management', { 
+      month: month,
+      events: data.events,
+      amount: data.amount
+    });
+  };
+  
+  const handleRiskCategoryClick = (data: any) => {
+    toast.info(`Navigating to Risk Analysis filtered by ${data.name} risks (${data.count} items)`);
+    
+    handleNavigate('fmea-analysis', { 
+      category: data.name,
+      count: data.count 
+    });
+  };
+  
   return (
     <Layout>
-      <div className="space-y-6">
-        <div className="flex flex-col space-y-1.5">
-          <h1 className="text-2xl font-semibold">Risk Insights Dashboard</h1>
-          <p className="text-muted-foreground">
-            Comprehensive overview of your risk management program
-          </p>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="container py-6 animate-fade-in">
+        <h1 className="text-3xl font-bold tracking-tight mb-1">Dashboard</h1>
+        <p className="text-muted-foreground mb-6">
+          Real-time insights and analytics for operational risk management
+        </p>
+        
+        <RibbonNav className="mb-6 animate-fade-in" style={{ animationDelay: '100ms' }}>
           <MetricCard
             title="High-Severity Risks"
             value="5"
-            trend={-12}
-            severity="high"
+            severity="critical"
             icon={<Shield className="h-5 w-5" />}
-            tooltip="Number of high-severity risks identified"
+            tooltip="Risks with critical or high severity ratings"
+            trend={-2}
+            isLoading={loading}
             onClick={() => handleMetricClick("High-Severity Risks")}
+          />
+          <MetricCard
+            title="Open Risks"
+            value="46"
+            severity="medium"
+            icon={<AlertTriangle className="h-5 w-5" />}
+            tooltip="Total number of open risk items across all categories"
+            trend={8}
+            isLoading={loading}
+            onClick={() => handleMetricClick("Open Risks")}
           />
           <MetricCard
             title="Compliance Score"
             value="85%"
-            trend={5}
-            severity="medium"
+            severity="low"
             icon={<CheckCheck className="h-5 w-5" />}
-            tooltip="Overall compliance score across frameworks"
+            tooltip="Overall compliance score across all regulatory frameworks"
+            trend={5}
+            isLoading={loading}
             onClick={() => handleMetricClick("Compliance Score")}
+          />
+          <MetricCard
+            title="Critical Process Steps"
+            value="24"
+            severity="medium"
+            icon={<GitBranch className="h-5 w-5" />}
+            tooltip="Active processes being monitored in the system"
+            trend={3}
+            isLoading={loading}
+            onClick={() => handleMetricClick("Critical Process Steps")}
+          />
+          <MetricCard
+            title="Total Potential Loss"
+            value="963K"
+            prefix="$"
+            severity="high"
+            icon={<DollarSign className="h-5 w-5" />}
+            tooltip="Estimated financial impact of all identified risks"
+            trend={12}
+            isLoading={loading}
+            onClick={() => handleMetricClick("Potential Loss")}
           />
           <MetricCard
             title="Control Failures"
             value="15%"
-            trend={-3}
             severity="medium"
             icon={<Gauge className="h-5 w-5" />}
-            tooltip="Percentage of controls that failed testing"
+            tooltip="Percentage of control models that have failed testing"
+            trend={-3}
+            isLoading={loading}
             onClick={() => handleMetricClick("Control Failures")}
           />
           <MetricCard
-            title="Potential Loss"
-            value="$960K"
+            title="Scenario Analysis"
+            value="3.2M"
+            prefix="$"
+            severity="high"
+            icon={<BarChart4 className="h-5 w-5" />}
+            tooltip="Projected loss based on current scenario analysis"
             trend={8}
-            severity="critical"
-            icon={<DollarSign className="h-5 w-5" />}
-            tooltip="Estimated potential financial loss"
-            onClick={() => handleMetricClick("Potential Loss")}
+            isLoading={loading}
+            onClick={() => handleMetricClick("Scenario Analysis")}
+          />
+        </RibbonNav>
+        
+        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '600ms' }}>
+          Risk Insights
+        </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '700ms' }}>
+          {infoWidgetData.map(module => (
+            <InfoWidget 
+              key={module.id} 
+              data={module} 
+              isLoading={loading}
+              onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
+            />
+          ))}
+        </div>
+        
+        <Separator className="my-8 animate-fade-in" style={{ animationDelay: '800ms' }} />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '900ms' }}>
+          <Chart 
+            title="Controls Health"
+            data={controlsHealthData}
+            series={[{ name: 'Percentage', dataKey: 'value', color: '#4ade80' }]}
+            type="pie"
+            showPercentages={true}
+            height={300}
+            tooltip="Current health status of control mechanisms"
+            onClick={(data) => handleNavigate('controls-testing', { status: String(data.name).toLowerCase() })}
+          />
+          
+          <Chart 
+            title="Loss Events Over Time"
+            description="Trend of financial impact and event count by month"
+            data={lossEventsData}
+            series={[
+              { name: 'Financial Loss ($K)', dataKey: 'amount', color: '#ef4444' },
+              { name: 'Event Count', dataKey: 'events', color: '#8b5cf6' }
+            ]}
+            type="composed"
+            xAxisKey="name"
+            height={300}
+            tooltip="Click on any month to see detailed incident reports for that period"
+            onClick={handleLossEventClick}
           />
         </div>
 
-        <Separator />
-
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Risk Insights</h2>
-          </div>
-
-          <RibbonNav>
-            {[
-              infoWidgetData.find(w => w.id === 'fmea-analysis'),
-              infoWidgetData.find(w => w.id === 'outlier-analysis'),
-              infoWidgetData.find(w => w.id === 'compliance-monitoring'),
-              infoWidgetData.find(w => w.id === 'process-discovery'),
-              infoWidgetData.find(w => w.id === 'controls-testing'),
-              infoWidgetData.find(w => w.id === 'incident-management'),
-              infoWidgetData.find(w => w.id === 'scenario-analysis'),
-            ].map((widget) => 
-              widget && (
-                <InfoWidget
-                  key={widget.id}
-                  data={widget}
-                  onClick={() => handleNavigate(widget.id)}
-                  className="min-w-[350px] max-w-[350px]"
-                />
-              )
-            )}
-          </RibbonNav>
-        </div>
-
-        <Separator />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Risk Distribution</h2>
-            <div className="border rounded-lg p-4">
-              <Chart
-                title="Risk Distribution by Type"
-                data={riskDistributionData}
-                series={[{ name: 'Percentage', dataKey: 'value', color: '#8b5cf6' }]}
-                type="pie"
-                height={280}
-                showPercentages={true}
-              />
+        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
+          Digital Twin Overview
+        </h2>
+        <div className="mb-6 animate-fade-in" style={{ animationDelay: '1300ms' }}>
+          <div className="p-1 border border-primary/20 rounded-lg bg-primary/5">
+            <div className="relative w-full aspect-video sm:aspect-[16/9] xl:aspect-[21/9] overflow-hidden rounded-lg">
+              <KnowledgeGraph className="w-full h-full" />
             </div>
           </div>
-
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Knowledge Graph</h2>
-            <KnowledgeGraph />
-          </div>
+          <p className="text-sm text-muted-foreground mt-2 italic">
+            <span>This is your central data hub – all insights and interdependencies are sourced here.</span>
+          </p>
         </div>
-
-        <Separator />
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Incident Severity Distribution</h2>
-            <div className="border rounded-lg p-4">
-              <Chart
-                title="Incident Severity"
-                data={incidentSeverityData}
-                series={[{ name: 'Count', dataKey: 'value', color: '#f97316' }]}
-                type="pie"
-                height={280}
-                showPercentages={true}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Loss Events Trend</h2>
-            <div className="border rounded-lg p-4">
-              <Chart
-                title="Loss Events Over Time"
-                data={lossEventsData}
-                series={[
-                  { name: 'Event Count', dataKey: 'value', color: '#3b82f6' },
-                  { name: 'Financial Impact ($K)', dataKey: 'amount', color: '#ef4444', type: 'line' }
-                ]}
-                type="composed"
-                height={280}
-                xAxisKey="name"
-              />
+        
+        <div className="mb-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
+          <h2 className="text-2xl font-semibold tracking-tight mb-4 animate-fade-in">
+            Announcements & Tips
+          </h2>
+          <div className="bg-card rounded-lg border shadow-sm p-4">
+            <div className="space-y-3 text-sm">
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark:border-blue-800">
+                <p className="font-medium text-blue-800 dark:text-blue-300 mb-1">New Feature</p>
+                <p className="text-blue-700 dark:text-blue-400">Knowledge Graph now supports interactive drilling through relationships between risks and controls.</p>
+              </div>
+              <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md border border-yellow-200 dark:border-yellow-800">
+                <p className="font-medium text-yellow-800 dark:text-yellow-300 mb-1">Tip</p>
+                <p className="text-yellow-700 dark:text-yellow-400">Use the Risk Catalog to drill into detailed risk descriptions and mitigations.</p>
+              </div>
+              <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-md border border-purple-200 dark:border-purple-800">
+                <p className="font-medium text-purple-800 dark:text-purple-300 mb-1">Training</p>
+                <p className="text-purple-700 dark:text-purple-400">New training session on FMEA Analysis scheduled for next Friday.</p>
+              </div>
             </div>
           </div>
         </div>
