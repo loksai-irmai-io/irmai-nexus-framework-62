@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -484,99 +483,6 @@ const placeholderModuleData = [
 
 const infoWidgetData: InfoWidgetData[] = [
   {
-    id: 'process-discovery',
-    title: 'Process Discovery',
-    subtitle: 'Process mining and discovery insights',
-    icon: <GitBranch className="h-5 w-5 text-primary" />,
-    metrics: [
-      { 
-        label: 'Processes', 
-        value: '24', 
-        icon: 'chart-bar',
-        tooltip: 'Total number of processes discovered through process mining',
-        trend: { direction: 'up' as const, value: 8 }
-      },
-      { 
-        label: 'Activities', 
-        value: '158', 
-        icon: 'activity',
-        tooltip: 'Total unique activities identified across all processes'
-      },
-      { 
-        label: 'Variants', 
-        value: '42', 
-        icon: 'git-branch',
-        tooltip: 'Number of process variants or alternative paths identified'
-      },
-      { 
-        label: 'Cases', 
-        value: '2,453', 
-        icon: 'info',
-        tooltip: 'Total number of cases analyzed'
-      },
-    ],
-    insights: [
-      'Payment processing has 3 bottlenecks identified',
-      'Customer onboarding has 2 automation opportunities'
-    ],
-    chartData: processDiscoveryData,
-    chartSeries: [{ name: 'Activities', dataKey: 'value', color: '#22c55e' }],
-    chartType: 'pie',
-    status: 'info',
-    actionText: 'View Process Discovery',
-    actionHref: '/process-discovery',
-    chartHeight: 200,
-  },
-  {
-    id: 'outlier-analysis',
-    title: 'Outlier Analysis',
-    subtitle: 'Anomaly detection and unusual patterns',
-    icon: <SearchX className="h-5 w-5 text-primary" />,
-    metrics: [
-      { 
-        label: 'Outliers', 
-        value: '18', 
-        icon: 'search-x',
-        tooltip: 'Total number of outliers detected',
-        trend: { direction: 'up' as const, value: 12 }
-      },
-      { 
-        label: 'False Positives', 
-        value: '3', 
-        icon: 'info',
-        tooltip: 'Number of outliers determined to be false positives'
-      },
-      { 
-        label: 'Accuracy', 
-        value: '94%', 
-        icon: 'check',
-        tooltip: 'Accuracy rate of anomaly detection',
-        trend: { direction: 'up' as const, value: 3 }
-      },
-      { 
-        label: 'Cases Analyzed', 
-        value: '5,120', 
-        icon: 'activity',
-        tooltip: 'Total number of cases analyzed for anomalies'
-      },
-    ],
-    insights: [
-      '5 new anomalies detected in the payment process',
-      'Loan approval has unusual timestamp patterns'
-    ],
-    chartData: outlierAnalysisData,
-    chartSeries: [
-      { name: 'Anomaly Count', dataKey: 'count', color: '#f97316' },
-      { name: 'Anomaly Rate (%)', dataKey: 'rate', color: '#3b82f6' }
-    ],
-    chartType: 'composed',
-    xAxisKey: 'name',
-    status: 'warning',
-    actionText: 'View Outlier Analysis',
-    actionHref: '/outlier-analysis',
-    chartHeight: 200,
-  },
-  {
     id: 'fmea-analysis',
     title: 'Predictive Risk Analytics',
     subtitle: 'Risk assessment and failure mode analysis',
@@ -587,14 +493,14 @@ const infoWidgetData: InfoWidgetData[] = [
         value: '46', 
         icon: 'alert-triangle',
         tooltip: 'Total number of open risk items',
-        trend: { direction: 'up' as const, value: 5 }
+        trend: { direction: 'up', value: 5 }
       },
       { 
         label: 'High Severity', 
         value: '5', 
         icon: 'trending-up',
         tooltip: 'Number of high severity risks',
-        trend: { direction: 'down' as const, value: 2 }
+        trend: { direction: 'down', value: 2 }
       },
       { 
         label: 'Medium Severity', 
@@ -630,6 +536,55 @@ const infoWidgetData: InfoWidgetData[] = [
     chartHeight: 200,
   },
   {
+    id: 'outlier-analysis',
+    title: 'Outlier Analysis',
+    subtitle: 'Anomaly detection and unusual patterns',
+    icon: <SearchX className="h-5 w-5 text-primary" />,
+    metrics: [
+      { 
+        label: 'Outliers', 
+        value: '18', 
+        icon: 'search-x',
+        tooltip: 'Total number of outliers detected',
+        trend: { direction: 'up', value: 12 }
+      },
+      { 
+        label: 'False Positives', 
+        value: '3', 
+        icon: 'info',
+        tooltip: 'Number of outliers determined to be false positives'
+      },
+      { 
+        label: 'Accuracy', 
+        value: '94%', 
+        icon: 'check',
+        tooltip: 'Accuracy rate of anomaly detection',
+        trend: { direction: 'up', value: 3 }
+      },
+      { 
+        label: 'Cases Analyzed', 
+        value: '5,120', 
+        icon: 'activity',
+        tooltip: 'Total number of cases analyzed for anomalies'
+      },
+    ],
+    insights: [
+      '5 new anomalies detected in the payment process',
+      'Loan approval has unusual timestamp patterns'
+    ],
+    chartData: outlierAnalysisData,
+    chartSeries: [
+      { name: 'Anomaly Count', dataKey: 'count', color: '#f97316' },
+      { name: 'Anomaly Rate (%)', dataKey: 'rate', color: '#3b82f6' }
+    ],
+    chartType: 'composed',
+    xAxisKey: 'name',
+    status: 'warning',
+    actionText: 'View Outlier Analysis',
+    actionHref: '/outlier-analysis',
+    chartHeight: 200,
+  },
+  {
     id: 'compliance-monitoring',
     title: 'Compliance Monitoring',
     subtitle: 'Regulatory compliance and gap analysis',
@@ -640,14 +595,14 @@ const infoWidgetData: InfoWidgetData[] = [
         value: '85%', 
         icon: 'chart-line',
         tooltip: 'Overall compliance score across all frameworks',
-        trend: { direction: 'up' as const, value: 5 }
+        trend: { direction: 'up', value: 5 }
       },
       { 
         label: 'Critical Gaps', 
         value: '3', 
         icon: 'alert-triangle',
         tooltip: 'Number of critical compliance gaps',
-        trend: { direction: 'down' as const, value: 2 }
+        trend: { direction: 'down', value: 2 }
       },
       { 
         label: 'Controls', 
@@ -679,6 +634,50 @@ const infoWidgetData: InfoWidgetData[] = [
     chartHeight: 200,
   },
   {
+    id: 'process-discovery',
+    title: 'Process Discovery',
+    subtitle: 'Process mining and discovery insights',
+    icon: <GitBranch className="h-5 w-5 text-primary" />,
+    metrics: [
+      { 
+        label: 'Processes', 
+        value: '24', 
+        icon: 'chart-bar',
+        tooltip: 'Total number of processes discovered through process mining',
+        trend: { direction: 'up', value: 8 }
+      },
+      { 
+        label: 'Activities', 
+        value: '158', 
+        icon: 'activity',
+        tooltip: 'Total unique activities identified across all processes'
+      },
+      { 
+        label: 'Variants', 
+        value: '42', 
+        icon: 'git-branch',
+        tooltip: 'Number of process variants or alternative paths identified'
+      },
+      { 
+        label: 'Cases', 
+        value: '2,453', 
+        icon: 'info',
+        tooltip: 'Total number of cases analyzed'
+      },
+    ],
+    insights: [
+      'Payment processing has 3 bottlenecks identified',
+      'Customer onboarding has 2 automation opportunities'
+    ],
+    chartData: processDiscoveryData,
+    chartSeries: [{ name: 'Activities', dataKey: 'value', color: '#22c55e' }],
+    chartType: 'pie',
+    status: 'info',
+    actionText: 'View Process Discovery',
+    actionHref: '/process-discovery',
+    chartHeight: 200,
+  },
+  {
     id: 'controls-testing',
     title: 'Controls Testing',
     subtitle: 'Automated controls testing and validation',
@@ -701,14 +700,14 @@ const infoWidgetData: InfoWidgetData[] = [
         value: '85%', 
         icon: 'gauge',
         tooltip: 'Percentage of controls that passed testing',
-        trend: { direction: 'up' as const, value: 3 }
+        trend: { direction: 'up', value: 3 }
       },
       { 
         label: 'Fail Rate', 
         value: '15%', 
         icon: 'alert-triangle',
         tooltip: 'Percentage of controls that failed testing',
-        trend: { direction: 'down' as const, value: 3 }
+        trend: { direction: 'down', value: 3 }
       },
     ],
     insights: [
@@ -736,7 +735,7 @@ const infoWidgetData: InfoWidgetData[] = [
         value: '10', 
         icon: 'alert-triangle',
         tooltip: 'Number of currently open incidents',
-        trend: { direction: 'down' as const, value: 2 }
+        trend: { direction: 'down', value: 2 }
       },
       { 
         label: 'Resolved', 
@@ -755,7 +754,7 @@ const infoWidgetData: InfoWidgetData[] = [
         value: '2', 
         icon: 'alert-circle',
         tooltip: 'Number of critical incidents requiring immediate attention',
-        trend: { direction: 'up' as const, value: 1 }
+        trend: { direction: 'up', value: 1 }
       },
     ],
     insights: [
@@ -797,7 +796,7 @@ const infoWidgetData: InfoWidgetData[] = [
         value: '60%', 
         icon: 'percent',
         tooltip: 'Percentage of high-impact processes covered by scenarios',
-        trend: { direction: 'up' as const, value: 10 }
+        trend: { direction: 'up', value: 10 }
       },
       { 
         label: 'Avg. Loss', 
