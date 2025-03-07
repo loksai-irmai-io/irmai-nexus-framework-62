@@ -982,8 +982,34 @@ const Index = () => {
         <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '600ms' }}>
           Risk Insights
         </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '700ms' }}>
-          {infoWidgetData.map(module => (
+        
+        {/* First row of Risk Insights - 4 widgets */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '700ms' }}>
+          {infoWidgetData.slice(0, 4).map(module => (
+            <InfoWidget 
+              key={module.id} 
+              data={module} 
+              isLoading={loading}
+              onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
+            />
+          ))}
+        </div>
+        
+        {/* Second row of Risk Insights - Scenario Analysis centered */}
+        <div className="flex justify-center mb-6 animate-fade-in" style={{ animationDelay: '750ms' }}>
+          <div className="w-full lg:w-1/3">
+            <InfoWidget 
+              key={infoWidgetData[7].id} 
+              data={infoWidgetData[7]} 
+              isLoading={loading}
+              onClick={() => handleNavigate(infoWidgetData[7].actionHref.replace('/', ''))} 
+            />
+          </div>
+        </div>
+        
+        {/* Third row of Risk Insights - 2 remaining widgets */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '800ms' }}>
+          {infoWidgetData.slice(4, 7).map(module => (
             <InfoWidget 
               key={module.id} 
               data={module} 
