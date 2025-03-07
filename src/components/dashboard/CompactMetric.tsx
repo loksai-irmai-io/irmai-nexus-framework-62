@@ -13,7 +13,8 @@ import {
   Gauge,
   Info,
   TrendingDown,
-  TrendingUp
+  TrendingUp,
+  ExternalLink
 } from 'lucide-react';
 import { 
   Tooltip, 
@@ -39,6 +40,7 @@ interface CompactMetricProps {
   onClick?: () => void;
   className?: string;
   isLoading?: boolean;
+  drilldownHint?: string;
 }
 
 const CompactMetric: React.FC<CompactMetricProps> = ({
@@ -51,7 +53,8 @@ const CompactMetric: React.FC<CompactMetricProps> = ({
   accentColor,
   onClick,
   className,
-  isLoading = false
+  isLoading = false,
+  drilldownHint
 }) => {
   // Icon mapping
   const IconComponent = icon ? {
@@ -105,7 +108,7 @@ const CompactMetric: React.FC<CompactMetricProps> = ({
       className={cn(
         variantStyles[variant],
         getAccentStyles(),
-        onClick && "cursor-pointer hover:shadow-md transition-shadow",
+        onClick && "cursor-pointer hover:shadow-md transition-shadow transform hover:translate-y-[-2px] duration-200",
         className
       )}
       onClick={onClick}
@@ -128,7 +131,7 @@ const CompactMetric: React.FC<CompactMetricProps> = ({
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Info className="h-3.5 w-3.5 ml-1 text-gray-400 dark:text-gray-500" />
+                      <Info className="h-3.5 w-3.5 ml-1 text-gray-400 dark:text-gray-500 cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent side="top">
                       <p className="max-w-xs text-xs">{tooltip}</p>
@@ -152,6 +155,13 @@ const CompactMetric: React.FC<CompactMetricProps> = ({
               </div>
             )}
           </div>
+          
+          {onClick && drilldownHint && (
+            <div className="mt-2 flex items-center text-xs text-blue-500 dark:text-blue-400">
+              <ExternalLink className="h-3 w-3 mr-1" />
+              <span>{drilldownHint}</span>
+            </div>
+          )}
         </>
       )}
     </div>

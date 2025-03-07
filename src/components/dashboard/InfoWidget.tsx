@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ExternalLink, Info, Maximize2 } from 'lucide-react';
 import { 
   Tooltip, 
   TooltipContent, 
@@ -25,6 +25,8 @@ export interface InfoWidgetData {
       value: number;
     };
     icon?: string;
+    drilldownHint?: string;
+    drilldownFilter?: Record<string, any>;
   }[];
   insights: string[];
   chartData: any[];
@@ -40,6 +42,7 @@ export interface InfoWidgetData {
   icon: React.ReactNode;
   chartHeight?: number;
   xAxisKey?: string;
+  filterOptions?: string[];
 }
 
 interface InfoWidgetProps {
@@ -47,13 +50,19 @@ interface InfoWidgetProps {
   className?: string;
   isLoading?: boolean;
   onClick?: () => void;
+  onMetricClick?: (label: string, filter?: Record<string, any>) => void;
+  onChartElementClick?: (data: any) => void;
+  onFilterChange?: (filter: string) => void;
 }
 
 const InfoWidget: React.FC<InfoWidgetProps> = ({
   data,
   className,
   isLoading = false,
-  onClick
+  onClick,
+  onMetricClick,
+  onChartElementClick,
+  onFilterChange
 }) => {
   const navigate = useNavigate();
   const statusColors = {
@@ -78,6 +87,18 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
       console.log("Navigating to:", data.actionHref);
     } else if (onClick) {
       onClick();
+    }
+  };
+
+  const handleMetricClick = (label: string, filter?: Record<string, any>) => {
+    if (onMetricClick) {
+      onMetricClick(label, filter);
+    }
+  };
+
+  const handleFilterChange = (filter: string) => {
+    if (onFilterChange) {
+      onFilterChange(filter);
     }
   };
   
@@ -109,16 +130,51 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
         </div>
       ) : (
         <>
-          <div className={cn("p-4 border-b flex items-center", statusBg[data.status])}>
-            <div className="mr-3">
-              {data.icon}
+          <div className={cn("p-4 border-b flex items-center justify-between", statusBg[data.status])}>
+            <div className="flex items-center">
+              <div className="mr-3">
+                {data.icon}
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg flex items-center">
+                  {data.title}
+                </h3>
+                <p className="text-sm text-muted-foreground">{data.subtitle}</p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-semibold text-lg flex items-center">
-                {data.title}
-              </h3>
-              <p className="text-sm text-muted-foreground">{data.subtitle}</p>
-            </div>
+            
+            {data.filterOptions && data.filterOptions.length > 0 && (
+              <div className="flex items-center">
+                <select 
+                  className="text-xs bg-transparent border border-muted rounded-md px-2 py-1"
+                  onChange={(e) => handleFilterChange(e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {data.filterOptions.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button 
+                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleActionClick(e);
+                    }}
+                  >
+                    <Maximize2 className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <p>View full dashboard</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           
           <div className="p-4 flex flex-col flex-1">
@@ -132,11 +188,13 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
                   tooltip={metric.tooltip}
                   trend={metric.trend}
                   variant="minimal"
+                  drilldownHint={metric.drilldownHint}
+                  onClick={() => handleMetricClick(metric.label, metric.drilldownFilter)}
                 />
               ))}
             </div>
             
-            <div className="flex-1 min-h-[240px]">
+            <div className="flex-1 min-h-[240px] relative group">
               <Chart 
                 title={data.title + " Chart"}
                 data={data.chartData}
@@ -145,17 +203,40 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
                 xAxisKey={data.xAxisKey}
                 height={data.chartHeight || 220}
                 showPercentages={data.chartType === 'pie'}
+                onClick={onChartElementClick}
               />
+              
+              {onChartElementClick && (
+                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity pointer-events-none">
+                  <div className="bg-white dark:bg-gray-800 shadow-md rounded-md px-3 py-2 text-xs flex items-center">
+                    <ExternalLink className="h-3 w-3 mr-1" />
+                    <span>Click on chart elements for detailed analysis</span>
+                  </div>
+                </div>
+              )}
             </div>
             
             {data.insights && data.insights.length > 0 && (
               <div className="mt-4 pt-3 border-t">
-                <div className="text-xs text-muted-foreground uppercase mb-2">Key Insights</div>
+                <div className="text-xs text-muted-foreground uppercase mb-2 flex items-center">
+                  <span>Key Insights</span>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-3 w-3 ml-1 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent side="top">
+                        <p className="text-xs">AI-generated insights based on your data</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
                 <ul className="space-y-1 text-sm">
                   {data.insights.map((insight, index) => (
-                    <li key={index} className="flex items-start">
+                    <li key={index} className="flex items-start group transition-colors hover:bg-muted/20 p-1 rounded cursor-pointer">
                       <span className="mr-2 mt-0.5 text-primary">•</span>
                       <span>{insight}</span>
+                      <ExternalLink className="h-3 w-3 ml-auto opacity-0 group-hover:opacity-100 text-blue-500" />
                     </li>
                   ))}
                 </ul>
