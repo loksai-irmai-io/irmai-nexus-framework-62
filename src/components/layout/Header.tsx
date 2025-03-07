@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Bell, 
@@ -45,6 +46,7 @@ const Header: React.FC = () => {
   const [searchValue, setSearchValue] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   
+  // Sample notifications
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: '1',
@@ -117,10 +119,13 @@ const Header: React.FC = () => {
           
           <div className="flex items-center gap-2">
             <img 
-              src="/lovable-uploads/e0e5366a-be2b-4f02-97cb-831a9e41477f.png" 
-              alt="Logo" 
+              src="/logo.png" 
+              alt="IRMAI Logo" 
               className="h-8" 
             />
+            <h1 className="hidden md:block text-lg font-semibold tracking-tight">
+              IRMAI – Operational Risk Management
+            </h1>
           </div>
         </div>
 

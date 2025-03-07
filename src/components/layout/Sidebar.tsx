@@ -112,11 +112,11 @@ const Sidebar: React.FC = () => {
     >
       <div className="flex flex-col h-full overflow-y-auto">
         <div className="h-16 flex items-center justify-center px-4 border-b bg-sidebar">
-          <img 
-            src="/lovable-uploads/e0e5366a-be2b-4f02-97cb-831a9e41477f.png" 
-            alt="Logo" 
-            className={cn("h-8", !isOpen && "w-8")} 
-          />
+          {isOpen ? (
+            <img src="/logo.png" alt="IRMAI Logo" className="h-8" />
+          ) : (
+            <img src="/logo.png" alt="IRMAI Logo" className="h-8 w-8" />
+          )}
         </div>
         <nav className="flex-1 p-3 space-y-2 overflow-y-auto">
           {mainMenuItems.map((item) => (
