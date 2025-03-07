@@ -8,6 +8,7 @@ export interface Risk {
   likelihood: 'high' | 'medium' | 'low';
   severityScore: number; // 1-10
   likelihoodScore: number; // 1-10
+  detectabilityScore: number; // 1-10, added to fix type errors
   impactScore: number; // 1-10
   controlEffectiveness: number; // 0-100 percentage
   trendDirection: 'increasing' | 'decreasing' | 'stable';
@@ -30,6 +31,7 @@ export const mockRiskData: Risk[] = [
     likelihood: 'medium',
     severityScore: 9,
     likelihoodScore: 6,
+    detectabilityScore: 4, // Adding missing property
     impactScore: 9,
     controlEffectiveness: 72,
     trendDirection: 'increasing',
@@ -50,6 +52,7 @@ export const mockRiskData: Risk[] = [
     likelihood: 'medium',
     severityScore: 8,
     likelihoodScore: 5,
+    detectabilityScore: 3, // Adding missing property
     impactScore: 8,
     controlEffectiveness: 80,
     trendDirection: 'stable',
@@ -70,6 +73,7 @@ export const mockRiskData: Risk[] = [
     likelihood: 'low',
     severityScore: 7,
     likelihoodScore: 3,
+    detectabilityScore: 2, // Adding missing property
     impactScore: 8,
     controlEffectiveness: 85,
     trendDirection: 'decreasing',
@@ -90,6 +94,7 @@ export const mockRiskData: Risk[] = [
     likelihood: 'low',
     severityScore: 6,
     likelihoodScore: 3,
+    detectabilityScore: 2, // Adding missing property
     impactScore: 7,
     controlEffectiveness: 90,
     trendDirection: 'stable',
@@ -110,6 +115,7 @@ export const mockRiskData: Risk[] = [
     likelihood: 'medium',
     severityScore: 8,
     likelihoodScore: 5,
+    detectabilityScore: 4, // Adding missing property
     impactScore: 9,
     controlEffectiveness: 60,
     trendDirection: 'increasing',
@@ -130,6 +136,7 @@ export const mockRiskData: Risk[] = [
     likelihood: 'medium',
     severityScore: 6,
     likelihoodScore: 5,
+    detectabilityScore: 3, // Adding missing property
     impactScore: 7,
     controlEffectiveness: 75,
     trendDirection: 'stable',
@@ -150,6 +157,7 @@ export const mockRiskData: Risk[] = [
     likelihood: 'high',
     severityScore: 5,
     likelihoodScore: 8,
+    detectabilityScore: 6, // Adding missing property
     impactScore: 6,
     controlEffectiveness: 50,
     trendDirection: 'decreasing',
@@ -170,6 +178,7 @@ export const mockRiskData: Risk[] = [
     likelihood: 'high',
     severityScore: 6,
     likelihoodScore: 7,
+    detectabilityScore: 5, // Adding missing property
     impactScore: 7,
     controlEffectiveness: 65,
     trendDirection: 'stable',
@@ -190,6 +199,7 @@ export const mockRiskData: Risk[] = [
     likelihood: 'high',
     severityScore: 7,
     likelihoodScore: 8,
+    detectabilityScore: 4, // Adding missing property
     impactScore: 8,
     controlEffectiveness: 45,
     trendDirection: 'increasing',
@@ -210,6 +220,7 @@ export const mockRiskData: Risk[] = [
     likelihood: 'high',
     severityScore: 10,
     likelihoodScore: 8,
+    detectabilityScore: 7, // Adding missing property
     impactScore: 10,
     controlEffectiveness: 70,
     trendDirection: 'increasing',
