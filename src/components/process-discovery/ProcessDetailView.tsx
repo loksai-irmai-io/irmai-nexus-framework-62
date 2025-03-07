@@ -83,8 +83,8 @@ const ProcessDetailView: React.FC<ProcessDetailViewProps> = ({
               </CardDescription>
             </div>
             <Badge 
-              variant={node.compliant ? "success" : "destructive"}
-              className="capitalize px-3 py-1"
+              variant={node.compliant ? "outline" : "destructive"}
+              className={`capitalize px-3 py-1 ${node.compliant ? "bg-green-100 text-green-800 dark:bg-green-950/30 dark:text-green-400 border-green-200 dark:border-green-800" : ""}`}
             >
               {node.compliant ? "Compliant" : "Non-Compliant"}
             </Badge>
