@@ -10,19 +10,19 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        default: "bg-blue-600 text-white hover:bg-blue-700", // Changed to blue for interactive elements
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-red-500 text-white hover:bg-red-600", // Changed to red for critical alerts
         outline:
           "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        success: "bg-green-500 text-white hover:bg-green-600",
+        link: "text-blue-600 underline-offset-4 hover:underline", // Changed to blue for interactive
+        success: "bg-green-500 text-white hover:bg-green-600", // Kept green for compliant indicators
         warning: "bg-amber-500 text-white hover:bg-amber-600",
-        info: "bg-blue-500 text-white hover:bg-blue-600",
-        error: "bg-red-500 text-white hover:bg-red-600",
+        info: "bg-blue-500 text-white hover:bg-blue-600", // Changed to blue for interactive
+        error: "bg-red-500 text-white hover:bg-red-600", // Changed to red for critical alerts
       },
       size: {
         default: "h-10 px-4 py-2",

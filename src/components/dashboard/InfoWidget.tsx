@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight, ExternalLink, Info, Maximize2 } from 'lucide-react';
+import { ChevronRight, ExternalLink, Filter, Info, Maximize2, SlidersHorizontal } from 'lucide-react';
 import { 
   Tooltip, 
   TooltipContent, 
@@ -11,6 +11,17 @@ import {
 import Chart from './Chart';
 import CompactMetric from './CompactMetric';
 import { useNavigate } from 'react-router-dom';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuCheckboxItem, 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export interface InfoWidgetData {
   id: string;
@@ -65,18 +76,22 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
   onFilterChange
 }) => {
   const navigate = useNavigate();
+  const [filterView, setFilterView] = useState<'all' | 'high' | 'critical' | 'medium' | 'low'>('all');
+  const [visibleSeries, setVisibleSeries] = useState<string[]>(data.chartSeries.map(s => s.name));
+  const [timeRange, setTimeRange] = useState<string>("all");
+  
   const statusColors = {
-    success: 'border-green-500 dark:border-green-600',
-    warning: 'border-yellow-500 dark:border-yellow-600',
-    error: 'border-red-500 dark:border-red-600',
-    info: 'border-blue-500 dark:border-blue-600',
+    success: 'border-green-500 dark:border-green-600', // Green for compliant indicators
+    warning: 'border-amber-500 dark:border-amber-600',
+    error: 'border-red-500 dark:border-red-600', // Red for critical alerts
+    info: 'border-blue-500 dark:border-blue-600', // Blue for interactive elements
   };
   
   const statusBg = {
-    success: 'bg-green-50 dark:bg-green-950/20',
-    warning: 'bg-yellow-50 dark:bg-yellow-950/20',
-    error: 'bg-red-50 dark:bg-red-950/20',
-    info: 'bg-blue-50 dark:bg-blue-950/20',
+    success: 'bg-green-50 dark:bg-green-950/20', // Green for compliant
+    warning: 'bg-amber-50 dark:bg-amber-950/20',
+    error: 'bg-red-50 dark:bg-red-950/20', // Red for critical alerts
+    info: 'bg-blue-50 dark:bg-blue-950/20', // Blue for interactive elements
   };
   
   const handleActionClick = (e: React.MouseEvent) => {
@@ -101,6 +116,40 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
       onFilterChange(filter);
     }
   };
+
+  const toggleSeries = (seriesName: string) => {
+    setVisibleSeries(prev => 
+      prev.includes(seriesName) 
+        ? prev.filter(name => name !== seriesName)
+        : [...prev, seriesName]
+    );
+  };
+  
+  // Filter chart data based on selected view
+  const filteredChartData = React.useMemo(() => {
+    if (filterView === 'all') {
+      return data.chartData;
+    }
+    
+    // Example filtering logic - adjust based on your actual data structure
+    if (data.chartType === 'pie') {
+      return data.chartData.filter(item => {
+        // For pie charts, filter based on category or name
+        if (filterView === 'critical') return String(item.name).toLowerCase().includes('critical');
+        if (filterView === 'high') return String(item.name).toLowerCase().includes('high');
+        if (filterView === 'medium') return String(item.name).toLowerCase().includes('medium');
+        if (filterView === 'low') return String(item.name).toLowerCase().includes('low');
+        return true;
+      });
+    }
+    
+    return data.chartData;
+  }, [data.chartData, data.chartType, filterView]);
+  
+  // Filter chart series based on visibility selection
+  const filteredChartSeries = React.useMemo(() => {
+    return data.chartSeries.filter(series => visibleSeries.includes(series.name));
+  }, [data.chartSeries, visibleSeries]);
   
   return (
     <div 
@@ -143,38 +192,105 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
               </div>
             </div>
             
-            {data.filterOptions && data.filterOptions.length > 0 && (
-              <div className="flex items-center">
-                <select 
-                  className="text-xs bg-transparent border border-muted rounded-md px-2 py-1"
-                  onChange={(e) => handleFilterChange(e.target.value)}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {data.filterOptions.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button 
-                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleActionClick(e);
-                    }}
-                  >
-                    <Maximize2 className="h-4 w-4" />
+            <div className="flex items-center space-x-2">
+              {/* Time range filter */}
+              <Select value={timeRange} onValueChange={setTimeRange} onOpenChange={e => e.stopPropagation()}>
+                <SelectTrigger className="w-[125px] h-8 text-xs border-blue-200 bg-blue-50/50 dark:bg-blue-900/10" onClick={e => e.stopPropagation()}>
+                  <SelectValue placeholder="Time Range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Time</SelectItem>
+                  <SelectItem value="1d">Last 24 Hours</SelectItem>
+                  <SelectItem value="7d">Last 7 Days</SelectItem>
+                  <SelectItem value="30d">Last 30 Days</SelectItem>
+                  <SelectItem value="90d">Last Quarter</SelectItem>
+                  <SelectItem value="1y">Last Year</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              {/* Filter and visualization options */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
+                  <button className="p-1.5 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-600 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400">
+                    <SlidersHorizontal className="h-4 w-4" />
                   </button>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  <p>View full dashboard</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56" onClick={e => e.stopPropagation()}>
+                  <DropdownMenuLabel>Severity Filter</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  
+                  <div className="p-2 flex flex-col gap-2">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id={`${data.id}-all`} checked={filterView === 'all'} onCheckedChange={() => setFilterView('all')} />
+                      <label htmlFor={`${data.id}-all`} className="text-sm cursor-pointer">All Severities</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id={`${data.id}-critical`} checked={filterView === 'critical'} onCheckedChange={() => setFilterView('critical')} />
+                      <label htmlFor={`${data.id}-critical`} className="text-sm cursor-pointer">
+                        <Badge variant="outline" className="bg-red-100 text-red-700 border-red-300">Critical</Badge>
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id={`${data.id}-high`} checked={filterView === 'high'} onCheckedChange={() => setFilterView('high')} />
+                      <label htmlFor={`${data.id}-high`} className="text-sm cursor-pointer">
+                        <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-300">High</Badge>
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id={`${data.id}-medium`} checked={filterView === 'medium'} onCheckedChange={() => setFilterView('medium')} />
+                      <label htmlFor={`${data.id}-medium`} className="text-sm cursor-pointer">
+                        <Badge variant="outline" className="bg-yellow-100 text-yellow-700 border-yellow-300">Medium</Badge>
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id={`${data.id}-low`} checked={filterView === 'low'} onCheckedChange={() => setFilterView('low')} />
+                      <label htmlFor={`${data.id}-low`} className="text-sm cursor-pointer">
+                        <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">Low</Badge>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>Data Series</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  
+                  <div className="p-2 flex flex-col gap-2">
+                    {data.chartSeries.map((series) => (
+                      <div key={series.name} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`${data.id}-${series.name}`} 
+                          checked={visibleSeries.includes(series.name)} 
+                          onCheckedChange={() => toggleSeries(series.name)}
+                        />
+                        <label htmlFor={`${data.id}-${series.name}`} className="text-sm cursor-pointer flex items-center">
+                          <span className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: series.color }}></span>
+                          {series.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-1.5"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleActionClick(e);
+                      }}
+                    >
+                      <Maximize2 className="h-4 w-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <p>View full dashboard</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
           
           <div className="p-4 flex flex-col flex-1">
@@ -197,8 +313,8 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
             <div className="flex-1 min-h-[240px] relative group">
               <Chart 
                 title={data.title + " Chart"}
-                data={data.chartData}
-                series={data.chartSeries}
+                data={filteredChartData}
+                series={filteredChartSeries}
                 type={data.chartType}
                 xAxisKey={data.xAxisKey}
                 height={data.chartHeight || 220}
@@ -248,7 +364,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button 
-                      className="w-full flex items-center justify-between p-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors text-sm"
+                      className="w-full flex items-center justify-between p-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm"
                       onClick={handleActionClick}
                     >
                       <span>{data.actionText}</span>
