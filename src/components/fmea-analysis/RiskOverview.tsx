@@ -91,19 +91,19 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ selectedRole, onDrilldown }
         {
           label: 'Critical Risks',
           value: criticalRisks.toString(),
-          icon: 'alert-triangle',
+          icon: 'alert-triangle' as const,
           drilldownHint: 'View critical risks'
         },
         {
           label: 'High Risks',
           value: highRisks.toString(),
-          icon: 'trending-up',
+          icon: 'trending-up' as const,
           drilldownHint: 'View high risks'
         },
         {
           label: 'Q3 Prediction',
           value: `${riskExposureScore + 12}`,
-          icon: 'sparkles',
+          icon: 'sparkles' as const,
           tooltip: 'AI-powered prediction based on current trends'
         }
       ],
@@ -128,27 +128,27 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ selectedRole, onDrilldown }
         {
           label: 'Total Risks',
           value: filteredData.length.toString(),
-          icon: 'chart-bar'
+          icon: 'chart-bar' as const
         },
         {
           label: 'Highest Category',
           value: 'Operational',
-          icon: 'activity',
+          icon: 'activity' as const,
           drilldownHint: 'View operational risks'
         },
         {
           label: 'Controls Coverage',
           value: '76%',
-          icon: 'shield',
+          icon: 'shield' as const,
           trend: {
-            direction: 'up',
+            direction: 'up' as const,
             value: 4
           }
         },
         {
           label: 'Open Treatment Actions',
           value: '24',
-          icon: 'list-checks',
+          icon: 'list-checks' as const,
           drilldownHint: 'View open actions'
         }
       ],
