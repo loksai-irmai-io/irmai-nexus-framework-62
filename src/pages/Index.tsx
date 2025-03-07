@@ -7,6 +7,7 @@ import MetricCard from '@/components/dashboard/MetricCard';
 import InfoWidget, { InfoWidgetData } from '@/components/dashboard/InfoWidget';
 import Chart from '@/components/dashboard/Chart';
 import RibbonNav from '@/components/dashboard/RibbonNav';
+import AIRiskSummary from '@/components/dashboard/AIRiskSummary';
 import { 
   AlertTriangle, 
   Shield, 
@@ -1026,15 +1027,21 @@ const Index = () => {
         <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
           Digital Twin Overview
         </h2>
-        <div className="mb-6 animate-fade-in" style={{ animationDelay: '1300ms' }}>
-          <div className="p-1 border border-primary/20 rounded-lg bg-primary/5">
-            <div className="relative w-full aspect-video sm:aspect-[16/9] xl:aspect-[21/9] overflow-hidden rounded-lg">
-              <KnowledgeGraph className="w-full h-full" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '1300ms' }}>
+          <div className="lg:col-span-2">
+            <div className="p-1 border border-primary/20 rounded-lg bg-primary/5">
+              <div className="relative w-full aspect-video sm:aspect-[16/9] xl:aspect-[21/9] overflow-hidden rounded-lg">
+                <KnowledgeGraph className="w-full h-full" />
+              </div>
             </div>
+            <p className="text-sm text-muted-foreground mt-2 italic">
+              <span>This is your central data hub – all insights and interdependencies are sourced here.</span>
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground mt-2 italic">
-            <span>This is your central data hub – all insights and interdependencies are sourced here.</span>
-          </p>
+          
+          <div className="lg:col-span-1">
+            <AIRiskSummary className="h-full" />
+          </div>
         </div>
         
         <div className="mb-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
