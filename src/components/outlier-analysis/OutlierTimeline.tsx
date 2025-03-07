@@ -97,6 +97,7 @@ const OutlierTimeline: React.FC<OutlierTimelineProps> = ({ onDrillDown, timefram
       </CardHeader>
       <CardContent>
         <Chart
+          title="Anomaly Timeline" // Added the required title property
           type="composed"
           data={timelineData}
           series={series}
