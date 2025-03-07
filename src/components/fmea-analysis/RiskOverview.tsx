@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InfoWidget } from './InfoWidget';
@@ -16,10 +16,13 @@ import {
   AlertCircle,
   Sparkles,
   Info,
-  Gauge as GaugeIcon
+  Gauge as GaugeIcon,
+  Filter
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { mockRiskData } from './mockData';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import TopRiskCards from './TopRiskCards';
 
 interface RiskOverviewProps {
   selectedRole: string;
@@ -27,6 +30,10 @@ interface RiskOverviewProps {
 }
 
 const RiskOverview: React.FC<RiskOverviewProps> = ({ selectedRole, onDrilldown }) => {
+  const [businessUnit, setBusinessUnit] = useState<string>("all");
+  const [process, setProcess] = useState<string>("all");
+  const [timeframe, setTimeframe] = useState<string>("quarter");
+  
   // Filter data based on role
   const filteredData = mockRiskData.filter(risk => {
     if (selectedRole === 'exec') return risk.severity === 'high' || risk.severity === 'critical';
@@ -39,7 +46,7 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ selectedRole, onDrilldown }
   const highRisks = filteredData.filter(risk => risk.severity === 'high').length;
   const riskExposureScore = Math.round((criticalRisks * 5 + highRisks * 3) / filteredData.length * 100);
   const riskChangePercent = 8; // Simulated percent change
-  const predictedTrend = riskExposureScore > 50 ? 'up' : 'down';
+  const predictedTrend = riskExposureScore > 50 ? 'up' as const : 'down' as const;
   
   // Chart data
   const riskByCategory = [
@@ -83,7 +90,7 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ selectedRole, onDrilldown }
           label: 'Current Score',
           value: `${riskExposureScore}`,
           trend: {
-            direction: predictedTrend as 'up' | 'down',
+            direction: predictedTrend,
             value: riskChangePercent
           },
           tooltip: 'Aggregated score based on risk severity and likelihood'
@@ -169,11 +176,69 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ selectedRole, onDrilldown }
   return (
     <div className="p-4 space-y-6">
       <div className="flex items-center mb-4">
-        <h2 className="text-xl font-semibold">{selectedRole === 'exec' ? 'Executive Overview' : selectedRole === 'riskmgr' ? 'Risk Manager Overview' : 'Risk Overview'}</h2>
+        <h2 className="text-xl font-semibold">Risk Assessment – FMEA Analysis</h2>
         <Badge className="ml-2 bg-blue-100 text-blue-800 hover:bg-blue-200">
           {selectedRole === 'exec' ? 'Executive View' : selectedRole === 'riskmgr' ? 'Risk Manager View' : selectedRole === 'process' ? 'Process Owner View' : 'Analyst View'}
         </Badge>
       </div>
+      
+      <div className="flex flex-col md:flex-row items-start md:items-center gap-3 mb-4">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center">
+                <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Filter:</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Filter the risk list based on various parameters</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
+        <div className="flex flex-wrap gap-2">
+          <Select value={businessUnit} onValueChange={setBusinessUnit}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Business Unit" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Units</SelectItem>
+              <SelectItem value="finance">Finance</SelectItem>
+              <SelectItem value="operations">Operations</SelectItem>
+              <SelectItem value="it">IT</SelectItem>
+              <SelectItem value="sales">Sales</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Select value={process} onValueChange={setProcess}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Process" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Processes</SelectItem>
+              <SelectItem value="payment">Payment Processing</SelectItem>
+              <SelectItem value="onboarding">Customer Onboarding</SelectItem>
+              <SelectItem value="reporting">Financial Reporting</SelectItem>
+              <SelectItem value="compliance">Compliance Verification</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Select value={timeframe} onValueChange={setTimeframe}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Timeframe" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="quarter">Current Quarter</SelectItem>
+              <SelectItem value="year">Current Year</SelectItem>
+              <SelectItem value="prior">Prior Quarter</SelectItem>
+              <SelectItem value="lastYear">Last Year</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      
+      <TopRiskCards risks={filteredData} onRiskClick={onDrilldown} />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {riskWidgets.map((widget) => (
