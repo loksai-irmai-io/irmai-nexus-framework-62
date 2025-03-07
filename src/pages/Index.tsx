@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -899,14 +900,14 @@ const Index = () => {
         
         <RibbonNav className="mb-6 animate-fade-in" style={{ animationDelay: '100ms' }}>
           <MetricCard
-            title="Process Discovery"
-            value="24"
-            severity="medium"
-            icon={<GitBranch className="h-5 w-5" />}
-            tooltip="Active processes being monitored in the system"
-            trend={3}
+            title="High-Severity Risks"
+            value="5"
+            severity="critical"
+            icon={<Shield className="h-5 w-5" />}
+            tooltip="Risks with critical or high severity ratings"
+            trend={-2}
             isLoading={loading}
-            onClick={() => handleNavigate('process-discovery')}
+            onClick={() => handleMetricClick("High-Severity Risks")}
           />
           <MetricCard
             title="Open Risks"
@@ -919,14 +920,24 @@ const Index = () => {
             onClick={() => handleMetricClick("Risk Management")}
           />
           <MetricCard
-            title="High-Severity Risks"
-            value="5"
-            severity="critical"
-            icon={<Shield className="h-5 w-5" />}
-            tooltip="Risks with critical or high severity ratings"
-            trend={-2}
+            title="Compliance Score"
+            value="85%"
+            severity="low"
+            icon={<CheckCheck className="h-5 w-5" />}
+            tooltip="Overall compliance score across all regulatory frameworks"
+            trend={5}
             isLoading={loading}
-            onClick={() => handleMetricClick("High-Severity Risks")}
+            onClick={() => handleMetricClick("Compliance")}
+          />
+          <MetricCard
+            title="Critical Process Steps"
+            value="24"
+            severity="medium"
+            icon={<GitBranch className="h-5 w-5" />}
+            tooltip="Active processes being monitored in the system"
+            trend={3}
+            isLoading={loading}
+            onClick={() => handleNavigate('process-discovery')}
           />
           <MetricCard
             title="Total Potential Loss"
@@ -940,17 +951,7 @@ const Index = () => {
             onClick={() => handleMetricClick("Potential Loss")}
           />
           <MetricCard
-            title="Compliance Score"
-            value="85%"
-            severity="low"
-            icon={<CheckCheck className="h-5 w-5" />}
-            tooltip="Overall compliance score across all regulatory frameworks"
-            trend={5}
-            isLoading={loading}
-            onClick={() => handleMetricClick("Compliance")}
-          />
-          <MetricCard
-            title="Control Model Failures"
+            title="Control Failures"
             value="15%"
             severity="medium"
             icon={<Gauge className="h-5 w-5" />}
