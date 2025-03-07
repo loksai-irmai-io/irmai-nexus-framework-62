@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, Line, LineChart, Area, AreaChart, ComposedChart } from 'recharts';
@@ -42,6 +41,8 @@ type ChartProps = {
   tooltip?: string;
   isLoading?: boolean;
   onClick?: (datapoint: ChartData) => void;
+  onMouseMove?: (data: any) => void;
+  onMouseLeave?: () => void;
 };
 
 const COLORS = [
@@ -84,7 +85,9 @@ const Chart: React.FC<ChartProps> = ({
   periods,
   tooltip,
   isLoading = false,
-  onClick
+  onClick,
+  onMouseMove,
+  onMouseLeave
 }) => {
   const [activeTab, setActiveTab] = useState(tabs ? tabs[0].title : null);
   const [activePeriodIndex, setActivePeriodIndex] = useState(periods ? 0 : null);
