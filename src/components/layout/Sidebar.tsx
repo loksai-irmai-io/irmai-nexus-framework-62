@@ -36,10 +36,10 @@ const mainMenuItems: MenuItem[] = [
     href: '/'
   },
   {
-    id: 'process-discovery',
-    label: 'Process Discovery',
-    icon: GitBranch,
-    href: '/process-discovery'
+    id: 'fmea-analysis',
+    label: 'Predictive Risk Analytics',
+    icon: Shield,
+    href: '/fmea-analysis'
   },
   {
     id: 'outlier-analysis',
@@ -48,34 +48,16 @@ const mainMenuItems: MenuItem[] = [
     href: '/outlier-analysis'
   },
   {
-    id: 'fmea-analysis',
-    label: 'Predictive Risk Analytics',
-    icon: Shield,
-    href: '/fmea-analysis'
-  },
-  {
-    id: 'gap-analysis',
-    label: 'Gap Analysis',
-    icon: Share2,
-    href: '/gap-analysis'
-  },
-  {
     id: 'compliance-monitoring',
     label: 'Compliance & Monitoring',
     icon: CheckCheck,
     href: '/compliance-monitoring'
   },
   {
-    id: 'incident-management',
-    label: 'Incident Management',
-    icon: Siren,
-    href: '/incident-management'
-  },
-  {
-    id: 'admin',
-    label: 'Admin & Dependencies',
-    icon: Settings,
-    href: '/admin'
+    id: 'process-discovery',
+    label: 'Process Discovery',
+    icon: GitBranch,
+    href: '/process-discovery'
   },
   {
     id: 'controls-testing',
@@ -85,11 +67,29 @@ const mainMenuItems: MenuItem[] = [
     href: '/controls-testing'
   },
   {
+    id: 'incident-management',
+    label: 'Incident Management',
+    icon: Siren,
+    href: '/incident-management'
+  },
+  {
     id: 'scenario-analysis',
     label: 'Scenario Analysis',
     icon: Presentation,
     comingSoon: true,
     href: '/scenario-analysis'
+  },
+  {
+    id: 'gap-analysis',
+    label: 'Gap Analysis',
+    icon: Share2,
+    href: '/gap-analysis'
+  },
+  {
+    id: 'admin',
+    label: 'Admin & Dependencies',
+    icon: Settings,
+    href: '/admin'
   },
   {
     id: 'risk-catalog',
