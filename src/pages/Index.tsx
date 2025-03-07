@@ -1,4 +1,4 @@
-<lov-code>
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -865,4 +865,145 @@ const Index = () => {
     toast.info(`Navigating to ${title} details...`);
     
     setTimeout(() => {
-      
+      setLoading(false);
+      navigate(`/${route}`);
+    }, 500);
+  };
+  
+  return (
+    <Layout>
+      <div className="container mx-auto px-4 py-8">
+        {/* Dashboard Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">IRMAI Dashboard</h1>
+            <p className="text-muted-foreground">
+              Integrated Risk Management with AI
+            </p>
+          </div>
+          <div className="mt-4 md:mt-0">
+            <RibbonNav />
+          </div>
+        </div>
+
+        {/* Top Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <MetricCard
+            title="High-Severity Risks"
+            value="5"
+            change={-15}
+            status="down"
+            icon={<AlertTriangle className="h-8 w-8" />}
+            onClick={() => handleMetricClick("High-Severity Risks")}
+          />
+          <MetricCard
+            title="Compliance Score" 
+            value="85%"
+            change={5}
+            status="up"
+            icon={<CheckCheck className="h-8 w-8" />}
+            onClick={() => handleMetricClick("Compliance Score")}
+          />
+          <MetricCard
+            title="Potential Loss"
+            value="$2.4M"
+            change={-8}
+            status="down"
+            icon={<DollarSign className="h-8 w-8" />}
+            onClick={() => handleMetricClick("Potential Loss")}
+          />
+          <MetricCard
+            title="Control Failures"
+            value="15%"
+            change={-3}
+            status="down"
+            icon={<Gauge className="h-8 w-8" />}
+            onClick={() => handleMetricClick("Control Failures")}
+          />
+        </div>
+
+        {/* Risk Knowledge Graph */}
+        <div className="mb-8 bg-card border rounded-lg shadow-sm p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold">Risk Knowledge Network</h2>
+            <button className="text-sm text-primary" onClick={() => handleNavigate('knowledge-graph')}>
+              View Full Graph
+            </button>
+          </div>
+          <div className="h-[400px] w-full">
+            <KnowledgeGraph />
+          </div>
+        </div>
+
+        {/* Risk Insights */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Risk Insights</h2>
+            <button className="text-sm text-primary">View All</button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {infoWidgetData.map((widget) => (
+              <InfoWidget 
+                key={widget.id} 
+                data={widget} 
+                onAction={() => handleNavigate(widget.actionHref.replace('/', ''))} 
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Risk Management Stats */}
+        <div className="mb-8 bg-card border rounded-lg shadow-sm p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Risk Management Activity</h2>
+            <button className="text-sm text-primary">
+              <BarChart4 className="h-4 w-4 inline mr-1" />
+              View Chart Options
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-lg font-medium mb-3">Loss Events Over Time</h3>
+              <div className="h-[300px]">
+                <Chart 
+                  data={lossEventsData}
+                  series={[
+                    { name: 'Loss Events', dataKey: 'value', color: '#f97316' },
+                    { name: 'Financial Impact ($K)', dataKey: 'amount', color: '#ef4444', type: 'line' }
+                  ]}
+                  type="composed"
+                  xAxisKey="name"
+                  showTooltip
+                />
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-medium mb-3">Risk Distribution</h3>
+              <div className="h-[300px]">
+                <Chart 
+                  data={riskDistributionData}
+                  series={[
+                    { name: 'Risk Distribution', dataKey: 'value', color: '#8b5cf6' }
+                  ]}
+                  type="pie"
+                  showTooltip
+                  showLegend
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Separator className="my-8" />
+
+        {/* Footer section with demo disclaimer */}
+        <div className="text-center text-sm text-muted-foreground pb-6">
+          <p className="mb-1">IRMAI - Integrated Risk Management AI Platform</p>
+          <p>© 2025 RiskAI Technologies - Demo System</p>
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default Index;
