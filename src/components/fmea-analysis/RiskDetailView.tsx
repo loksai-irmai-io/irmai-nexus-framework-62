@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft, BarChart4, Calendar, Clock, Edit, ExternalLink, FileCheck, Flag, Info, Layers, List, MapPin, MoreHorizontal, Shield, Sparkles, UserCircle, XCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +17,6 @@ interface RiskDetailViewProps {
 const RiskDetailView: React.FC<RiskDetailViewProps> = ({ riskId, onBack }) => {
   const [activeTab, setActiveTab] = useState('overview');
   
-  // Find the risk by ID or category (for heatmap drilldowns)
   const getRisk = () => {
     if (riskId === 'critical') {
       return mockRiskData.find(risk => risk.severity === 'critical');
@@ -27,12 +25,10 @@ const RiskDetailView: React.FC<RiskDetailViewProps> = ({ riskId, onBack }) => {
       return mockRiskData.find(risk => risk.severity === 'high');
     }
     if (riskId.startsWith('severity-')) {
-      // Parse severity and probability from the ID format "severity-{severity}-probability-{probability}"
       const parts = riskId.split('-');
       const severityValue = parseInt(parts[1]);
       const probabilityValue = parseInt(parts[3]);
       
-      // Find a risk that approximately matches these criteria
       return mockRiskData.find(r => 
         Math.floor(r.severityScore / 2) === severityValue - 1 && 
         Math.floor(r.likelihoodScore / 2) === probabilityValue - 1
@@ -41,7 +37,7 @@ const RiskDetailView: React.FC<RiskDetailViewProps> = ({ riskId, onBack }) => {
     return mockRiskData.find(risk => risk.id === riskId);
   };
   
-  const risk = getRisk() || mockRiskData[0]; // Fallback to first risk if not found
+  const risk = getRisk() || mockRiskData[0];
   
   const trendData = [
     { month: 'Jan', score: 52 },
@@ -212,6 +208,7 @@ const RiskDetailView: React.FC<RiskDetailViewProps> = ({ riskId, onBack }) => {
                         </CardHeader>
                         <CardContent className="pt-0">
                           <Chart 
+                            title="Risk Trend" 
                             data={trendData}
                             series={trendSeries}
                             type="line"
@@ -230,6 +227,7 @@ const RiskDetailView: React.FC<RiskDetailViewProps> = ({ riskId, onBack }) => {
                         </CardHeader>
                         <CardContent className="pt-0">
                           <Chart 
+                            title="Control Breakdown"
                             data={controlData}
                             series={controlSeries}
                             type="pie"

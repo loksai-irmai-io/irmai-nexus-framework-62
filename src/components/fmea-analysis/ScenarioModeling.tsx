@@ -75,7 +75,7 @@ const ScenarioModeling: React.FC<ScenarioModelingProps> = ({ selectedRole }) => 
             <TooltipTrigger asChild>
               <Info className="h-4 w-4 ml-2 text-muted-foreground cursor-help" />
             </TooltipTrigger>
-            <TooltipContent maxWidth="sm">
+            <TooltipContent className="max-w-xs">
               <p>Adjust the variables below to run "what-if" scenarios and see how they affect risk projections. The AI model will simulate risk trajectories under different conditions.</p>
             </TooltipContent>
           </Tooltip>

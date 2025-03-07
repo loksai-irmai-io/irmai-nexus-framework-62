@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +14,8 @@ import {
   ChevronRight,
   AlertCircle,
   Sparkles,
-  Info
+  Info,
+  Gauge as GaugeIcon
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { mockRiskData } from './mockData';
@@ -113,10 +113,10 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ selectedRole, onDrilldown }
       ],
       chartData: trendData,
       chartSeries: trendSeries,
-      chartType: 'line',
+      chartType: 'line' as 'line' | 'pie' | 'bar' | 'composed',
       actionText: 'View Risk Exposure Details',
       actionHref: '/fmea-analysis/exposure',
-      icon: <Gauge className="h-5 w-5 text-rose-500" />
+      icon: <GaugeIcon className="h-5 w-5 text-rose-500" />
     },
     {
       id: 'risk-distribution',
@@ -158,7 +158,7 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ selectedRole, onDrilldown }
       ],
       chartData: riskByCategory,
       chartSeries: riskSeries,
-      chartType: 'pie',
+      chartType: 'pie' as 'line' | 'pie' | 'bar' | 'composed',
       actionText: 'Explore Risk Categories',
       actionHref: '/fmea-analysis/categories',
       icon: <PieChart className="h-5 w-5 text-blue-500" />
