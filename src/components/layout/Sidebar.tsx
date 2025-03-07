@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useSidebarContext } from './SidebarProvider';
 import { cn } from '@/lib/utils';
@@ -110,13 +111,13 @@ const Sidebar: React.FC = () => {
       )}
     >
       <div className="flex flex-col h-full overflow-y-auto">
-        <div className="h-16 flex items-center justify-center px-4 border-b bg-sidebar">
+        <div className="h-20 flex items-center justify-center px-4 border-b bg-sidebar">
           {isOpen ? (
             <div className="flex items-center justify-center w-full h-full">
               <img 
                 src="/lovable-uploads/f6af323e-8e1e-41cb-a223-30dc2436352c.png" 
                 alt="IRMAI Logo" 
-                className="h-9 object-contain" 
+                className="h-12 object-contain" 
               />
             </div>
           ) : (
@@ -124,7 +125,7 @@ const Sidebar: React.FC = () => {
               <img 
                 src="/lovable-uploads/f6af323e-8e1e-41cb-a223-30dc2436352c.png" 
                 alt="IRMAI Logo" 
-                className="h-8 w-8 object-contain" 
+                className="h-10 w-10 object-contain" 
               />
             </div>
           )}
