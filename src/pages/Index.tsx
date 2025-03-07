@@ -83,6 +83,28 @@ const gapAnalysisData = [
   { name: 'Basel III', current: 70, target: 100 },
 ];
 
+const controlsTestingData = [
+  { name: 'Passing', value: 85 },
+  { name: 'Failing', value: 15 },
+];
+
+const incidentManagementData = [
+  { name: 'Jan', count: 4, amount: 160000 },
+  { name: 'Feb', count: 6, amount: 180000 },
+  { name: 'Mar', count: 8, amount: 260000 },
+  { name: 'Apr', count: 5, amount: 150000 },
+  { name: 'May', count: 3, amount: 120000 },
+  { name: 'Jun', count: 2, amount: 90000 },
+];
+
+const scenarioAnalysisData = [
+  { name: 'Data Breach', probability: 0.3, impact: 85, size: 25 },
+  { name: 'System Failure', probability: 0.5, impact: 65, size: 32 },
+  { name: 'Compliance', probability: 0.2, impact: 75, size: 15 },
+  { name: 'Disaster Recovery', probability: 0.1, impact: 95, size: 10 },
+  { name: 'Fraud', probability: 0.6, impact: 55, size: 33 },
+];
+
 const moduleSummaryData = [
   {
     id: 'process-discovery',
@@ -277,6 +299,151 @@ const moduleSummaryData = [
     status: 'warning' as const,
     actionText: 'View Compliance Monitoring',
     actionHref: '/compliance-monitoring',
+    chartHeight: 200,
+  },
+  {
+    id: 'controls-testing',
+    title: 'Controls Testing',
+    subtitle: 'Automated controls testing and validation',
+    icon: <TestTube className="h-5 w-5 text-primary" />,
+    metrics: [
+      { 
+        label: 'Total Controls', 
+        value: '124', 
+        icon: 'circle-check',
+        tooltip: 'Total number of controls in the system'
+      },
+      { 
+        label: 'Tested', 
+        value: '80', 
+        icon: 'check',
+        tooltip: 'Number of controls that have been tested'
+      },
+      { 
+        label: 'Pass Rate', 
+        value: '85%', 
+        icon: 'gauge',
+        tooltip: 'Percentage of controls that passed testing',
+        trend: { direction: 'up' as const, value: 3 }
+      },
+      { 
+        label: 'Fail Rate', 
+        value: '15%', 
+        icon: 'alert-triangle',
+        tooltip: 'Percentage of controls that failed testing',
+        trend: { direction: 'down' as const, value: 3 }
+      },
+    ],
+    insights: [
+      'No new controls tested this week (awaiting scheduling)',
+      'Evidence collection automation in progress'
+    ],
+    chartData: controlsTestingData,
+    chartSeries: [
+      { name: 'Percentage', dataKey: 'value', color: '#4ade80' }
+    ],
+    chartType: 'pie',
+    status: 'info',
+    actionText: 'View Controls Testing',
+    actionHref: '/controls-testing',
+    chartHeight: 200,
+  },
+  {
+    id: 'incident-management',
+    title: 'Incident Management',
+    subtitle: 'Loss events and issue tracking',
+    icon: <AlertTriangle className="h-5 w-5 text-primary" />,
+    metrics: [
+      { 
+        label: 'Open Incidents', 
+        value: '10', 
+        icon: 'alert-triangle',
+        tooltip: 'Number of currently open incidents',
+        trend: { direction: 'down' as const, value: 2 }
+      },
+      { 
+        label: 'Resolved', 
+        value: '5', 
+        icon: 'check',
+        tooltip: 'Number of incidents resolved this month'
+      },
+      { 
+        label: 'Avg. Resolution', 
+        value: '3.2 days', 
+        icon: 'clock',
+        tooltip: 'Average time to resolve incidents'
+      },
+      { 
+        label: 'Critical Incidents', 
+        value: '2', 
+        icon: 'alert-circle',
+        tooltip: 'Number of critical incidents requiring immediate attention',
+        trend: { direction: 'up' as const, value: 1 }
+      },
+    ],
+    insights: [
+      'Financial loss peaked in March 2025 ($260K)',
+      'Major data breach incident resolved last week'
+    ],
+    chartData: incidentManagementData,
+    chartSeries: [
+      { name: 'Incident Count', dataKey: 'count', color: '#8b5cf6' },
+      { name: 'Financial Loss ($K)', dataKey: 'amount', color: '#ef4444' }
+    ],
+    chartType: 'composed',
+    xAxisKey: 'name',
+    status: 'warning',
+    actionText: 'View Incident Management',
+    actionHref: '/incident-management',
+    chartHeight: 200,
+  },
+  {
+    id: 'scenario-analysis',
+    title: 'Scenario Analysis',
+    subtitle: 'Risk scenario modeling and simulation',
+    icon: <Presentation className="h-5 w-5 text-primary" />,
+    metrics: [
+      { 
+        label: 'Scenarios', 
+        value: '5', 
+        icon: 'lightbulb',
+        tooltip: 'Total number of risk scenarios modeled'
+      },
+      { 
+        label: 'Simulations Run', 
+        value: '12', 
+        icon: 'repeat',
+        tooltip: 'Total number of simulations executed'
+      },
+      { 
+        label: 'Coverage', 
+        value: '60%', 
+        icon: 'percent',
+        tooltip: 'Percentage of high-impact processes covered by scenarios',
+        trend: { direction: 'up' as const, value: 10 }
+      },
+      { 
+        label: 'Avg. Loss', 
+        value: '$75K', 
+        icon: 'dollar-sign',
+        tooltip: 'Average potential financial loss across all scenarios'
+      },
+    ],
+    insights: [
+      'Disaster recovery scenario indicates 20% potential revenue impact',
+      '3 new simulations pending for Q1 2026'
+    ],
+    chartData: scenarioAnalysisData,
+    chartSeries: [
+      { name: 'Probability', dataKey: 'probability', color: '#0ea5e9' },
+      { name: 'Impact', dataKey: 'impact', color: '#f97316' },
+      { name: 'Size', dataKey: 'size', color: '#d946ef' }
+    ],
+    chartType: 'composed',
+    xAxisKey: 'name',
+    status: 'error',
+    actionText: 'View Scenario Analysis',
+    actionHref: '/scenario-analysis',
     chartHeight: 200,
   }
 ];
@@ -508,6 +675,151 @@ const infoWidgetData: InfoWidgetData[] = [
     status: 'warning',
     actionText: 'View Compliance Monitoring',
     actionHref: '/compliance-monitoring',
+    chartHeight: 200,
+  },
+  {
+    id: 'controls-testing',
+    title: 'Controls Testing',
+    subtitle: 'Automated controls testing and validation',
+    icon: <TestTube className="h-5 w-5 text-primary" />,
+    metrics: [
+      { 
+        label: 'Total Controls', 
+        value: '124', 
+        icon: 'circle-check',
+        tooltip: 'Total number of controls in the system'
+      },
+      { 
+        label: 'Tested', 
+        value: '80', 
+        icon: 'check',
+        tooltip: 'Number of controls that have been tested'
+      },
+      { 
+        label: 'Pass Rate', 
+        value: '85%', 
+        icon: 'gauge',
+        tooltip: 'Percentage of controls that passed testing',
+        trend: { direction: 'up' as const, value: 3 }
+      },
+      { 
+        label: 'Fail Rate', 
+        value: '15%', 
+        icon: 'alert-triangle',
+        tooltip: 'Percentage of controls that failed testing',
+        trend: { direction: 'down' as const, value: 3 }
+      },
+    ],
+    insights: [
+      'No new controls tested this week (awaiting scheduling)',
+      'Evidence collection automation in progress'
+    ],
+    chartData: controlsTestingData,
+    chartSeries: [
+      { name: 'Percentage', dataKey: 'value', color: '#4ade80' }
+    ],
+    chartType: 'pie',
+    status: 'info',
+    actionText: 'View Controls Testing',
+    actionHref: '/controls-testing',
+    chartHeight: 200,
+  },
+  {
+    id: 'incident-management',
+    title: 'Incident Management',
+    subtitle: 'Loss events and issue tracking',
+    icon: <AlertTriangle className="h-5 w-5 text-primary" />,
+    metrics: [
+      { 
+        label: 'Open Incidents', 
+        value: '10', 
+        icon: 'alert-triangle',
+        tooltip: 'Number of currently open incidents',
+        trend: { direction: 'down' as const, value: 2 }
+      },
+      { 
+        label: 'Resolved', 
+        value: '5', 
+        icon: 'check',
+        tooltip: 'Number of incidents resolved this month'
+      },
+      { 
+        label: 'Avg. Resolution', 
+        value: '3.2 days', 
+        icon: 'clock',
+        tooltip: 'Average time to resolve incidents'
+      },
+      { 
+        label: 'Critical Incidents', 
+        value: '2', 
+        icon: 'alert-circle',
+        tooltip: 'Number of critical incidents requiring immediate attention',
+        trend: { direction: 'up' as const, value: 1 }
+      },
+    ],
+    insights: [
+      'Financial loss peaked in March 2025 ($260K)',
+      'Major data breach incident resolved last week'
+    ],
+    chartData: incidentManagementData,
+    chartSeries: [
+      { name: 'Incident Count', dataKey: 'count', color: '#8b5cf6' },
+      { name: 'Financial Loss ($K)', dataKey: 'amount', color: '#ef4444' }
+    ],
+    chartType: 'composed',
+    xAxisKey: 'name',
+    status: 'warning',
+    actionText: 'View Incident Management',
+    actionHref: '/incident-management',
+    chartHeight: 200,
+  },
+  {
+    id: 'scenario-analysis',
+    title: 'Scenario Analysis',
+    subtitle: 'Risk scenario modeling and simulation',
+    icon: <Presentation className="h-5 w-5 text-primary" />,
+    metrics: [
+      { 
+        label: 'Scenarios', 
+        value: '5', 
+        icon: 'lightbulb',
+        tooltip: 'Total number of risk scenarios modeled'
+      },
+      { 
+        label: 'Simulations Run', 
+        value: '12', 
+        icon: 'repeat',
+        tooltip: 'Total number of simulations executed'
+      },
+      { 
+        label: 'Coverage', 
+        value: '60%', 
+        icon: 'percent',
+        tooltip: 'Percentage of high-impact processes covered by scenarios',
+        trend: { direction: 'up' as const, value: 10 }
+      },
+      { 
+        label: 'Avg. Loss', 
+        value: '$75K', 
+        icon: 'dollar-sign',
+        tooltip: 'Average potential financial loss across all scenarios'
+      },
+    ],
+    insights: [
+      'Disaster recovery scenario indicates 20% potential revenue impact',
+      '3 new simulations pending for Q1 2026'
+    ],
+    chartData: scenarioAnalysisData,
+    chartSeries: [
+      { name: 'Probability', dataKey: 'probability', color: '#0ea5e9' },
+      { name: 'Impact', dataKey: 'impact', color: '#f97316' },
+      { name: 'Size', dataKey: 'size', color: '#d946ef' }
+    ],
+    chartType: 'composed',
+    xAxisKey: 'name',
+    status: 'error',
+    actionText: 'View Scenario Analysis',
+    actionHref: '/scenario-analysis',
     chartHeight: 200,
   }
 ];
