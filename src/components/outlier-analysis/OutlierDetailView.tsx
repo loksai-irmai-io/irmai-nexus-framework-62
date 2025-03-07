@@ -8,7 +8,11 @@ import {
   ThumbsDown, 
   ThumbsUp, 
   Bot,
-  Activity
+  Activity,
+  Info,
+  Check,
+  X,
+  Download
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +21,8 @@ import { OutlierEvent } from './types';
 import Chart, { ChartDataSeries } from '../dashboard/Chart';
 import type { ChartData } from '../dashboard/Chart';
 import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useToast } from '@/hooks/use-toast';
 
 interface OutlierDetailViewProps {
   outlier: OutlierEvent;
@@ -27,6 +33,8 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
   const [comment, setComment] = useState('');
   const [isAddingComment, setIsAddingComment] = useState(false);
   const [feedbackGiven, setFeedbackGiven] = useState(false);
+  const [hoveredLogIndex, setHoveredLogIndex] = useState<number | null>(null);
+  const { toast } = useToast();
   
   // Get event logs for this outlier (or empty array if not found)
   const eventLogs = mockEventLogs[outlier.id] || [];
@@ -75,6 +83,82 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
       case 'resource': return 'text-purple-600 bg-purple-50';
       default: return 'text-gray-600 bg-gray-50';
     }
+  };
+  
+  const handleConfirmOutlier = () => {
+    toast({
+      title: "Outlier Confirmed",
+      description: `The outlier "${outlier.name}" has been confirmed.`,
+      variant: "success",
+    });
+  };
+  
+  const handleDismissOutlier = () => {
+    toast({
+      title: "Outlier Dismissed",
+      description: `The outlier "${outlier.name}" has been dismissed as a false positive.`,
+      variant: "default",
+    });
+  };
+  
+  const handleCreateInvestigation = () => {
+    toast({
+      title: "Investigation Created",
+      description: `A new investigation has been created for "${outlier.name}".`,
+      variant: "info",
+    });
+  };
+  
+  const handleSubmitComment = () => {
+    if (comment.trim()) {
+      toast({
+        title: "Comment Added",
+        description: "Your comment has been added to this outlier event.",
+        variant: "success",
+      });
+      setComment('');
+      setIsAddingComment(false);
+    }
+  };
+  
+  const handleMouseEnterLogRow = (index: number) => {
+    setHoveredLogIndex(index);
+  };
+  
+  const handleMouseLeaveLogRow = () => {
+    setHoveredLogIndex(null);
+  };
+  
+  const handleDownloadEventLog = () => {
+    // Create CSV content
+    const headers = ['Timestamp', 'Activity', 'Resource', 'Deviation Value'];
+    const rows = eventLogs.map(log => [
+      log.timestamp,
+      log.activity,
+      log.resource,
+      log.deviationValue
+    ]);
+    
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+    
+    // Create and trigger download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `outlier-${outlier.id}-events.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Download Started",
+      description: "Event log data is being downloaded as CSV.",
+      variant: "success",
+    });
   };
   
   return (
@@ -132,23 +216,38 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
           </Card>
           
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between">
               <CardTitle className="text-base font-medium">
                 Event Log Timeline
               </CardTitle>
+              <Button variant="ghost" size="sm" onClick={handleDownloadEventLog}>
+                <Download className="mr-2 h-4 w-4" />
+                Download
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="mb-4">
-                <Chart
-                  title="Anomaly Trend"
-                  type="line"
-                  data={chartData}
-                  series={series}
-                  xAxisKey="name"
-                  height={200}
-                  showLegend={false}
-                  tooltip="This chart shows the trend of deviation values across the event timeline."
-                />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div>
+                        <Chart
+                          title="Anomaly Trend"
+                          type="line"
+                          data={chartData}
+                          series={series}
+                          xAxisKey="name"
+                          height={200}
+                          showLegend={false}
+                          tooltip="This chart shows the trend of deviation values across the event timeline."
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      <p>Visual Drill-Down: This chart highlights the trend around the outlier. Peaks indicate significant deviations from expected behavior.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -162,7 +261,12 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
                   </thead>
                   <tbody>
                     {eventLogs.map((log, index) => (
-                      <tr key={index} className="border-b hover:bg-muted/20">
+                      <tr 
+                        key={index} 
+                        className={`border-b hover:bg-muted/20 transition-colors ${hoveredLogIndex === index ? 'bg-muted/30' : ''}`}
+                        onMouseEnter={() => handleMouseEnterLogRow(index)}
+                        onMouseLeave={handleMouseLeaveLogRow}
+                      >
                         <td className="px-4 py-2">{formatTimestamp(log.timestamp)}</td>
                         <td className="px-4 py-2">{log.activity}</td>
                         <td className="px-4 py-2">{log.resource}</td>
@@ -184,6 +288,18 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
               <CardTitle className="text-base font-medium flex items-center">
                 <Bot className="mr-2 h-5 w-5 text-blue-500" />
                 AI Explanation
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 ml-1">
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      <p>AI Explanation: This event deviated from the norm by {outlier.deviationPercentage}%. Provide feedback if this is a false positive.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
@@ -196,9 +312,12 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
                   <p className="mb-2">
                     AI confidence in this anomaly detection: <span className="font-medium">{(outlier.aiConfidence * 100).toFixed(0)}%</span>
                   </p>
-                  <p>
-                    Suggested action: Review the {outlier.activity} process for potential bottlenecks or resource constraints.
-                  </p>
+                  <p className="font-medium mb-1">Suggested actions:</p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>Review the {outlier.activity} process for potential bottlenecks.</li>
+                    <li>Check resource allocation for the {outlier.resource}.</li>
+                    <li>Verify if this pattern occurs at regular intervals.</li>
+                  </ul>
                 </div>
                 
                 {!feedbackGiven ? (
@@ -237,27 +356,78 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
             </CardHeader>
             <CardContent className="pt-4">
               <div className="space-y-3">
-                <Button className="w-full justify-start" variant="outline">
-                  <AlertTriangle className="mr-2 h-4 w-4 text-amber-500" />
-                  Confirm Outlier
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <Activity className="mr-2 h-4 w-4 text-blue-500" />
-                  Create Investigation
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <ThumbsDown className="mr-2 h-4 w-4 text-red-500" />
-                  Dismiss
-                </Button>
-                <Button 
-                  className="w-full justify-start" 
-                  variant="outline"
-                  onClick={() => setIsAddingComment(!isAddingComment)}
-                >
-                  <MessageSquare className="mr-2 h-4 w-4 text-gray-500" />
-                  Add Comment
-                  <ChevronDown className="ml-auto h-4 w-4" />
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        className="w-full justify-start" 
+                        variant="outline"
+                        onClick={handleConfirmOutlier}
+                      >
+                        <Check className="mr-2 h-4 w-4 text-green-500" />
+                        Confirm Outlier
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                      <p>Mark this as a confirmed anomaly</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        className="w-full justify-start" 
+                        variant="outline"
+                        onClick={handleCreateInvestigation}
+                      >
+                        <Activity className="mr-2 h-4 w-4 text-blue-500" />
+                        Create Investigation
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                      <p>Start a formal investigation process</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        className="w-full justify-start" 
+                        variant="outline"
+                        onClick={handleDismissOutlier}
+                      >
+                        <X className="mr-2 h-4 w-4 text-red-500" />
+                        Dismiss
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                      <p>Mark this as a false positive</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        className="w-full justify-start" 
+                        variant="outline"
+                        onClick={() => setIsAddingComment(!isAddingComment)}
+                      >
+                        <MessageSquare className="mr-2 h-4 w-4 text-gray-500" />
+                        Add Comment
+                        <ChevronDown className="ml-auto h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                      <p>Add a comment or note to this outlier</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 
                 {isAddingComment && (
                   <div className="pt-2 space-y-2">
@@ -267,7 +437,14 @@ const OutlierDetailView: React.FC<OutlierDetailViewProps> = ({ outlier, onBack }
                       onChange={(e) => setComment(e.target.value)}
                       className="text-sm min-h-[80px]"
                     />
-                    <Button size="sm" className="mt-2">Submit Comment</Button>
+                    <Button 
+                      size="sm" 
+                      className="mt-2"
+                      onClick={handleSubmitComment}
+                      disabled={!comment.trim()}
+                    >
+                      Submit Comment
+                    </Button>
                   </div>
                 )}
               </div>
