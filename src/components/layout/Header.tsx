@@ -32,7 +32,6 @@ import {
 } from "@/components/ui/tooltip";
 import { useSidebarContext } from './SidebarProvider';
 import { toast } from "sonner";
-import { uploadEventLog } from '@/services/processService';
 
 type Notification = {
   id: string;
@@ -45,7 +44,26 @@ type Notification = {
 
 export const handleFileUpload = (file: File) => {
   if (!file) return;
-  uploadEventLog(file);
+  
+  const validFileTypes = ['text/csv', 'text/xml', 'application/xml', 'text/plain'];
+  const fileType = file.type;
+  
+  if (!validFileTypes.includes(fileType) && !file.name.endsWith('.xes')) {
+    toast.error("Invalid file type. Please upload a CSV, XES, or XML file.");
+    return;
+  }
+  
+  const maxSize = 10 * 1024 * 1024;
+  if (file.size > maxSize) {
+    toast.error("File is too large. Maximum size is 10MB.");
+    return;
+  }
+  
+  const formData = new FormData();
+  formData.append('eventLog', file);
+  
+  toast.success(`Event log "${file.name}" uploaded successfully!`);
+  console.log("File ready for backend processing:", file.name);
 };
 
 const Header: React.FC = () => {
@@ -108,10 +126,10 @@ const Header: React.FC = () => {
     }
   };
 
-  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      await uploadEventLog(file);
+      handleFileUpload(file);
     }
     
     if (fileInputRef.current) {
