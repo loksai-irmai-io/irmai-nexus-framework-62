@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Bell, 
   Menu, 
@@ -11,7 +10,8 @@ import {
   X,
   Settings,
   HelpCircle,
-  LogOut
+  LogOut,
+  FileUp
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,7 @@ import {
   TooltipTrigger 
 } from "@/components/ui/tooltip";
 import { useSidebarContext } from './SidebarProvider';
+import { toast } from "sonner";
 
 type Notification = {
   id: string;
@@ -41,10 +42,35 @@ type Notification = {
   type: 'risk' | 'incident' | 'compliance' | 'system';
 };
 
+export const handleFileUpload = (file: File) => {
+  if (!file) return;
+  
+  const validFileTypes = ['text/csv', 'text/xml', 'application/xml', 'text/plain'];
+  const fileType = file.type;
+  
+  if (!validFileTypes.includes(fileType) && !file.name.endsWith('.xes')) {
+    toast.error("Invalid file type. Please upload a CSV, XES, or XML file.");
+    return;
+  }
+  
+  const maxSize = 10 * 1024 * 1024;
+  if (file.size > maxSize) {
+    toast.error("File is too large. Maximum size is 10MB.");
+    return;
+  }
+  
+  const formData = new FormData();
+  formData.append('eventLog', file);
+  
+  toast.success(`Event log "${file.name}" uploaded successfully!`);
+  console.log("File ready for backend processing:", file.name);
+};
+
 const Header: React.FC = () => {
   const { isOpen, setIsOpen } = useSidebarContext();
   const [searchValue, setSearchValue] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [notifications, setNotifications] = useState<Notification[]>([
     {
@@ -91,6 +117,23 @@ const Header: React.FC = () => {
       case 'incident': return <Bell className="w-4 h-4 text-risk-medium" />;
       case 'compliance': return <Upload className="w-4 h-4 text-risk-low" />;
       default: return <Bell className="w-4 h-4" />;
+    }
+  };
+
+  const triggerFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+    
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -142,6 +185,26 @@ const Header: React.FC = () => {
 
         <div className="flex items-center gap-3">
           <div className="hidden lg:flex gap-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept=".csv,.xes,.xml,text/csv,application/xml,text/xml,text/plain"
+              onChange={onFileChange}
+            />
+            
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2 transition-all" onClick={triggerFileUpload}>
+                    <FileUp className="h-4 w-4" />
+                    <span>Upload Event Log</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Upload event logs for process mining</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -163,18 +226,6 @@ const Header: React.FC = () => {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">Log a new incident</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2 transition-all">
-                    <Upload className="h-4 w-4" />
-                    <span>Upload Event Log</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">Upload transaction logs</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>

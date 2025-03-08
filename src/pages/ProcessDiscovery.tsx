@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -35,8 +34,8 @@ import { InsightItem } from '@/components/process-discovery/types';
 import { ProcessInsights } from '@/components/process-discovery/ProcessInsights';
 import { ProcessStatistics } from '@/components/process-discovery/ProcessStatistics';
 import { EventLogs } from '@/components/process-discovery/EventLogs';
+import { handleFileUpload } from '@/components/layout/Header';
 
-// Sample process data will be moved to a separate file/service
 const processData = {
   nodes: [
     { id: 'start', type: 'event', label: 'Start', position: { x: 100, y: 150 }, compliant: true },
@@ -128,13 +127,12 @@ const ProcessDiscovery = () => {
   const [timeframe, setTimeframe] = useState("all");
   const [caseVariant, setCaseVariant] = useState("all");
   const [orgUnit, setOrgUnit] = useState("all");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Handle node click
   const handleNodeClick = (nodeId: string) => {
     setSelectedNode(nodeId);
     setDetailView(true);
     
-    // Filter logs based on selected node
     const node = processData.nodes.find(n => n.id === nodeId);
     if (node) {
       const nodeLabel = node.label;
@@ -143,28 +141,36 @@ const ProcessDiscovery = () => {
     }
   };
   
-  // Handle insight validation
   const handleValidateInsight = (insightId: number) => {
     toast.success("Insight validated successfully");
   };
   
-  // Handle insight click (highlights corresponding node)
   const handleInsightClick = (nodeId: string) => {
     setSelectedNode(nodeId);
     toast.info(`Highlighting node: ${nodeId}`);
   };
   
-  // Handle filter change
   const handleFilterChange = () => {
     toast.info("Filters applied");
   };
   
-  // Handle file upload
-  const handleFileUpload = () => {
-    toast.success("Event log uploaded successfully");
+  const triggerFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+  
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+    
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
-  // Handle back to process map
   const handleBackToMap = () => {
     setDetailView(false);
     setSelectedNode(null);
@@ -174,7 +180,6 @@ const ProcessDiscovery = () => {
     <Layout>
       <div className="container py-6">
         <div className="flex flex-col space-y-6">
-          {/* Header */}
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold tracking-tight mb-1">Process Discovery</h1>
@@ -182,10 +187,19 @@ const ProcessDiscovery = () => {
                 Visualize your end-to-end processes with AI insights
               </p>
             </div>
+            
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept=".csv,.xes,.xml,text/csv,application/xml,text/xml,text/plain"
+              onChange={onFileChange}
+            />
+            
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button onClick={handleFileUpload}>
+                  <Button onClick={triggerFileUpload}>
                     <Upload className="h-4 w-4 mr-2" />
                     Upload Event Log
                   </Button>
@@ -199,7 +213,6 @@ const ProcessDiscovery = () => {
 
           {detailView ? (
             <>
-              {/* Breadcrumb Navigation */}
               <div className="flex items-center mb-4">
                 <Button 
                   variant="ghost" 
@@ -212,7 +225,6 @@ const ProcessDiscovery = () => {
                 </Button>
               </div>
 
-              {/* Process Detail View */}
               <ProcessDetailView 
                 nodeId={selectedNode || ''} 
                 processData={processData}
@@ -222,7 +234,6 @@ const ProcessDiscovery = () => {
             </>
           ) : (
             <>
-              {/* Process Map (Full View) */}
               <Card className="w-full">
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-center">
@@ -248,7 +259,6 @@ const ProcessDiscovery = () => {
                     </div>
                   </div>
                   
-                  {/* Filter row that appears when filter button is clicked */}
                   <div className="grid grid-cols-3 gap-3 mt-3">
                     <Select value={timeframe} onValueChange={setTimeframe}>
                       <SelectTrigger>
@@ -340,25 +350,19 @@ const ProcessDiscovery = () => {
                 </CardContent>
               </Card>
               
-              {/* Raw Events Panel (conditionally displayed) */}
-              {showRawEvents && (
-                <EventLogs 
-                  logs={filteredLogs} 
-                  selectedNode={selectedNode} 
-                  processNodes={processData.nodes} 
-                />
-              )}
+              <EventLogs 
+                logs={filteredLogs} 
+                selectedNode={selectedNode} 
+                processNodes={processData.nodes} 
+              />
               
-              {/* Level 2: Process Insights and Process Statistics (side by side) */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Process Insights */}
                 <ProcessInsights 
                   insights={insights} 
                   onInsightClick={handleInsightClick} 
                   onValidateInsight={handleValidateInsight} 
                 />
                 
-                {/* Process Statistics */}
                 <ProcessStatistics />
               </div>
             </>
