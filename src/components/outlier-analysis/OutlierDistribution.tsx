@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
 import Chart, { ChartDataSeries } from '../dashboard/Chart';
-import { mockActivityDistribution, mockResourceDistribution } from './mockData';
 import type { ChartData } from '../dashboard/Chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info } from 'lucide-react';
+import { useOutlierDistribution } from '@/hooks/useOutlierDistribution';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface OutlierDistributionProps {
   type: 'activity' | 'resource';
@@ -13,10 +14,10 @@ interface OutlierDistributionProps {
 }
 
 const OutlierDistribution: React.FC<OutlierDistributionProps> = ({ type, height = 300 }) => {
-  const distributionData = type === 'activity' ? mockActivityDistribution : mockResourceDistribution;
   const [hoveredItem, setHoveredItem] = useState<ChartData | null>(null);
+  const { data: distributionData, isLoading, isError, logClick } = useOutlierDistribution(type);
   
-  // Convert the mock data to the format expected by the Chart component
+  // Convert the API data to the format expected by the Chart component
   const chartData: ChartData[] = distributionData.map(item => ({
     name: item.name,
     value: item.value,
@@ -38,6 +39,8 @@ const OutlierDistribution: React.FC<OutlierDistributionProps> = ({ type, height 
 
   const handleDataClick = (data: any) => {
     console.log(`${type} distribution data clicked:`, data);
+    // Log this click to the backend
+    logClick(data);
   };
 
   const handleDataHover = (data: any) => {
@@ -74,33 +77,45 @@ const OutlierDistribution: React.FC<OutlierDistributionProps> = ({ type, height 
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Chart
-          title=""
-          description=""
-          type="bar"
-          data={chartData}
-          series={series}
-          xAxisKey="name"
-          height={height}
-          showLegend={true}
-          onClick={handleDataClick}
-          onMouseMove={handleDataHover}
-          onMouseLeave={() => setHoveredItem(null)}
-          tooltip={`This chart shows the distribution of events and their deviation percentages across ${type === 'activity' ? 'different activities' : 'resource types'}. Click on any bar for more details.`}
-        />
-        
-        {hoveredItem && (
-          <div className="mt-2 p-2 border border-border rounded-md bg-muted/30 text-sm animate-fade-in">
-            <p className="font-medium">{hoveredItem.name}</p>
-            <div className="grid grid-cols-2 gap-2 mt-1">
-              <div>
-                <span className="text-muted-foreground">Occurrences:</span> {hoveredItem.value}
-              </div>
-              <div>
-                <span className="text-muted-foreground">Deviation:</span> {hoveredItem.deviation}%
-              </div>
-            </div>
+        {isLoading ? (
+          <div className="space-y-2">
+            <Skeleton className="h-[300px] w-full" />
           </div>
+        ) : isError ? (
+          <div className="h-[300px] flex items-center justify-center">
+            <p className="text-red-500">Error loading data. Please try again.</p>
+          </div>
+        ) : (
+          <>
+            <Chart
+              title=""
+              description=""
+              type="bar"
+              data={chartData}
+              series={series}
+              xAxisKey="name"
+              height={height}
+              showLegend={true}
+              onClick={handleDataClick}
+              onMouseMove={handleDataHover}
+              onMouseLeave={() => setHoveredItem(null)}
+              tooltip={`This chart shows the distribution of events and their deviation percentages across ${type === 'activity' ? 'different activities' : 'resource types'}. Click on any bar for more details.`}
+            />
+            
+            {hoveredItem && (
+              <div className="mt-2 p-2 border border-border rounded-md bg-muted/30 text-sm animate-fade-in">
+                <p className="font-medium">{hoveredItem.name}</p>
+                <div className="grid grid-cols-2 gap-2 mt-1">
+                  <div>
+                    <span className="text-muted-foreground">Occurrences:</span> {hoveredItem.value}
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Deviation:</span> {hoveredItem.deviation}%
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </CardContent>
     </Card>
