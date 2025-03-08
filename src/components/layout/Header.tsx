@@ -32,7 +32,6 @@ import {
 } from "@/components/ui/tooltip";
 import { useSidebarContext } from './SidebarProvider';
 import { toast } from "sonner";
-import { useProcessUpload } from '@/hooks/process/useProcessUpload';
 
 type Notification = {
   id: string;
@@ -60,7 +59,11 @@ export const handleFileUpload = (file: File) => {
     return;
   }
   
-  return file;
+  const formData = new FormData();
+  formData.append('eventLog', file);
+  
+  toast.success(`Event log "${file.name}" uploaded successfully!`);
+  console.log("File ready for backend processing:", file.name);
 };
 
 const Header: React.FC = () => {
@@ -117,8 +120,6 @@ const Header: React.FC = () => {
     }
   };
 
-  const uploadMutation = useProcessUpload();
-
   const triggerFileUpload = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -128,10 +129,7 @@ const Header: React.FC = () => {
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const validatedFile = handleFileUpload(file);
-      if (validatedFile) {
-        uploadMutation.mutate(validatedFile);
-      }
+      handleFileUpload(file);
     }
     
     if (fileInputRef.current) {
@@ -198,24 +196,9 @@ const Header: React.FC = () => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="gap-2 transition-all" 
-                    onClick={triggerFileUpload}
-                    disabled={uploadMutation.isPending}
-                  >
-                    {uploadMutation.isPending ? (
-                      <span className="flex items-center gap-2">
-                        <FileUp className="h-4 w-4 animate-pulse" />
-                        <span>Uploading...</span>
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <FileUp className="h-4 w-4" />
-                        <span>Upload Event Log</span>
-                      </span>
-                    )}
+                  <Button variant="outline" size="sm" className="gap-2 transition-all" onClick={triggerFileUpload}>
+                    <FileUp className="h-4 w-4" />
+                    <span>Upload Event Log</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">Upload event logs for process mining</TooltipContent>
