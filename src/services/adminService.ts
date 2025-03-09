@@ -1,5 +1,6 @@
 
-import { apiClient } from './apiClient';
+import { AxiosResponse } from 'axios';
+import apiClient from './apiClient';
 
 export type ServiceStatus = {
   id: string;

@@ -22,7 +22,7 @@ const AdminDashboard: React.FC = () => {
       case 'healthy':
         return <Badge className="bg-green-500">Healthy</Badge>;
       case 'degraded':
-        return <Badge variant="warning" className="bg-amber-500">Degraded</Badge>;
+        return <Badge variant="outline" className="bg-amber-500">Degraded</Badge>;
       case 'critical':
         return <Badge variant="destructive">Critical</Badge>;
       default:
@@ -79,7 +79,7 @@ const AdminDashboard: React.FC = () => {
       )}
 
       {healthData?.overall.status === 'degraded' && (
-        <Alert variant="warning" className="border-amber-500 bg-amber-50 text-amber-900">
+        <Alert variant="default" className="border-amber-500 bg-amber-50 text-amber-900">
           <AlertTriangle className="h-5 w-5" />
           <AlertTitle>Performance Degradation</AlertTitle>
           <AlertDescription className="text-amber-800">
