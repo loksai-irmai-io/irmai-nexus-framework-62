@@ -19,7 +19,24 @@ export const useSidebarContext = () => {
 
 export const SidebarProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
   const isMobile = useIsMobile();
-  const [isOpen, setIsOpen] = useState(true);
+  
+  // Initialize from localStorage or default based on device size
+  const [isOpen, setIsOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedState = localStorage.getItem('sidebar-open');
+      if (savedState !== null) {
+        return savedState === 'true';
+      }
+    }
+    return !isMobile; // Default state based on device size
+  });
+
+  // Update localStorage when isOpen changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sidebar-open', isOpen.toString());
+    }
+  }, [isOpen]);
 
   // Close sidebar by default on mobile or when screen becomes mobile-sized
   useEffect(() => {

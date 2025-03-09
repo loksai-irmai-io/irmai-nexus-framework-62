@@ -3,11 +3,27 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import Header from './Header';
 import Sidebar from './Sidebar';
-import { SidebarProvider } from './SidebarProvider';
+import { SidebarProvider, useSidebarContext } from './SidebarProvider';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
+
+// Main content component that adjusts based on sidebar state
+const MainContent: React.FC<{children: React.ReactNode}> = ({ children }) => {
+  const { isOpen } = useSidebarContext();
+  
+  return (
+    <main 
+      className={cn(
+        "flex-1 transition-all duration-300 animate-fade-in overflow-x-hidden pb-8",
+        isOpen ? "pl-64" : "pl-16"
+      )}
+    >
+      {children}
+    </main>
+  );
+};
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
@@ -16,9 +32,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Header />
         <div className="flex flex-1">
           <Sidebar />
-          <main className="flex-1 pl-16 transition-all duration-300 animate-fade-in overflow-x-hidden pb-8">
+          <MainContent>
             {children}
-          </main>
+          </MainContent>
         </div>
       </div>
     </SidebarProvider>

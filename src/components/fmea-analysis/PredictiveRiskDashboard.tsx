@@ -21,13 +21,37 @@ import {
   BrainCircuit, 
   UserCircle, 
   MapPin,
-  Calendar
+  Calendar,
+  LayoutGrid,
+  LayoutList,
+  RotateCcw
 } from 'lucide-react';
+import useDraggableLayout from '@/hooks/useDraggableLayout';
+import ReactGridLayout from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 
 const PredictiveRiskDashboard = () => {
   const [activeView, setActiveView] = useState<string>('overview');
   const [selectedRole, setSelectedRole] = useState<string>('riskmgr');
   const [selectedRisk, setSelectedRisk] = useState<string | null>(null);
+  const [isCustomLayoutMode, setIsCustomLayoutMode] = useState<boolean>(false);
+  
+  // Define default layouts for overview section
+  const defaultLayout = [
+    { i: 'top-risks', x: 0, y: 0, w: 12, h: 2 },
+    { i: 'risk-metrics', x: 0, y: 2, w: 6, h: 4 },
+    { i: 'risk-trends', x: 6, y: 2, w: 6, h: 4 },
+    { i: 'recommendations', x: 0, y: 6, w: 12, h: 3 },
+  ];
+  
+  // Use the custom draggable layout hook
+  const { 
+    layout, 
+    onLayoutChange, 
+    resetLayout,
+    cols 
+  } = useDraggableLayout('risk-dashboard-layout', defaultLayout);
   
   const handleDrilldown = (riskId: string) => {
     setSelectedRisk(riskId);
@@ -78,6 +102,24 @@ const PredictiveRiskDashboard = () => {
           </div>
           
           <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={() => setIsCustomLayoutMode(!isCustomLayoutMode)}
+              className={isCustomLayoutMode ? "bg-blue-100 dark:bg-blue-900/50" : ""}
+            >
+              {isCustomLayoutMode ? <LayoutList className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}
+            </Button>
+            {isCustomLayoutMode && (
+              <Button 
+                variant="outline" 
+                size="icon" 
+                title="Reset layout"
+                onClick={resetLayout}
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            )}
             <Button variant="outline" size="icon">
               <SlidersHorizontal className="h-4 w-4" />
             </Button>
@@ -128,7 +170,36 @@ const PredictiveRiskDashboard = () => {
               ) : (
                 <>
                   <TabsContent value="overview" className="m-0">
-                    <RiskOverview selectedRole={selectedRole} onDrilldown={handleDrilldown} />
+                    {isCustomLayoutMode ? (
+                      <div className="p-4">
+                        <ReactGridLayout
+                          className="layout"
+                          layout={layout}
+                          cols={cols}
+                          rowHeight={100}
+                          width={1200}
+                          isDraggable={true}
+                          isResizable={false}
+                          onLayoutChange={onLayoutChange}
+                          draggableHandle=".drag-handle"
+                        >
+                          <div key="top-risks" className="border rounded-lg p-4 overflow-hidden">
+                            <div className="drag-handle cursor-move mb-2 flex items-center justify-between bg-muted/30 rounded p-1.5">
+                              <h3 className="text-sm font-medium">Top Risks</h3>
+                              <div className="h-1.5 w-10 bg-muted rounded-full"></div>
+                            </div>
+                            <div className="overflow-y-auto" style={{height: 'calc(100% - 40px)'}}>
+                              <RiskOverview selectedRole={selectedRole} onDrilldown={handleDrilldown} />
+                            </div>
+                          </div>
+                        </ReactGridLayout>
+                        <div className="bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 p-3 rounded-lg mt-4 text-sm">
+                          <p>Customization mode enabled. Drag widgets by their headers to rearrange them. Click the layout button again to exit this mode.</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <RiskOverview selectedRole={selectedRole} onDrilldown={handleDrilldown} />
+                    )}
                   </TabsContent>
                   
                   <TabsContent value="scenario" className="m-0">

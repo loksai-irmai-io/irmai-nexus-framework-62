@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSidebarContext } from './SidebarProvider';
 import { cn } from '@/lib/utils';
 import { useLocation } from 'react-router-dom';
@@ -100,100 +100,149 @@ const mainMenuItems: MenuItem[] = [
 ];
 
 const Sidebar: React.FC = () => {
-  const { isOpen } = useSidebarContext();
+  const { isOpen, setIsOpen } = useSidebarContext();
   const location = useLocation();
   const currentPath = location.pathname;
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const hoverZoneRef = useRef<HTMLDivElement>(null);
+  
+  // Handle clicks outside the sidebar to auto-hide it
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        sidebarRef.current && 
+        !sidebarRef.current.contains(event.target as Node) &&
+        isOpen
+      ) {
+        setIsOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, setIsOpen]);
+
+  // Handle mouse movement to show sidebar on hover
+  useEffect(() => {
+    const handleHover = () => {
+      if (!isOpen) {
+        setIsOpen(true);
+      }
+    };
+
+    const hoverZone = hoverZoneRef.current;
+    if (hoverZone) {
+      hoverZone.addEventListener('mouseenter', handleHover);
+      return () => {
+        hoverZone.removeEventListener('mouseenter', handleHover);
+      };
+    }
+  }, [isOpen, setIsOpen]);
 
   return (
-    <aside 
-      className={cn(
-        "fixed inset-y-0 left-0 z-30 flex flex-col border-r shadow-lg transition-all duration-300 ease-in-out animate-fade-in bg-sidebar",
-        isOpen ? "w-64" : "w-0 -translate-x-full sm:translate-x-0 sm:w-16"
-      )}
-    >
-      <div className="flex flex-col h-full overflow-y-auto">
-        <div className="h-20 flex items-center justify-center px-4 border-b bg-sidebar">
-          {isOpen ? (
-            <div className="flex items-center justify-center w-full h-full">
-              <img 
-                src="/lovable-uploads/f6af323e-8e1e-41cb-a223-30dc2436352c.png" 
-                alt="IRMAI Logo" 
-                className="h-12 object-contain" 
-              />
+    <>
+      {/* Invisible hover zone to detect when user hovers near the edge */}
+      <div 
+        ref={hoverZoneRef}
+        className={cn(
+          "fixed inset-y-0 left-0 w-4 z-20",
+          isOpen && "hidden"
+        )}
+      />
+      
+      <aside 
+        ref={sidebarRef}
+        className={cn(
+          "fixed inset-y-0 left-0 z-30 flex flex-col border-r shadow-lg transition-all duration-300 ease-in-out animate-fade-in bg-sidebar",
+          isOpen ? "w-64" : "w-0 -translate-x-full sm:translate-x-0 sm:w-16"
+        )}
+      >
+        <div className="flex flex-col h-full overflow-y-auto">
+          <div className="h-20 flex items-center justify-center px-4 border-b bg-sidebar">
+            {isOpen ? (
+              <div className="flex items-center justify-center w-full h-full">
+                <img 
+                  src="/lovable-uploads/f6af323e-8e1e-41cb-a223-30dc2436352c.png" 
+                  alt="IRMAI Logo" 
+                  className="h-12 object-contain" 
+                />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center w-full h-full">
+                <img 
+                  src="/lovable-uploads/f6af323e-8e1e-41cb-a223-30dc2436352c.png" 
+                  alt="IRMAI Logo" 
+                  className="h-10 w-10 object-contain" 
+                />
+              </div>
+            )}
+          </div>
+          <nav className="flex-1 p-3 space-y-2 overflow-y-auto">
+            {mainMenuItems.map((item) => {
+              const isActive = currentPath === item.href || 
+                             (item.href !== '/' && currentPath.startsWith(item.href));
+              
+              return (
+                <TooltipProvider key={item.id}>
+                  <Tooltip delayDuration={isOpen ? 1000 : 0}>
+                    <TooltipTrigger asChild>
+                      <a
+                        href={item.href}
+                        className={cn(
+                          "flex items-center px-3 py-2.5 rounded-lg text-sm group transition-all hover:bg-sidebar-accent/50",
+                          isActive 
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
+                            : "text-sidebar-foreground",
+                          item.comingSoon && "opacity-60"
+                        )}
+                      >
+                        <item.icon className={cn(
+                          "h-5 w-5 flex-shrink-0",
+                          isOpen ? "mr-3" : "mx-auto"
+                        )} />
+                        {isOpen && (
+                          <div className="flex items-center justify-between w-full min-w-0">
+                            <span className="truncate mr-2">{item.label}</span>
+                            {item.comingSoon && (
+                              <Badge 
+                                variant="outline" 
+                                className="text-[10px] py-0.5 px-1.5 whitespace-nowrap bg-secondary/10"
+                              >
+                                Coming Soon
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                      </a>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" sideOffset={10} className={cn(isOpen && "hidden")}>
+                      <div className="flex flex-col">
+                        <span>{item.label}</span>
+                        {item.comingSoon && (
+                          <Badge 
+                            variant="outline" 
+                            className="text-[10px] py-0 px-1.5 mt-1"
+                          >
+                            Coming Soon
+                          </Badge>
+                        )}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              );
+            })}
+          </nav>
+          <div className="p-3 border-t">
+            <div className="text-xs text-center text-muted-foreground py-2">
+              {isOpen ? 'IRMAI v1.0.0' : 'v1'}
             </div>
-          ) : (
-            <div className="flex items-center justify-center w-full h-full">
-              <img 
-                src="/lovable-uploads/f6af323e-8e1e-41cb-a223-30dc2436352c.png" 
-                alt="IRMAI Logo" 
-                className="h-10 w-10 object-contain" 
-              />
-            </div>
-          )}
-        </div>
-        <nav className="flex-1 p-3 space-y-2 overflow-y-auto">
-          {mainMenuItems.map((item) => {
-            const isActive = currentPath === item.href || 
-                           (item.href !== '/' && currentPath.startsWith(item.href));
-            
-            return (
-              <TooltipProvider key={item.id}>
-                <Tooltip delayDuration={isOpen ? 1000 : 0}>
-                  <TooltipTrigger asChild>
-                    <a
-                      href={item.href}
-                      className={cn(
-                        "flex items-center px-3 py-2.5 rounded-lg text-sm group transition-all hover:bg-sidebar-accent/50",
-                        isActive 
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
-                          : "text-sidebar-foreground",
-                        item.comingSoon && "opacity-60"
-                      )}
-                    >
-                      <item.icon className={cn(
-                        "h-5 w-5 flex-shrink-0",
-                        isOpen ? "mr-3" : "mx-auto"
-                      )} />
-                      {isOpen && (
-                        <div className="flex items-center justify-between w-full min-w-0">
-                          <span className="truncate mr-2">{item.label}</span>
-                          {item.comingSoon && (
-                            <Badge 
-                              variant="outline" 
-                              className="text-[10px] py-0.5 px-1.5 whitespace-nowrap bg-secondary/10"
-                            >
-                              Coming Soon
-                            </Badge>
-                          )}
-                        </div>
-                      )}
-                    </a>
-                  </TooltipTrigger>
-                  <TooltipContent side="right" sideOffset={10} className={cn(isOpen && "hidden")}>
-                    <div className="flex flex-col">
-                      <span>{item.label}</span>
-                      {item.comingSoon && (
-                        <Badge 
-                          variant="outline" 
-                          className="text-[10px] py-0 px-1.5 mt-1"
-                        >
-                          Coming Soon
-                        </Badge>
-                      )}
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            );
-          })}
-        </nav>
-        <div className="p-3 border-t">
-          <div className="text-xs text-center text-muted-foreground py-2">
-            {isOpen ? 'IRMAI v1.0.0' : 'v1'}
           </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };
 
