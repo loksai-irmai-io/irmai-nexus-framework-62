@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -742,3 +743,372 @@ const ApiIntegrations = () => {
                       <AccordionTrigger className="text-sm py-2">Connected Components</AccordionTrigger>
                       <AccordionContent>
                         <ul className="space-y-2 pt-2">
+                          <li className="flex items-center justify-between text-sm">
+                            <span>NotificationCenter</span>
+                            <Badge variant="outline" className="bg-green-50">Connected</Badge>
+                          </li>
+                          <li className="flex items-center justify-between text-sm">
+                            <span>AlertManager</span>
+                            <Badge variant="outline" className="bg-red-50">Not Connected</Badge>
+                          </li>
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+                <CardFooter className="flex justify-between pt-2">
+                  <Button variant="outline" size="sm" onClick={() => handleTestConnection("Notifications")}>
+                    Test Connection
+                  </Button>
+                  <Button size="sm" onClick={() => handleSaveConnection("Notifications")}>
+                    {notifConnected ? "Update" : "Connect"}
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="client-data" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* ERP System Integration */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-2">
+                      <Building className="h-5 w-5 text-blue-500" />
+                      <CardTitle className="text-lg">ERP System</CardTitle>
+                    </div>
+                    <Badge variant={erpConnected ? "default" : "outline"}>
+                      {erpConnected ? "Connected" : "Not Connected"}
+                    </Badge>
+                  </div>
+                  <CardDescription>
+                    Enterprise resource planning system integration
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="config">
+                      <AccordionTrigger className="text-sm py-2">Connection Details</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-4 pt-2">
+                          <div className="space-y-2">
+                            <Label htmlFor="erp-provider">Provider</Label>
+                            <Select value={erpProvider} onValueChange={setErpProvider}>
+                              <SelectTrigger id="erp-provider">
+                                <SelectValue placeholder="Select provider" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="sap">SAP</SelectItem>
+                                <SelectItem value="oracle">Oracle ERP</SelectItem>
+                                <SelectItem value="ms">Microsoft Dynamics</SelectItem>
+                                <SelectItem value="sage">Sage</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="erp-endpoint">API Endpoint</Label>
+                            <Input id="erp-endpoint" value={erpEndpoint} 
+                                  onChange={(e) => setErpEndpoint(e.target.value)} 
+                                  placeholder="https://api.erp.example.com" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="erp-key">API Key</Label>
+                            <Input id="erp-key" type="password" value={erpApiKey}
+                                  onChange={(e) => setErpApiKey(e.target.value)} 
+                                  placeholder="Enter your API key" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="erp-sync">Sync Frequency</Label>
+                            <Select value={erpSyncFrequency} onValueChange={setErpSyncFrequency}>
+                              <SelectTrigger id="erp-sync">
+                                <SelectValue placeholder="Select frequency" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="hourly">Hourly</SelectItem>
+                                <SelectItem value="daily">Daily</SelectItem>
+                                <SelectItem value="weekly">Weekly</SelectItem>
+                                <SelectItem value="manual">Manual Only</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="block mb-2">Entity Types</Label>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id="processes-entity" checked={erpEntities.processes} 
+                                          onCheckedChange={(checked) => 
+                                            setErpEntities({...erpEntities, processes: !!checked})} />
+                                <label htmlFor="processes-entity" className="text-sm cursor-pointer">
+                                  Processes
+                                </label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id="risks-entity" checked={erpEntities.risks} 
+                                          onCheckedChange={(checked) => 
+                                            setErpEntities({...erpEntities, risks: !!checked})} />
+                                <label htmlFor="risks-entity" className="text-sm cursor-pointer">
+                                  Risks
+                                </label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id="controls-entity" checked={erpEntities.controls} 
+                                          onCheckedChange={(checked) => 
+                                            setErpEntities({...erpEntities, controls: !!checked})} />
+                                <label htmlFor="controls-entity" className="text-sm cursor-pointer">
+                                  Controls
+                                </label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id="incidents-entity" checked={erpEntities.incidents} 
+                                          onCheckedChange={(checked) => 
+                                            setErpEntities({...erpEntities, incidents: !!checked})} />
+                                <label htmlFor="incidents-entity" className="text-sm cursor-pointer">
+                                  Incidents
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="components">
+                      <AccordionTrigger className="text-sm py-2">Connected Components</AccordionTrigger>
+                      <AccordionContent>
+                        <ul className="space-y-2 pt-2">
+                          <li className="flex items-center justify-between text-sm">
+                            <span>ProcessMap</span>
+                            <Badge variant="outline" className="bg-green-50">Connected</Badge>
+                          </li>
+                          <li className="flex items-center justify-between text-sm">
+                            <span>RiskDetailView</span>
+                            <Badge variant="outline" className="bg-green-50">Connected</Badge>
+                          </li>
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+                <CardFooter className="flex justify-between pt-2">
+                  <Button variant="outline" size="sm" onClick={() => handleTestConnection("ERP System")}>
+                    Test Connection
+                  </Button>
+                  <Button size="sm" onClick={() => handleSaveConnection("ERP System")}>
+                    {erpConnected ? "Update" : "Connect"}
+                  </Button>
+                </CardFooter>
+              </Card>
+
+              {/* CRM Integration */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-purple-500" />
+                      <CardTitle className="text-lg">CRM Integration</CardTitle>
+                    </div>
+                    <Badge variant={crmConnected ? "default" : "outline"}>
+                      {crmConnected ? "Connected" : "Not Connected"}
+                    </Badge>
+                  </div>
+                  <CardDescription>
+                    Customer relationship management system integration
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="config">
+                      <AccordionTrigger className="text-sm py-2">Connection Details</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-4 pt-2">
+                          <div className="space-y-2">
+                            <Label htmlFor="crm-provider">Provider</Label>
+                            <Select value={crmProvider} onValueChange={setCrmProvider}>
+                              <SelectTrigger id="crm-provider">
+                                <SelectValue placeholder="Select provider" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="salesforce">Salesforce</SelectItem>
+                                <SelectItem value="dynamics">Dynamics 365</SelectItem>
+                                <SelectItem value="zoho">Zoho CRM</SelectItem>
+                                <SelectItem value="hubspot">HubSpot</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="crm-endpoint">API Endpoint</Label>
+                            <Input id="crm-endpoint" value={crmEndpoint} 
+                                  onChange={(e) => setCrmEndpoint(e.target.value)} 
+                                  placeholder="https://api.crm.example.com" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="crm-key">API Key</Label>
+                            <Input id="crm-key" type="password" value={crmApiKey}
+                                  onChange={(e) => setCrmApiKey(e.target.value)} 
+                                  placeholder="Enter your API key" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="crm-object">Object Type</Label>
+                            <Select value={crmObjectType} onValueChange={setCrmObjectType}>
+                              <SelectTrigger id="crm-object">
+                                <SelectValue placeholder="Select object type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All Objects</SelectItem>
+                                <SelectItem value="accounts">Accounts Only</SelectItem>
+                                <SelectItem value="contacts">Contacts Only</SelectItem>
+                                <SelectItem value="opportunities">Opportunities Only</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="components">
+                      <AccordionTrigger className="text-sm py-2">Connected Components</AccordionTrigger>
+                      <AccordionContent>
+                        <ul className="space-y-2 pt-2">
+                          <li className="flex items-center justify-between text-sm">
+                            <span>CustomerRiskProfile</span>
+                            <Badge variant="outline" className="bg-green-50">Connected</Badge>
+                          </li>
+                          <li className="flex items-center justify-between text-sm">
+                            <span>IncidentTracker</span>
+                            <Badge variant="outline" className="bg-yellow-50">Partial</Badge>
+                          </li>
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+                <CardFooter className="flex justify-between pt-2">
+                  <Button variant="outline" size="sm" onClick={() => handleTestConnection("CRM")}>
+                    Test Connection
+                  </Button>
+                  <Button size="sm" onClick={() => handleSaveConnection("CRM")}>
+                    {crmConnected ? "Update" : "Connect"}
+                  </Button>
+                </CardFooter>
+              </Card>
+
+              {/* Document Management Integration */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-green-500" />
+                      <CardTitle className="text-lg">Document Management</CardTitle>
+                    </div>
+                    <Badge variant={docMgmtConnected ? "default" : "outline"}>
+                      {docMgmtConnected ? "Connected" : "Not Connected"}
+                    </Badge>
+                  </div>
+                  <CardDescription>
+                    Document management system integration
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="config">
+                      <AccordionTrigger className="text-sm py-2">Connection Details</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-4 pt-2">
+                          <div className="space-y-2">
+                            <Label htmlFor="doc-provider">Provider</Label>
+                            <Select value={docProvider} onValueChange={setDocProvider}>
+                              <SelectTrigger id="doc-provider">
+                                <SelectValue placeholder="Select provider" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="sharepoint">SharePoint</SelectItem>
+                                <SelectItem value="gdrive">Google Drive</SelectItem>
+                                <SelectItem value="dropbox">Dropbox</SelectItem>
+                                <SelectItem value="onedrive">OneDrive</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="doc-endpoint">API Endpoint</Label>
+                            <Input id="doc-endpoint" value={docEndpoint} 
+                                  onChange={(e) => setDocEndpoint(e.target.value)} 
+                                  placeholder="https://api.docs.example.com" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="doc-key">API Key</Label>
+                            <Input id="doc-key" type="password" value={docApiKey}
+                                  onChange={(e) => setDocApiKey(e.target.value)} 
+                                  placeholder="Enter your API key" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="doc-path">Root Path</Label>
+                            <Input id="doc-path" value={docRootPath}
+                                  onChange={(e) => setDocRootPath(e.target.value)} 
+                                  placeholder="/risk-management/docs" />
+                          </div>
+                          <div>
+                            <Label className="block mb-2">Permissions</Label>
+                            <div className="flex flex-wrap gap-4">
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id="read-perm" checked={docPermissions.read} 
+                                          onCheckedChange={(checked) => 
+                                            setDocPermissions({...docPermissions, read: !!checked})} />
+                                <label htmlFor="read-perm" className="text-sm cursor-pointer">
+                                  Read
+                                </label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id="write-perm" checked={docPermissions.write} 
+                                          onCheckedChange={(checked) => 
+                                            setDocPermissions({...docPermissions, write: !!checked})} />
+                                <label htmlFor="write-perm" className="text-sm cursor-pointer">
+                                  Write
+                                </label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id="delete-perm" checked={docPermissions.delete} 
+                                          onCheckedChange={(checked) => 
+                                            setDocPermissions({...docPermissions, delete: !!checked})} />
+                                <label htmlFor="delete-perm" className="text-sm cursor-pointer">
+                                  Delete
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="components">
+                      <AccordionTrigger className="text-sm py-2">Connected Components</AccordionTrigger>
+                      <AccordionContent>
+                        <ul className="space-y-2 pt-2">
+                          <li className="flex items-center justify-between text-sm">
+                            <span>EvidenceVaultPanel</span>
+                            <Badge variant="outline" className="bg-green-50">Connected</Badge>
+                          </li>
+                          <li className="flex items-center justify-between text-sm">
+                            <span>DocumentLibrary</span>
+                            <Badge variant="outline" className="bg-red-50">Not Connected</Badge>
+                          </li>
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+                <CardFooter className="flex justify-between pt-2">
+                  <Button variant="outline" size="sm" onClick={() => handleTestConnection("Document Management")}>
+                    Test Connection
+                  </Button>
+                  <Button size="sm" onClick={() => handleSaveConnection("Document Management")}>
+                    {docMgmtConnected ? "Update" : "Connect"}
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </Layout>
+  );
+};
+
+export default ApiIntegrations;
