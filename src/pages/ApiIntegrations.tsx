@@ -12,9 +12,103 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Plug, Database, Link, Lock, CloudCog, Network, Globe, ArrowRight, Check, Plus, Server, ChevronRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { 
+  Shield, 
+  GitBranch, 
+  BarChart, 
+  BellRing, 
+  Brain, 
+  Building, 
+  Users, 
+  FileText, 
+  Pencil
+} from "lucide-react";
 
 const ApiIntegrations = () => {
   const [activeCategory, setActiveCategory] = useState("internal");
+
+  // Risk Management API states
+  const [riskApiConnected, setRiskApiConnected] = useState(true);
+  const [riskEndpoint, setRiskEndpoint] = useState("https://api.irmai.com/risk");
+  const [riskApiKey, setRiskApiKey] = useState("risk_api_key_12345");
+  const [riskApiVersion, setRiskApiVersion] = useState("v2");
+  const [riskAutoRetry, setRiskAutoRetry] = useState(true);
+
+  // Process Mining API states
+  const [processApiConnected, setProcessApiConnected] = useState(true);
+  const [processEndpoint, setProcessEndpoint] = useState("https://api.irmai.com/process");
+  const [processApiKey, setProcessApiKey] = useState("process_api_key_12345");
+  const [processMode, setProcessMode] = useState("async");
+
+  // Compliance API states
+  const [complianceApiConnected, setComplianceApiConnected] = useState(false);
+  const [complianceEndpoint, setComplianceEndpoint] = useState("");
+  const [complianceApiKey, setComplianceApiKey] = useState("");
+  const [complianceRefresh, setComplianceRefresh] = useState("15");
+
+  // Admin API states
+  const [adminApiConnected, setAdminApiConnected] = useState(true);
+  const [adminEndpoint, setAdminEndpoint] = useState("https://api.irmai.com/admin");
+  const [adminApiKey, setAdminApiKey] = useState("admin_api_key_12345");
+  const [adminSecureMode, setAdminSecureMode] = useState(true);
+
+  // Third-party API states
+  const [aiApiConnected, setAiApiConnected] = useState(false);
+  const [aiProvider, setAiProvider] = useState("openai");
+  const [aiEndpoint, setAiEndpoint] = useState("");
+  const [aiApiKey, setAiApiKey] = useState("");
+  const [aiModel, setAiModel] = useState("gpt-4");
+
+  // Data visualization states
+  const [dataVisConnected, setDataVisConnected] = useState(true);
+  const [visProvider, setVisProvider] = useState("tableau");
+  const [visEndpoint, setVisEndpoint] = useState("https://api.tableau.com");
+  const [visApiKey, setVisApiKey] = useState("viz_api_key_12345");
+  const [visWorkspace, setVisWorkspace] = useState("ws-12345");
+
+  // Notification states
+  const [notifConnected, setNotifConnected] = useState(false);
+  const [notifProvider, setNotifProvider] = useState("twilio");
+  const [notifEndpoint, setNotifEndpoint] = useState("");
+  const [notifApiKey, setNotifApiKey] = useState("");
+  const [notifChannels, setNotifChannels] = useState({
+    email: true,
+    sms: false,
+    push: true,
+    slack: false
+  });
+
+  // Client data integration states
+  const [erpConnected, setErpConnected] = useState(false);
+  const [erpProvider, setErpProvider] = useState("sap");
+  const [erpEndpoint, setErpEndpoint] = useState("");
+  const [erpApiKey, setErpApiKey] = useState("");
+  const [erpSyncFrequency, setErpSyncFrequency] = useState("daily");
+  const [erpEntities, setErpEntities] = useState({
+    processes: true,
+    risks: true,
+    controls: false,
+    incidents: false
+  });
+
+  // CRM states
+  const [crmConnected, setCrmConnected] = useState(true);
+  const [crmProvider, setCrmProvider] = useState("salesforce");
+  const [crmEndpoint, setCrmEndpoint] = useState("https://api.salesforce.com");
+  const [crmApiKey, setCrmApiKey] = useState("crm_api_key_12345");
+  const [crmObjectType, setCrmObjectType] = useState("all");
+
+  // Document management states
+  const [docMgmtConnected, setDocMgmtConnected] = useState(false);
+  const [docProvider, setDocProvider] = useState("sharepoint");
+  const [docEndpoint, setDocEndpoint] = useState("");
+  const [docApiKey, setDocApiKey] = useState("");
+  const [docRootPath, setDocRootPath] = useState("");
+  const [docPermissions, setDocPermissions] = useState({
+    read: true,
+    write: true,
+    delete: false
+  });
 
   const handleTestConnection = (apiName: string) => {
     toast.success(`Connection to ${apiName} API tested successfully`);
@@ -46,6 +140,7 @@ const ApiIntegrations = () => {
             <TabsTrigger value="client-data">Client Data Integrations</TabsTrigger>
           </TabsList>
 
+          {/* Internal API tab content */}
           <TabsContent value="internal" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Risk Management API */}
@@ -647,460 +742,3 @@ const ApiIntegrations = () => {
                       <AccordionTrigger className="text-sm py-2">Connected Components</AccordionTrigger>
                       <AccordionContent>
                         <ul className="space-y-2 pt-2">
-                          <li className="flex items-center justify-between text-sm">
-                            <span>RiskAlerts</span>
-                            <Badge variant="outline" className="bg-green-50">Connected</Badge>
-                          </li>
-                          <li className="flex items-center justify-between text-sm">
-                            <span>ComplianceAlertPanel</span>
-                            <Badge variant="outline" className="bg-green-50">Connected</Badge>
-                          </li>
-                          <li className="flex items-center justify-between text-sm">
-                            <span>SystemOverview</span>
-                            <Badge variant="outline" className="bg-red-50">Not Connected</Badge>
-                          </li>
-                        </ul>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </CardContent>
-                <CardFooter className="flex justify-between pt-2">
-                  <Button variant="outline" size="sm" onClick={() => handleTestConnection("Notifications")}>
-                    Test Connection
-                  </Button>
-                  <Button size="sm" onClick={() => handleSaveConnection("Notifications")}>
-                    {notifConnected ? "Update" : "Connect"}
-                  </Button>
-                </CardFooter>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="client-data" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* ERP System Integration */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-2">
-                      <Building className="h-5 w-5 text-indigo-500" />
-                      <CardTitle className="text-lg">ERP System</CardTitle>
-                    </div>
-                    <Badge variant={erpConnected ? "default" : "outline"}>
-                      {erpConnected ? "Connected" : "Not Connected"}
-                    </Badge>
-                  </div>
-                  <CardDescription>
-                    Enterprise Resource Planning system integration
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="config">
-                      <AccordionTrigger className="text-sm py-2">Connection Details</AccordionTrigger>
-                      <AccordionContent>
-                        <div className="space-y-4 pt-2">
-                          <div className="space-y-2">
-                            <Label htmlFor="erp-provider">ERP System</Label>
-                            <Select value={erpProvider} onValueChange={setErpProvider}>
-                              <SelectTrigger id="erp-provider">
-                                <SelectValue placeholder="Select ERP system" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="sap">SAP</SelectItem>
-                                <SelectItem value="oracle">Oracle ERP</SelectItem>
-                                <SelectItem value="microsoft">Microsoft Dynamics</SelectItem>
-                                <SelectItem value="netsuite">NetSuite</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="erp-endpoint">API Endpoint</Label>
-                            <Input id="erp-endpoint" value={erpEndpoint} 
-                                  onChange={(e) => setErpEndpoint(e.target.value)} 
-                                  placeholder="https://api.erp-system.com" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="erp-key">API Key</Label>
-                            <Input id="erp-key" type="password" value={erpApiKey}
-                                  onChange={(e) => setErpApiKey(e.target.value)} 
-                                  placeholder="Enter your API key" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="erp-sync">Sync Frequency</Label>
-                            <Select value={erpSyncFrequency} onValueChange={setErpSyncFrequency}>
-                              <SelectTrigger id="erp-sync">
-                                <SelectValue placeholder="Select frequency" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="realtime">Real-time</SelectItem>
-                                <SelectItem value="hourly">Hourly</SelectItem>
-                                <SelectItem value="daily">Daily</SelectItem>
-                                <SelectItem value="weekly">Weekly</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="entities">
-                      <AccordionTrigger className="text-sm py-2">Data Entities</AccordionTrigger>
-                      <AccordionContent>
-                        <div className="pt-2 space-y-4">
-                          <div className="text-sm text-muted-foreground mb-2">
-                            Select data entities to sync
-                          </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="flex items-center space-x-2">
-                              <Checkbox id="entity-processes" checked={erpEntities.processes} 
-                                        onCheckedChange={(checked) => 
-                                          setErpEntities({...erpEntities, processes: !!checked})} />
-                              <label htmlFor="entity-processes" className="text-sm cursor-pointer">
-                                Processes
-                              </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Checkbox id="entity-risks" checked={erpEntities.risks} 
-                                        onCheckedChange={(checked) => 
-                                          setErpEntities({...erpEntities, risks: !!checked})} />
-                              <label htmlFor="entity-risks" className="text-sm cursor-pointer">
-                                Risks
-                              </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Checkbox id="entity-controls" checked={erpEntities.controls} 
-                                        onCheckedChange={(checked) => 
-                                          setErpEntities({...erpEntities, controls: !!checked})} />
-                              <label htmlFor="entity-controls" className="text-sm cursor-pointer">
-                                Controls
-                              </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Checkbox id="entity-incidents" checked={erpEntities.incidents} 
-                                        onCheckedChange={(checked) => 
-                                          setErpEntities({...erpEntities, incidents: !!checked})} />
-                              <label htmlFor="entity-incidents" className="text-sm cursor-pointer">
-                                Incidents
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </CardContent>
-                <CardFooter className="flex justify-between pt-2">
-                  <Button variant="outline" size="sm" onClick={() => handleTestConnection("ERP System")}>
-                    Test Connection
-                  </Button>
-                  <Button size="sm" onClick={() => handleSaveConnection("ERP System")}>
-                    {erpConnected ? "Update" : "Connect"}
-                  </Button>
-                </CardFooter>
-              </Card>
-
-              {/* CRM System Integration */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-5 w-5 text-blue-500" />
-                      <CardTitle className="text-lg">CRM System</CardTitle>
-                    </div>
-                    <Badge variant={crmConnected ? "default" : "outline"}>
-                      {crmConnected ? "Connected" : "Not Connected"}
-                    </Badge>
-                  </div>
-                  <CardDescription>
-                    Customer Relationship Management system integration
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="config">
-                      <AccordionTrigger className="text-sm py-2">Connection Details</AccordionTrigger>
-                      <AccordionContent>
-                        <div className="space-y-4 pt-2">
-                          <div className="space-y-2">
-                            <Label htmlFor="crm-provider">CRM System</Label>
-                            <Select value={crmProvider} onValueChange={setCrmProvider}>
-                              <SelectTrigger id="crm-provider">
-                                <SelectValue placeholder="Select CRM system" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="salesforce">Salesforce</SelectItem>
-                                <SelectItem value="dynamics">Dynamics 365</SelectItem>
-                                <SelectItem value="hubspot">HubSpot</SelectItem>
-                                <SelectItem value="zoho">Zoho CRM</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="crm-endpoint">API Endpoint</Label>
-                            <Input id="crm-endpoint" value={crmEndpoint} 
-                                  onChange={(e) => setCrmEndpoint(e.target.value)} 
-                                  placeholder="https://api.crm-system.com" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="crm-key">API Key</Label>
-                            <Input id="crm-key" type="password" value={crmApiKey}
-                                  onChange={(e) => setCrmApiKey(e.target.value)} 
-                                  placeholder="Enter your API key" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="crm-objects">Object Types</Label>
-                            <Select value={crmObjectType} onValueChange={setCrmObjectType}>
-                              <SelectTrigger id="crm-objects">
-                                <SelectValue placeholder="Select objects to sync" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="all">All Objects</SelectItem>
-                                <SelectItem value="accounts">Accounts Only</SelectItem>
-                                <SelectItem value="contacts">Contacts Only</SelectItem>
-                                <SelectItem value="custom">Custom Selection</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="mappings">
-                      <AccordionTrigger className="text-sm py-2">Field Mappings</AccordionTrigger>
-                      <AccordionContent>
-                        <div className="pt-2 space-y-4">
-                          <div className="text-sm text-muted-foreground mb-2">
-                            Configure how CRM fields map to system entities
-                          </div>
-                          <Button variant="outline" size="sm" className="w-full">
-                            <Plus className="h-4 w-4 mr-2" /> Add Field Mapping
-                          </Button>
-                          <div className="border rounded-md p-3 space-y-2">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm font-medium">Customer ID → Client Reference</span>
-                              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                <Pencil className="h-3 w-3" />
-                              </Button>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm font-medium">Account Type → Risk Category</span>
-                              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                <Pencil className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </CardContent>
-                <CardFooter className="flex justify-between pt-2">
-                  <Button variant="outline" size="sm" onClick={() => handleTestConnection("CRM System")}>
-                    Test Connection
-                  </Button>
-                  <Button size="sm" onClick={() => handleSaveConnection("CRM System")}>
-                    {crmConnected ? "Update" : "Connect"}
-                  </Button>
-                </CardFooter>
-              </Card>
-
-              {/* Document Management System */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-green-500" />
-                      <CardTitle className="text-lg">Document System</CardTitle>
-                    </div>
-                    <Badge variant={docMgmtConnected ? "default" : "outline"}>
-                      {docMgmtConnected ? "Connected" : "Not Connected"}
-                    </Badge>
-                  </div>
-                  <CardDescription>
-                    Document Management System integration
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="config">
-                      <AccordionTrigger className="text-sm py-2">Connection Details</AccordionTrigger>
-                      <AccordionContent>
-                        <div className="space-y-4 pt-2">
-                          <div className="space-y-2">
-                            <Label htmlFor="doc-provider">Document System</Label>
-                            <Select value={docProvider} onValueChange={setDocProvider}>
-                              <SelectTrigger id="doc-provider">
-                                <SelectValue placeholder="Select document system" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="sharepoint">SharePoint</SelectItem>
-                                <SelectItem value="onedrive">OneDrive</SelectItem>
-                                <SelectItem value="googledrive">Google Drive</SelectItem>
-                                <SelectItem value="dropbox">Dropbox</SelectItem>
-                                <SelectItem value="box">Box</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="doc-endpoint">API Endpoint</Label>
-                            <Input id="doc-endpoint" value={docEndpoint} 
-                                  onChange={(e) => setDocEndpoint(e.target.value)} 
-                                  placeholder="https://api.document-system.com" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="doc-key">API Key / OAuth Token</Label>
-                            <Input id="doc-key" type="password" value={docApiKey}
-                                  onChange={(e) => setDocApiKey(e.target.value)} 
-                                  placeholder="Enter your API key or OAuth token" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="doc-root">Root Folder Path</Label>
-                            <Input id="doc-root" value={docRootPath}
-                                  onChange={(e) => setDocRootPath(e.target.value)} 
-                                  placeholder="/Risk Management/Evidence" />
-                          </div>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="permissions">
-                      <AccordionTrigger className="text-sm py-2">Permissions</AccordionTrigger>
-                      <AccordionContent>
-                        <div className="pt-2 space-y-2">
-                          <div className="text-sm text-muted-foreground mb-2">
-                            Configure access permissions
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <Label htmlFor="doc-read" className="cursor-pointer">
-                              Read Access
-                            </Label>
-                            <Switch id="doc-read" checked={docPermissions.read} 
-                                  onCheckedChange={(checked) => 
-                                    setDocPermissions({...docPermissions, read: checked})} />
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <Label htmlFor="doc-write" className="cursor-pointer">
-                              Write Access
-                            </Label>
-                            <Switch id="doc-write" checked={docPermissions.write} 
-                                  onCheckedChange={(checked) => 
-                                    setDocPermissions({...docPermissions, write: checked})} />
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <Label htmlFor="doc-delete" className="cursor-pointer">
-                              Delete Access
-                            </Label>
-                            <Switch id="doc-delete" checked={docPermissions.delete} 
-                                  onCheckedChange={(checked) => 
-                                    setDocPermissions({...docPermissions, delete: checked})} />
-                          </div>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </CardContent>
-                <CardFooter className="flex justify-between pt-2">
-                  <Button variant="outline" size="sm" onClick={() => handleTestConnection("Document System")}>
-                    Test Connection
-                  </Button>
-                  <Button size="sm" onClick={() => handleSaveConnection("Document System")}>
-                    {docMgmtConnected ? "Update" : "Connect"}
-                  </Button>
-                </CardFooter>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </Layout>
-  );
-};
-
-// Add necessary imports for icon components
-import { 
-  Shield, 
-  GitBranch, 
-  BarChart, 
-  BellRing, 
-  Brain, 
-  Building, 
-  Users, 
-  FileText, 
-  Pencil
-} from "lucide-react";
-
-// State for API connections
-const [riskApiConnected, setRiskApiConnected] = useState(true);
-const [riskEndpoint, setRiskEndpoint] = useState("https://api.irmai.com/risk");
-const [riskApiKey, setRiskApiKey] = useState("risk_api_key_12345");
-const [riskApiVersion, setRiskApiVersion] = useState("v2");
-const [riskAutoRetry, setRiskAutoRetry] = useState(true);
-
-const [processApiConnected, setProcessApiConnected] = useState(true);
-const [processEndpoint, setProcessEndpoint] = useState("https://api.irmai.com/process");
-const [processApiKey, setProcessApiKey] = useState("process_api_key_12345");
-const [processMode, setProcessMode] = useState("async");
-
-const [complianceApiConnected, setComplianceApiConnected] = useState(false);
-const [complianceEndpoint, setComplianceEndpoint] = useState("");
-const [complianceApiKey, setComplianceApiKey] = useState("");
-const [complianceRefresh, setComplianceRefresh] = useState("15");
-
-const [adminApiConnected, setAdminApiConnected] = useState(true);
-const [adminEndpoint, setAdminEndpoint] = useState("https://api.irmai.com/admin");
-const [adminApiKey, setAdminApiKey] = useState("admin_api_key_12345");
-const [adminSecureMode, setAdminSecureMode] = useState(true);
-
-// Third-party API states
-const [aiApiConnected, setAiApiConnected] = useState(false);
-const [aiProvider, setAiProvider] = useState("openai");
-const [aiEndpoint, setAiEndpoint] = useState("");
-const [aiApiKey, setAiApiKey] = useState("");
-const [aiModel, setAiModel] = useState("gpt-4");
-
-const [dataVisConnected, setDataVisConnected] = useState(true);
-const [visProvider, setVisProvider] = useState("tableau");
-const [visEndpoint, setVisEndpoint] = useState("https://api.tableau.com");
-const [visApiKey, setVisApiKey] = useState("viz_api_key_12345");
-const [visWorkspace, setVisWorkspace] = useState("ws-12345");
-
-const [notifConnected, setNotifConnected] = useState(false);
-const [notifProvider, setNotifProvider] = useState("twilio");
-const [notifEndpoint, setNotifEndpoint] = useState("");
-const [notifApiKey, setNotifApiKey] = useState("");
-const [notifChannels, setNotifChannels] = useState({
-  email: true,
-  sms: false,
-  push: true,
-  slack: false
-});
-
-// Client data integration states
-const [erpConnected, setErpConnected] = useState(false);
-const [erpProvider, setErpProvider] = useState("sap");
-const [erpEndpoint, setErpEndpoint] = useState("");
-const [erpApiKey, setErpApiKey] = useState("");
-const [erpSyncFrequency, setErpSyncFrequency] = useState("daily");
-const [erpEntities, setErpEntities] = useState({
-  processes: true,
-  risks: true,
-  controls: false,
-  incidents: false
-});
-
-const [crmConnected, setCrmConnected] = useState(true);
-const [crmProvider, setCrmProvider] = useState("salesforce");
-const [crmEndpoint, setCrmEndpoint] = useState("https://api.salesforce.com");
-const [crmApiKey, setCrmApiKey] = useState("crm_api_key_12345");
-const [crmObjectType, setCrmObjectType] = useState("all");
-
-const [docMgmtConnected, setDocMgmtConnected] = useState(false);
-const [docProvider, setDocProvider] = useState("sharepoint");
-const [docEndpoint, setDocEndpoint] = useState("");
-const [docApiKey, setDocApiKey] = useState("");
-const [docRootPath, setDocRootPath] = useState("");
-const [docPermissions, setDocPermissions] = useState({
-  read: true,
-  write: true,
-  delete: false
-});
-
-export default ApiIntegrations;
