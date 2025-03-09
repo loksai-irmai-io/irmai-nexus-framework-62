@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import Header from './Header';
 import Sidebar from './Sidebar';
@@ -11,7 +11,25 @@ interface LayoutProps {
 
 // Main content component that adjusts based on sidebar state
 const MainContent: React.FC<{children: React.ReactNode}> = ({ children }) => {
-  const { isOpen } = useSidebarContext();
+  const { isOpen, setIsOpen } = useSidebarContext();
+  
+  // Handle clicks outside the sidebar to close it on mobile/tablet
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      // Check if click is outside the sidebar and not on a toggle button
+      const sidebar = document.getElementById('main-sidebar');
+      const target = e.target as HTMLElement;
+      
+      // Don't close if clicking within the sidebar
+      if (sidebar && !sidebar.contains(target) && 
+          !target.closest('[data-sidebar-toggle]')) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleOutsideClick);
+    return () => document.removeEventListener('click', handleOutsideClick);
+  }, [setIsOpen]);
   
   return (
     <main 
