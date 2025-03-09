@@ -1,5 +1,5 @@
 
-import { useQuery, useMutation, useQueryClient, QueryKey } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, QueryClient } from '@tanstack/react-query';
 import { adminService, SystemHealth, LogEntry, ServiceStatus } from '@/services/adminService';
 import { toast } from 'sonner';
 
@@ -19,8 +19,10 @@ export const useSystemHealth = (autoRefresh = true) => {
     refetchInterval: autoRefresh ? 30000 : false, // Refetch every 30 seconds if enabled
     staleTime: 15000, // Consider data stale after 15 seconds
     retry: 2,
-    onError: (error) => {
-      toast.error(`Failed to fetch system health: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    meta: {
+      onError: (error: Error) => {
+        toast.error(`Failed to fetch system health: ${error.message || 'Unknown error'}`);
+      },
     },
   });
 };
@@ -33,8 +35,10 @@ export const useServiceStatus = (serviceId: string, autoRefresh = true) => {
     enabled: Boolean(serviceId),
     refetchInterval: autoRefresh ? 15000 : false, // Refetch every 15 seconds if enabled
     retry: 2,
-    onError: (error) => {
-      toast.error(`Failed to fetch service status: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    meta: {
+      onError: (error: Error) => {
+        toast.error(`Failed to fetch service status: ${error.message || 'Unknown error'}`);
+      },
     },
   });
 };
@@ -50,8 +54,8 @@ export const useTestEndpoint = () => {
         toast.error(`Test failed: ${data.message || 'Unknown error'}`);
       }
     },
-    onError: (error) => {
-      toast.error(`Error testing endpoint: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    onError: (error: Error) => {
+      toast.error(`Error testing endpoint: ${error.message || 'Unknown error'}`);
     }
   });
 };
@@ -74,8 +78,10 @@ export const useSystemLogs = (filter?: LogFilter) => {
     refetchInterval: 60000, // Refetch every minute
     staleTime: 30000, // Consider data stale after 30 seconds
     retry: 2,
-    onError: (error) => {
-      toast.error(`Failed to fetch logs: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    meta: {
+      onError: (error: Error) => {
+        toast.error(`Failed to fetch logs: ${error.message || 'Unknown error'}`);
+      },
     },
   });
 };
@@ -123,7 +129,7 @@ export const useRestartService = () => {
         toast.error(data.message || `Failed to restart service ${serviceId}`);
       }
     },
-    onError: (error, serviceId, context) => {
+    onError: (error: Error, serviceId, context) => {
       // On error, revert the optimistic update
       if (context?.previousServiceData) {
         queryClient.setQueryData(
@@ -131,7 +137,7 @@ export const useRestartService = () => {
           context.previousServiceData
         );
       }
-      toast.error(`Error restarting service: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(`Error restarting service: ${error.message || 'Unknown error'}`);
     },
     onSettled: (_, __, serviceId) => {
       // Always refetch after error or success to ensure UI is in sync with server state

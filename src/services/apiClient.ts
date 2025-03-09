@@ -1,5 +1,5 @@
 
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 // Define a base URL for your API
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
@@ -18,25 +18,20 @@ export const apiClient = axios.create({
 
 // Add request interceptor for authentication if needed
 apiClient.interceptors.request.use(
-  (config: AxiosRequestConfig): AxiosRequestConfig => {
+  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
     // Get auth token from a secure location
     const token = localStorage.getItem('auth_token');
     
     // Only add the token if it exists
     if (token) {
       // Set the Authorization header with the token
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${token}`,
-      };
+      config.headers.set('Authorization', `Bearer ${token}`);
     }
     
     // Add CSRF protection for non-GET requests
     if (config.method !== 'get') {
-      config.headers = {
-        ...config.headers,
-        'X-CSRF-TOKEN': localStorage.getItem('csrf_token') || '',
-      };
+      const csrfToken = localStorage.getItem('csrf_token') || '';
+      config.headers.set('X-CSRF-TOKEN', csrfToken);
     }
     
     return config;

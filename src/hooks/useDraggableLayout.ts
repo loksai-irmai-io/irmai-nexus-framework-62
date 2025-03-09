@@ -11,7 +11,7 @@ interface DraggableLayoutOptions {
 }
 
 // Hook to manage draggable widget layouts
-export const useDraggableLayout = ({
+const useDraggableLayout = ({
   storageKey,
   defaultLayout,
   cols = 12,

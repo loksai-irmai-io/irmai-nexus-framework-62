@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,13 +44,16 @@ const PredictiveRiskDashboard = () => {
     { i: 'recommendations', x: 0, y: 6, w: 12, h: 3 },
   ];
   
-  // Use the custom draggable layout hook
+  // Use the custom draggable layout hook with correct parameters
   const { 
     layout, 
     onLayoutChange, 
     resetLayout,
     cols 
-  } = useDraggableLayout('risk-dashboard-layout', defaultLayout);
+  } = useDraggableLayout({
+    storageKey: 'risk-dashboard-layout',
+    defaultLayout,
+  });
   
   const handleDrilldown = (riskId: string) => {
     setSelectedRisk(riskId);
