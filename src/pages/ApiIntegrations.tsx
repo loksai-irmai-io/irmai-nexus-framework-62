@@ -1024,8 +1024,7 @@ import {
   Building, 
   Users, 
   FileText, 
-  Pencil,
-  Checkbox 
+  Pencil
 } from "lucide-react";
 
 // State for API connections
