@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Layout } from "@/components/layout/Layout";
+import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -222,7 +222,7 @@ const ApiIntegrations = () => {
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-2">
-                      <CheckCheck className="h-5 w-5 text-green-500" />
+                      <Check className="h-5 w-5 text-green-500" />
                       <CardTitle className="text-lg">Compliance API</CardTitle>
                     </div>
                     <Badge variant={complianceApiConnected ? "default" : "outline"}>
@@ -683,7 +683,7 @@ const ApiIntegrations = () => {
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-2">
-                      <BuildingWindows className="h-5 w-5 text-indigo-500" />
+                      <Building className="h-5 w-5 text-indigo-500" />
                       <CardTitle className="text-lg">ERP System</CardTitle>
                     </div>
                     <Badge variant={erpConnected ? "default" : "outline"}>
@@ -1021,12 +1021,12 @@ import {
   BarChart, 
   BellRing, 
   Brain, 
-  BuildingWindows, 
+  Building, 
   Users, 
   FileText, 
-  Pencil 
+  Pencil,
+  Checkbox 
 } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
 
 // State for API connections
 const [riskApiConnected, setRiskApiConnected] = useState(true);
