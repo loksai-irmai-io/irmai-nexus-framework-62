@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Plug, Database, Link, Lock, CloudCog, Network, Globe, ArrowRight, Check, Plus, Server, ChevronRight } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const ApiIntegrations = () => {
   const [activeCategory, setActiveCategory] = useState("internal");
