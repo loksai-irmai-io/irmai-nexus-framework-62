@@ -10,6 +10,7 @@ import ProcessDiscovery from "./pages/ProcessDiscovery";
 import OutlierAnalysis from "./pages/OutlierAnalysis";
 import ComplianceMonitoring from "./pages/ComplianceMonitoring";
 import FMEAAnalysis from "./pages/FMEAAnalysis";
+import Admin from "./pages/Admin";
 
 // Create a new QueryClient for React Query
 const queryClient = new QueryClient();
@@ -26,9 +27,9 @@ const App = () => (
           <Route path="/outlier-analysis" element={<OutlierAnalysis />} />
           <Route path="/compliance-monitoring" element={<ComplianceMonitoring />} />
           <Route path="/fmea-analysis" element={<FMEAAnalysis />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/gap-analysis" element={<NotFound />} />
           <Route path="/incident-management" element={<NotFound />} />
-          <Route path="/admin" element={<NotFound />} />
           <Route path="/controls-testing" element={<NotFound />} />
           <Route path="/scenario-analysis" element={<NotFound />} />
           <Route path="/risk-catalog" element={<NotFound />} />
