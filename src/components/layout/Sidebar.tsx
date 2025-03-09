@@ -14,7 +14,8 @@ import {
   Settings, 
   TestTube, 
   Presentation, 
-  BookText
+  BookText,
+  Plug
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from '@/components/ui/badge';
@@ -69,6 +70,12 @@ const mainMenuItems: MenuItem[] = [
     label: 'Incident Management',
     icon: Siren,
     href: '/incident-management'
+  },
+  {
+    id: 'api-integrations',
+    label: 'API Integrations',
+    icon: Plug,
+    href: '/api-integrations'
   },
   {
     id: 'admin',

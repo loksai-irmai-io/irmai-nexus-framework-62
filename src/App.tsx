@@ -1,4 +1,3 @@
-
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -14,6 +13,7 @@ const OutlierAnalysis = lazy(() => import("./pages/OutlierAnalysis"));
 const ComplianceMonitoring = lazy(() => import("./pages/ComplianceMonitoring"));
 const FMEAAnalysis = lazy(() => import("./pages/FMEAAnalysis"));
 const Admin = lazy(() => import("./pages/Admin"));
+const ApiIntegrations = lazy(() => import("./pages/ApiIntegrations"));
 
 // Loading fallback
 const LoadingFallback = () => (
@@ -62,6 +62,7 @@ const App = () => (
             <Route path="/compliance-monitoring" element={<ComplianceMonitoring />} />
             <Route path="/fmea-analysis" element={<FMEAAnalysis />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/api-integrations" element={<ApiIntegrations />} />
             
             {/* Redirect routes with clear communication */}
             <Route path="/gap-analysis" element={<Navigate to="/not-found" state={{ message: "Gap Analysis module is coming soon" }} />} />
