@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { api } from '@/services/apiClient';
 import { 
   Bell, 
   Menu, 
@@ -42,7 +43,7 @@ type Notification = {
   type: 'risk' | 'incident' | 'compliance' | 'system';
 };
 
-export const handleFileUpload = (file: File) => {
+export const handleFileUpload = async (file: File) => {
   if (!file) return;
   
   const validFileTypes = ['text/csv', 'text/xml', 'application/xml', 'text/plain'];
@@ -58,12 +59,20 @@ export const handleFileUpload = (file: File) => {
     toast.error("File is too large. Maximum size is 10MB.");
     return;
   }
-  
-  const formData = new FormData();
-  formData.append('eventLog', file);
-  
-  toast.success(`Event log "${file.name}" uploaded successfully!`);
-  console.log("File ready for backend processing:", file.name);
+
+  try {
+    toast.loading("Processing event log...");
+    const response = await api.uploadEventLog(file);
+    
+    if (response.bpmnXml) {
+      toast.success(`Event log "${file.name}" processed successfully!`);
+      console.log("BPMN XML:", response.bpmnXml);
+      console.log("Event count:", response.eventCount);
+    }
+  } catch (error) {
+    toast.error("Error processing event log. Please try again.");
+    console.error("Error:", error);
+  }
 };
 
 const Header: React.FC = () => {
