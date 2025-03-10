@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -35,7 +34,6 @@ import { InsightItem } from '@/components/process-discovery/types';
 import { ProcessInsights } from '@/components/process-discovery/ProcessInsights';
 import { ProcessStatistics } from '@/components/process-discovery/ProcessStatistics';
 import { api } from '@/services/apiClient';
-import { handleFileUpload } from '@/components/layout/Header';
 
 const processData = {
   nodes: [
@@ -123,12 +121,30 @@ const ProcessDiscovery = () => {
   const [viewType, setViewType] = useState('bpmn');
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [detailView, setDetailView] = useState(false);
-  const [showRawEvents, setShowRawEvents] = useState(false);
   const [filteredLogs, setFilteredLogs] = useState(eventLogs);
   const [timeframe, setTimeframe] = useState("all");
   const [caseVariant, setCaseVariant] = useState("all");
   const [orgUnit, setOrgUnit] = useState("all");
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  useEffect(() => {
+    if (isUploading && uploadProgress < 100) {
+      const timer = setTimeout(() => {
+        setUploadProgress(prev => Math.min(prev + 20, 100));
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+    
+    if (uploadProgress === 100) {
+      setTimeout(() => {
+        setIsUploading(false);
+        setUploadProgress(0);
+      }, 1000);
+    }
+  }, [isUploading, uploadProgress]);
   
   const handleNodeClick = (nodeId: string) => {
     setSelectedNode(nodeId);
@@ -165,11 +181,28 @@ const ProcessDiscovery = () => {
     const file = e.target.files?.[0];
     if (file) {
       try {
-        const result = await api.uploadEventLog(file);
+        setIsUploading(true);
+        setUploadProgress(0);
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const response = await fetch('http://localhost:8000/api/processdiscovery/eventlog', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to upload event log');
+        }
+        
+        const result = await response.json();
         toast.success(`Successfully processed event log with ${result.eventCount} events`);
       } catch (error) {
         console.error("Error uploading event log:", error);
         toast.error("Failed to process event log. Please try again.");
+        setIsUploading(false);
+        setUploadProgress(0);
       }
     }
     
@@ -206,9 +239,17 @@ const ProcessDiscovery = () => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button onClick={triggerFileUpload}>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload Event Log
+                  <Button onClick={triggerFileUpload} disabled={isUploading}>
+                    {isUploading ? (
+                      <>
+                        <span className="animate-pulse mr-2">Uploading... {uploadProgress}%</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Event Log
+                      </>
+                    )}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -217,6 +258,15 @@ const ProcessDiscovery = () => {
               </Tooltip>
             </TooltipProvider>
           </div>
+
+          {isUploading && (
+            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+              <div 
+                className="bg-primary h-2.5 rounded-full transition-all duration-500" 
+                style={{ width: `${uploadProgress}%` }}
+              ></div>
+            </div>
+          )}
 
           {detailView ? (
             <>
