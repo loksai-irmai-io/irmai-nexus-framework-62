@@ -1,41 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/layout/Layout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from "sonner";
 import { 
-  FileUp, 
   Filter, 
-  AlertCircle, 
-  CheckCircle2, 
-  Clock, 
-  Activity, 
-  Info, 
-  CheckCheck, 
-  XCircle, 
-  FileText, 
-  Upload,
-  BarChart,
-  Network,
-  GitBranch,
   ChevronRight,
   ChevronLeft,
-  Loader2
+  Loader2,
+  Upload,
+  Network,
+  GitBranch
 } from 'lucide-react';
 import ProcessMap from '@/components/process-discovery/ProcessMap';
 import ProcessDetailView from '@/components/process-discovery/ProcessDetailView';
-import { InsightItem } from '@/components/process-discovery/types';
+import { InsightItem, EventLog, ProcessData } from '@/components/process-discovery/types';
 import { ProcessInsights } from '@/components/process-discovery/ProcessInsights';
 import { ProcessStatistics } from '@/components/process-discovery/ProcessStatistics';
 import { EventLogs } from '@/components/process-discovery/EventLogs';
 import { api } from '@/services/apiClient';
+import { mockApi } from '@/services/mockApiClient';
+
+const USE_MOCK_API = true;
+const apiClient = USE_MOCK_API ? mockApi : api;
 
 const processData = {
   nodes: [
@@ -124,19 +115,20 @@ const ProcessDiscovery = () => {
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [detailView, setDetailView] = useState(false);
   const [showRawEvents, setShowRawEvents] = useState(false);
-  const [filteredLogs, setFilteredLogs] = useState<any[]>(defaultEventLogs);
+  const [filteredLogs, setFilteredLogs] = useState<EventLog[]>(defaultEventLogs);
   const [timeframe, setTimeframe] = useState("all");
   const [caseVariant, setCaseVariant] = useState("all");
   const [orgUnit, setOrgUnit] = useState("all");
   const [uploading, setUploading] = useState(false);
-  const [processedData, setProcessedData] = useState<any[]>([]);
+  const [processedData, setProcessedData] = useState<EventLog[]>([]);
+  const [processMap, setProcessMap] = useState<ProcessData>(processData);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleNodeClick = (nodeId: string) => {
     setSelectedNode(nodeId);
     setDetailView(true);
     
-    const node = processData.nodes.find(n => n.id === nodeId);
+    const node = processMap.nodes.find(n => n.id === nodeId);
     if (node) {
       const nodeLabel = node.label;
       const filtered = filteredLogs.filter(log => log.activity.includes(nodeLabel));
@@ -200,7 +192,7 @@ const ProcessDiscovery = () => {
       setUploading(true);
       toast.info(`Uploading ${file.name}...`);
       
-      const result = await api.uploadEventLog(file);
+      const result = await apiClient.uploadEventLog(file);
       
       setUploading(false);
       
@@ -210,6 +202,10 @@ const ProcessDiscovery = () => {
         
         if (result.data && Array.isArray(result.data) && result.data.length > 0) {
           setProcessedData(result.data);
+          
+          if (result.processMap) {
+            setProcessMap(result.processMap);
+          }
           
           const displayData = result.data.slice(0, 20).map((item: any, index: number) => ({
             id: index + 1,
@@ -247,6 +243,39 @@ const ProcessDiscovery = () => {
               </p>
             </div>
             
+            <div className="flex items-center gap-2">
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept=".csv,.xes,.xml,text/csv,application/xml,text/xml,text/plain"
+                onChange={onFileChange}
+              />
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button onClick={triggerFileUpload} disabled={uploading}>
+                      {uploading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload Event Log {USE_MOCK_API ? "(Mock)" : ""}
+                        </>
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Upload your event log to start process mining (Max: 50MB)</p>
+                    {USE_MOCK_API && <p className="text-xs text-muted-foreground mt-1">Using mock data</p>}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
 
           {detailView ? (
@@ -265,7 +294,7 @@ const ProcessDiscovery = () => {
 
               <ProcessDetailView 
                 nodeId={selectedNode || ''} 
-                processData={processData}
+                processData={processMap}
                 insights={insights.filter(i => i.nodeId === selectedNode)}
                 eventLogs={filteredLogs}
               />
@@ -278,7 +307,6 @@ const ProcessDiscovery = () => {
                     <CardTitle>Process Map</CardTitle>
                     <div className="flex items-center space-x-2">
                       <Badge variant={showRawEvents ? "outline" : "secondary"} className="cursor-pointer" onClick={() => setShowRawEvents(!showRawEvents)}>
-                        <FileText className="h-3 w-3 mr-1" />
                         {showRawEvents ? "Hide" : "View"} Raw Events
                       </Badge>
                       <TooltipProvider>
@@ -349,7 +377,7 @@ const ProcessDiscovery = () => {
                     
                     <TabsContent value="bpmn">
                       <ProcessMap 
-                        processData={processData} 
+                        processData={processMap} 
                         selectedNode={selectedNode} 
                         onNodeClick={handleNodeClick} 
                       />
@@ -398,7 +426,7 @@ const ProcessDiscovery = () => {
               <EventLogs 
                 logs={filteredLogs} 
                 selectedNode={selectedNode} 
-                processNodes={processData.nodes} 
+                processNodes={processMap.nodes} 
               />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

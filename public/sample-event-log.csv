@@ -1,0 +1,23 @@
+
+case_id,activity,timestamp,resource,cost,duration
+C-1001,Checkout Cart,2025-02-15T09:14:22,john.doe,10,2m 15s
+C-1001,Process Credit Card,2025-02-15T09:16:45,system,5,1m 53s
+C-1001,Handle Payment Error,2025-02-15T09:18:40,system,2,0m 2s
+C-1001,Checkout Cart,2025-02-15T09:20:15,john.doe,10,1m 45s
+C-1001,Process Bank Transfer,2025-02-15T09:22:05,john.doe,8,3m 10s
+C-1001,Confirm Order,2025-02-15T09:25:20,system,3,0m 45s
+C-1002,Checkout Cart,2025-02-15T10:30:10,jane.smith,10,1m 50s
+C-1002,Process Credit Card,2025-02-15T10:32:05,system,5,4m 35s
+C-1002,Confirm Order,2025-02-15T10:36:45,system,3,0m 30s
+C-1003,Checkout Cart,2025-02-15T11:45:15,robert.jones,10,2m 5s
+C-1003,Process Bank Transfer,2025-02-15T11:47:25,robert.jones,8,2m 45s
+C-1003,Confirm Order,2025-02-15T11:50:15,system,3,0m 50s
+C-1004,Checkout Cart,2025-02-15T13:10:05,sarah.williams,10,1m 55s
+C-1004,Process Credit Card,2025-02-15T13:12:05,system,5,3m 15s
+C-1004,Handle Payment Error,2025-02-15T13:15:25,system,2,0m 5s
+C-1004,Checkout Cart,2025-02-15T13:17:30,sarah.williams,10,1m 40s
+C-1004,Process Credit Card,2025-02-15T13:19:15,system,5,2m 30s
+C-1004,Confirm Order,2025-02-15T13:21:50,system,3,0m 40s
+C-1005,Checkout Cart,2025-02-15T15:05:20,michael.brown,10,2m 25s
+C-1005,Process Bank Transfer,2025-02-15T15:07:50,michael.brown,8,4m 10s
+C-1005,Confirm Order,2025-02-15T15:12:05,system,3,0m 35s
