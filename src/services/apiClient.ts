@@ -5,7 +5,7 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequ
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Request timeout (in milliseconds)
-const REQUEST_TIMEOUT = 120000; // Increased to 120 seconds for large file uploads
+const REQUEST_TIMEOUT = 30000; // 30 seconds
 
 // Create an axios instance with default config
 export const apiClient = axios.create({
@@ -104,36 +104,6 @@ export const api = {
   delete: async <T>(url: string): Promise<T> => {
     const response = await apiClient.delete<T>(url);
     return response.data;
-  },
-  
-  uploadEventLog: async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    console.log(`Uploading file: ${file.name} (${file.size} bytes)`);
-    
-    try {
-      // Using the POST method directly instead of the api.post wrapper
-      // This gives us more control over the request config
-      const response = await apiClient.post('/processdiscovery/eventlog', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        timeout: 180000, // 3 minutes timeout for large files
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            console.log(`Upload progress: ${percentCompleted}%`);
-          }
-        }
-      });
-      
-      console.log('Upload response:', response.data);
-      return response.data;
-    } catch (error) {
-      console.error('Error in uploadEventLog:', error);
-      throw error;
-    }
   }
 };
 

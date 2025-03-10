@@ -1,35 +1,40 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/layout/Layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from "sonner";
 import { 
+  FileUp, 
   Filter, 
-  ChevronRight,
-  ChevronLeft,
-  Loader2,
+  AlertCircle, 
+  CheckCircle2, 
+  Clock, 
+  Activity, 
+  Info, 
+  CheckCheck, 
+  XCircle, 
+  FileText, 
   Upload,
+  BarChart,
   Network,
   GitBranch,
-  Image
+  ChevronRight,
+  ChevronLeft,
 } from 'lucide-react';
 import ProcessMap from '@/components/process-discovery/ProcessMap';
 import ProcessDetailView from '@/components/process-discovery/ProcessDetailView';
-import { InsightItem, EventLog, ProcessData } from '@/components/process-discovery/types';
+import { InsightItem } from '@/components/process-discovery/types';
 import { ProcessInsights } from '@/components/process-discovery/ProcessInsights';
 import { ProcessStatistics } from '@/components/process-discovery/ProcessStatistics';
 import { EventLogs } from '@/components/process-discovery/EventLogs';
-import ProcessGraphImage from '@/components/process-discovery/ProcessGraphImage';
-import { api } from '@/services/apiClient';
-import { mockApi } from '@/services/mockApiClient';
-
-const USE_MOCK_API = true;
-const apiClient = USE_MOCK_API ? mockApi : api;
+import { handleFileUpload } from '@/components/layout/Header';
 
 const processData = {
   nodes: [
@@ -100,7 +105,7 @@ const insights: InsightItem[] = [
   }
 ];
 
-const defaultEventLogs = [
+const eventLogs = [
   { id: 1, timestamp: '2025-02-15T09:14:22', activity: 'Checkout Cart', caseId: 'C-1001', user: 'john.doe', duration: '2m 15s' },
   { id: 2, timestamp: '2025-02-15T09:16:45', activity: 'Process Credit Card', caseId: 'C-1001', user: 'system', duration: '1m 53s' },
   { id: 3, timestamp: '2025-02-15T09:18:40', activity: 'Payment Error', caseId: 'C-1001', user: 'system', duration: '0m 2s' },
@@ -118,42 +123,20 @@ const ProcessDiscovery = () => {
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [detailView, setDetailView] = useState(false);
   const [showRawEvents, setShowRawEvents] = useState(false);
-  const [filteredLogs, setFilteredLogs] = useState<EventLog[]>(defaultEventLogs);
+  const [filteredLogs, setFilteredLogs] = useState(eventLogs);
   const [timeframe, setTimeframe] = useState("all");
   const [caseVariant, setCaseVariant] = useState("all");
   const [orgUnit, setOrgUnit] = useState("all");
-  const [uploading, setUploading] = useState(false);
-  const [processedData, setProcessedData] = useState<EventLog[]>([]);
-  const [processMap, setProcessMap] = useState<ProcessData>(processData);
-  const [graphWidth, setGraphWidth] = useState(800);
-  const [graphHeight, setGraphHeight] = useState(600);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // Update graph dimensions based on window size
-  useEffect(() => {
-    const updateDimensions = () => {
-      const width = Math.min(window.innerWidth - 100, 1200);
-      const height = Math.min(window.innerHeight - 300, 800);
-      setGraphWidth(width);
-      setGraphHeight(height);
-    };
-    
-    updateDimensions();
-    window.addEventListener('resize', updateDimensions);
-    
-    return () => {
-      window.removeEventListener('resize', updateDimensions);
-    };
-  }, []);
   
   const handleNodeClick = (nodeId: string) => {
     setSelectedNode(nodeId);
     setDetailView(true);
     
-    const node = processMap.nodes.find(n => n.id === nodeId);
+    const node = processData.nodes.find(n => n.id === nodeId);
     if (node) {
       const nodeLabel = node.label;
-      const filtered = filteredLogs.filter(log => log.activity.includes(nodeLabel));
+      const filtered = eventLogs.filter(log => log.activity.includes(nodeLabel));
       setFilteredLogs(filtered);
     }
   };
@@ -193,66 +176,6 @@ const ProcessDiscovery = () => {
     setSelectedNode(null);
   };
   
-  const handleFileUpload = async (file: File) => {
-    if (!file) return;
-    
-    const validFileTypes = ['text/csv', 'text/xml', 'application/xml', 'text/plain'];
-    const fileType = file.type;
-    
-    if (!validFileTypes.includes(fileType) && !file.name.endsWith('.xes') && !file.name.endsWith('.csv')) {
-      toast.error("Invalid file type. Please upload a CSV, XES, or XML file.");
-      return;
-    }
-    
-    const maxSize = 50 * 1024 * 1024;
-    if (file.size > maxSize) {
-      toast.error("File is too large. Maximum size is 50MB.");
-      return;
-    }
-    
-    try {
-      setUploading(true);
-      toast.info(`Uploading ${file.name}...`);
-      
-      const result = await apiClient.uploadEventLog(file);
-      
-      setUploading(false);
-      
-      if (result.status === 'success') {
-        toast.success(result.message);
-        console.log("Received data:", result.data);
-        
-        if (result.data && Array.isArray(result.data) && result.data.length > 0) {
-          setProcessedData(result.data);
-          
-          if (result.processMap) {
-            setProcessMap(result.processMap);
-          }
-          
-          const displayData = result.data.slice(0, 20).map((item: any, index: number) => ({
-            id: index + 1,
-            timestamp: item.timestamp || item.time || new Date().toISOString(),
-            activity: item.activity || item.event || item.action || item.activity_name || item.name || 'Unknown Activity',
-            caseId: item.case_id || item.caseid || item.case || 'Unknown Case',
-            user: item.resource || item.user || item.originator || 'Unknown',
-            duration: item.duration || item.processing_time || '0m 0s'
-          }));
-          
-          setFilteredLogs(displayData);
-          setShowRawEvents(true);
-          toast.info(`Loaded ${result.data.length} events. Displaying first ${displayData.length}.`);
-        } else {
-          toast.error("No valid data found in the uploaded file.");
-        }
-      }
-    } catch (error: any) {
-      setUploading(false);
-      console.error('Upload error:', error);
-      const errorMessage = error?.response?.data?.detail?.message || error?.message || "Error uploading file. Please try again.";
-      toast.error(errorMessage);
-    }
-  };
-
   return (
     <Layout>
       <div className="container py-6">
@@ -265,39 +188,27 @@ const ProcessDiscovery = () => {
               </p>
             </div>
             
-            <div className="flex items-center gap-2">
-              <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                accept=".csv,.xes,.xml,text/csv,application/xml,text/xml,text/plain"
-                onChange={onFileChange}
-              />
-              
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button onClick={triggerFileUpload} disabled={uploading}>
-                      {uploading ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-4 w-4 mr-2" />
-                          Upload Event Log {USE_MOCK_API ? "(Mock)" : ""}
-                        </>
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Upload your event log to start process mining (Max: 50MB)</p>
-                    {USE_MOCK_API && <p className="text-xs text-muted-foreground mt-1">Using mock data</p>}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept=".csv,.xes,.xml,text/csv,application/xml,text/xml,text/plain"
+              onChange={onFileChange}
+            />
+            
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button onClick={triggerFileUpload}>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Event Log
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Upload your event log to start process mining</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
 
           {detailView ? (
@@ -316,7 +227,7 @@ const ProcessDiscovery = () => {
 
               <ProcessDetailView 
                 nodeId={selectedNode || ''} 
-                processData={processMap}
+                processData={processData}
                 insights={insights.filter(i => i.nodeId === selectedNode)}
                 eventLogs={filteredLogs}
               />
@@ -329,6 +240,7 @@ const ProcessDiscovery = () => {
                     <CardTitle>Process Map</CardTitle>
                     <div className="flex items-center space-x-2">
                       <Badge variant={showRawEvents ? "outline" : "secondary"} className="cursor-pointer" onClick={() => setShowRawEvents(!showRawEvents)}>
+                        <FileText className="h-3 w-3 mr-1" />
                         {showRawEvents ? "Hide" : "View"} Raw Events
                       </Badge>
                       <TooltipProvider>
@@ -393,25 +305,15 @@ const ProcessDiscovery = () => {
                   <Tabs defaultValue="bpmn" value={viewType} onValueChange={setViewType}>
                     <TabsList className="mb-4">
                       <TabsTrigger value="bpmn">BPMN Diagram</TabsTrigger>
-                      <TabsTrigger value="image">Process Graph Image</TabsTrigger>
                       <TabsTrigger value="petri">Petri Net</TabsTrigger>
                       <TabsTrigger value="tree">Process Tree</TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="bpmn">
                       <ProcessMap 
-                        processData={processMap} 
+                        processData={processData} 
                         selectedNode={selectedNode} 
                         onNodeClick={handleNodeClick} 
-                      />
-                    </TabsContent>
-                    
-                    <TabsContent value="image">
-                      <ProcessGraphImage 
-                        processData={processMap}
-                        width={graphWidth}
-                        height={graphHeight}
-                        isLoading={uploading}
                       />
                     </TabsContent>
                     
@@ -448,17 +350,10 @@ const ProcessDiscovery = () => {
                 </CardContent>
               </Card>
               
-              {processedData.length > 0 && (
-                <div className="flex justify-between items-center mt-4 mb-2">
-                  <h2 className="text-lg font-medium">Event Log Data</h2>
-                  <Badge variant="outline">{processedData.length} total events</Badge>
-                </div>
-              )}
-              
               <EventLogs 
                 logs={filteredLogs} 
                 selectedNode={selectedNode} 
-                processNodes={processMap.nodes} 
+                processNodes={processData.nodes} 
               />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
