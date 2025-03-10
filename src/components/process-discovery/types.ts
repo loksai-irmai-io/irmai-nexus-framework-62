@@ -11,6 +11,8 @@ export interface ProcessNode {
   metrics: {
     frequency: number;
     avgDuration: string;
+    waitTime?: string;
+    resourceUtilization?: number;
   };
 }
 
@@ -19,6 +21,10 @@ export interface ProcessEdge {
   source: string;
   target: string;
   label?: string;
+  metrics?: {
+    frequency?: number;
+    avgDuration?: string;
+  };
 }
 
 export interface ProcessData {
