@@ -112,15 +112,28 @@ export const api = {
     
     console.log(`Uploading file: ${file.name} (${file.size} bytes)`);
     
-    const response = await apiClient.post('/api/processdiscovery/eventlog', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      timeout: 180000, // 3 minutes timeout for large files
-    });
-    
-    console.log('Upload response:', response.data);
-    return response.data;
+    try {
+      // Using the POST method directly instead of the api.post wrapper
+      // This gives us more control over the request config
+      const response = await apiClient.post('/processdiscovery/eventlog', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 180000, // 3 minutes timeout for large files
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            console.log(`Upload progress: ${percentCompleted}%`);
+          }
+        }
+      });
+      
+      console.log('Upload response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error in uploadEventLog:', error);
+      throw error;
+    }
   }
 };
 

@@ -106,7 +106,7 @@ const insights: InsightItem[] = [
   }
 ];
 
-const eventLogs = [
+const defaultEventLogs = [
   { id: 1, timestamp: '2025-02-15T09:14:22', activity: 'Checkout Cart', caseId: 'C-1001', user: 'john.doe', duration: '2m 15s' },
   { id: 2, timestamp: '2025-02-15T09:16:45', activity: 'Process Credit Card', caseId: 'C-1001', user: 'system', duration: '1m 53s' },
   { id: 3, timestamp: '2025-02-15T09:18:40', activity: 'Payment Error', caseId: 'C-1001', user: 'system', duration: '0m 2s' },
@@ -124,7 +124,7 @@ const ProcessDiscovery = () => {
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [detailView, setDetailView] = useState(false);
   const [showRawEvents, setShowRawEvents] = useState(false);
-  const [filteredLogs, setFilteredLogs] = useState(eventLogs);
+  const [filteredLogs, setFilteredLogs] = useState<any[]>(defaultEventLogs);
   const [timeframe, setTimeframe] = useState("all");
   const [caseVariant, setCaseVariant] = useState("all");
   const [orgUnit, setOrgUnit] = useState("all");
@@ -206,21 +206,31 @@ const ProcessDiscovery = () => {
       
       if (result.status === 'success') {
         toast.success(result.message);
-        setProcessedData(result.data);
-        setFilteredLogs(result.data.slice(0, 10).map((item: any, index: number) => ({
-          id: index + 1,
-          timestamp: item.timestamp || new Date().toISOString(),
-          activity: item.activity || item.event || item.name || 'Unknown Activity',
-          caseId: item.case_id || item.caseId || item.case || 'Unknown Case',
-          user: item.resource || item.user || 'Unknown',
-          duration: item.duration || '0m 0s'
-        })));
-        toast.info(`Loaded ${result.data.length} events`);
+        console.log("Received data:", result.data);
+        
+        if (result.data && Array.isArray(result.data) && result.data.length > 0) {
+          setProcessedData(result.data);
+          
+          const displayData = result.data.slice(0, 20).map((item: any, index: number) => ({
+            id: index + 1,
+            timestamp: item.timestamp || item.time || new Date().toISOString(),
+            activity: item.activity || item.event || item.action || item.activity_name || item.name || 'Unknown Activity',
+            caseId: item.case_id || item.caseid || item.case || 'Unknown Case',
+            user: item.resource || item.user || item.originator || 'Unknown',
+            duration: item.duration || item.processing_time || '0m 0s'
+          }));
+          
+          setFilteredLogs(displayData);
+          setShowRawEvents(true);
+          toast.info(`Loaded ${result.data.length} events. Displaying first ${displayData.length}.`);
+        } else {
+          toast.error("No valid data found in the uploaded file.");
+        }
       }
     } catch (error: any) {
       setUploading(false);
       console.error('Upload error:', error);
-      const errorMessage = error?.response?.data?.detail?.message || "Error uploading file. Please try again.";
+      const errorMessage = error?.response?.data?.detail?.message || error?.message || "Error uploading file. Please try again.";
       toast.error(errorMessage);
     }
   };
@@ -410,6 +420,13 @@ const ProcessDiscovery = () => {
                 </CardContent>
               </Card>
               
+              {processedData.length > 0 && (
+                <div className="flex justify-between items-center mt-4 mb-2">
+                  <h2 className="text-lg font-medium">Event Log Data</h2>
+                  <Badge variant="outline">{processedData.length} total events</Badge>
+                </div>
+              )}
+              
               <EventLogs 
                 logs={filteredLogs} 
                 selectedNode={selectedNode} 
@@ -434,3 +451,4 @@ const ProcessDiscovery = () => {
 };
 
 export default ProcessDiscovery;
+
