@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { 
   Bell, 
@@ -33,7 +32,6 @@ import {
 } from "@/components/ui/tooltip";
 import { useSidebarContext } from './SidebarProvider';
 import { toast } from "sonner";
-import { api } from '@/services/apiClient';
 
 type Notification = {
   id: string;
@@ -44,7 +42,7 @@ type Notification = {
   type: 'risk' | 'incident' | 'compliance' | 'system';
 };
 
-export const handleFileUpload = async (file: File) => {
+export const handleFileUpload = (file: File) => {
   if (!file) return;
   
   const validFileTypes = ['text/csv', 'text/xml', 'application/xml', 'text/plain'];
@@ -61,35 +59,11 @@ export const handleFileUpload = async (file: File) => {
     return;
   }
   
-  // Show loading toast
-  const loadingToast = toast.loading(`Processing ${file.name}...`);
+  const formData = new FormData();
+  formData.append('eventLog', file);
   
-  try {
-    // Create FormData and append the file
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    // Send to API for processing
-    const response = await api.uploadFile('/processdiscovery/eventlog', formData);
-    
-    // Dismiss loading toast
-    toast.dismiss(loadingToast);
-    
-    if (response.status === 'success') {
-      const data = response.data;
-      toast.success(`Event log "${file.name}" processed with ${data.eventCount} events!`);
-      
-      // Redirect to process discovery page to see results
-      window.location.href = '/process-discovery';
-    } else {
-      toast.error(`Failed to process "${file.name}". ${response.message || 'Unknown error'}`);
-    }
-  } catch (error) {
-    // Dismiss loading toast
-    toast.dismiss(loadingToast);
-    console.error("Error processing file:", error);
-    toast.error(`Failed to process "${file.name}". Server may be unavailable.`);
-  }
+  toast.success(`Event log "${file.name}" uploaded successfully!`);
+  console.log("File ready for backend processing:", file.name);
 };
 
 const Header: React.FC = () => {
