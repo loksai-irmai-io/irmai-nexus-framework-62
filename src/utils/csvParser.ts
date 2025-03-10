@@ -45,7 +45,11 @@ export const convertToProcessGraph = (csvData: Record<string, string>[]) => {
     type: 'event',
     label: 'Start',
     position: { x: 100, y: 150 },
-    compliant: true
+    compliant: true,
+    metrics: {
+      frequency: csvData.length,
+      avgDuration: '0m 0s'
+    }
   });
   
   nodes.push({
@@ -53,7 +57,11 @@ export const convertToProcessGraph = (csvData: Record<string, string>[]) => {
     type: 'event',
     label: 'End',
     position: { x: 100 + (activities.length + 1) * 150, y: 150 },
-    compliant: true
+    compliant: true,
+    metrics: {
+      frequency: csvData.length,
+      avgDuration: '0m 0s'
+    }
   });
   
   // Create edges
