@@ -104,25 +104,6 @@ export const api = {
   delete: async <T>(url: string): Promise<T> => {
     const response = await apiClient.delete<T>(url);
     return response.data;
-  },
-  uploadEventLog: async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const response = await apiClient.post('/api/processdiscovery/eventlog', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      
-      return response.data;
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        throw new Error(error.response?.data?.message || 'Error uploading event log');
-      }
-      throw error;
-    }
   }
 };
 

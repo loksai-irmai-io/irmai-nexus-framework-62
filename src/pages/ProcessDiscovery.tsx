@@ -33,7 +33,8 @@ import ProcessDetailView from '@/components/process-discovery/ProcessDetailView'
 import { InsightItem } from '@/components/process-discovery/types';
 import { ProcessInsights } from '@/components/process-discovery/ProcessInsights';
 import { ProcessStatistics } from '@/components/process-discovery/ProcessStatistics';
-import { api } from '@/services/apiClient';
+import { EventLogs } from '@/components/process-discovery/EventLogs';
+import { handleFileUpload } from '@/components/layout/Header';
 
 const processData = {
   nodes: [
@@ -121,30 +122,12 @@ const ProcessDiscovery = () => {
   const [viewType, setViewType] = useState('bpmn');
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [detailView, setDetailView] = useState(false);
+  const [showRawEvents, setShowRawEvents] = useState(false);
   const [filteredLogs, setFilteredLogs] = useState(eventLogs);
   const [timeframe, setTimeframe] = useState("all");
   const [caseVariant, setCaseVariant] = useState("all");
   const [orgUnit, setOrgUnit] = useState("all");
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  useEffect(() => {
-    if (isUploading && uploadProgress < 100) {
-      const timer = setTimeout(() => {
-        setUploadProgress(prev => Math.min(prev + 20, 100));
-      }, 500);
-      
-      return () => clearTimeout(timer);
-    }
-    
-    if (uploadProgress === 100) {
-      setTimeout(() => {
-        setIsUploading(false);
-        setUploadProgress(0);
-      }, 1000);
-    }
-  }, [isUploading, uploadProgress]);
   
   const handleNodeClick = (nodeId: string) => {
     setSelectedNode(nodeId);
@@ -177,33 +160,10 @@ const ProcessDiscovery = () => {
     }
   };
   
-  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      try {
-        setIsUploading(true);
-        setUploadProgress(0);
-        
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        const response = await fetch('http://localhost:8000/api/processdiscovery/eventlog', {
-          method: 'POST',
-          body: formData,
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to upload event log');
-        }
-        
-        const result = await response.json();
-        toast.success(`Successfully processed event log with ${result.eventCount} events`);
-      } catch (error) {
-        console.error("Error uploading event log:", error);
-        toast.error("Failed to process event log. Please try again.");
-        setIsUploading(false);
-        setUploadProgress(0);
-      }
+      handleFileUpload(file);
     }
     
     if (fileInputRef.current) {
@@ -239,17 +199,9 @@ const ProcessDiscovery = () => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button onClick={triggerFileUpload} disabled={isUploading}>
-                    {isUploading ? (
-                      <>
-                        <span className="animate-pulse mr-2">Uploading... {uploadProgress}%</span>
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="h-4 w-4 mr-2" />
-                        Upload Event Log
-                      </>
-                    )}
+                  <Button onClick={triggerFileUpload}>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Event Log
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -258,15 +210,6 @@ const ProcessDiscovery = () => {
               </Tooltip>
             </TooltipProvider>
           </div>
-
-          {isUploading && (
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-              <div 
-                className="bg-primary h-2.5 rounded-full transition-all duration-500" 
-                style={{ width: `${uploadProgress}%` }}
-              ></div>
-            </div>
-          )}
 
           {detailView ? (
             <>
@@ -296,6 +239,10 @@ const ProcessDiscovery = () => {
                   <div className="flex justify-between items-center">
                     <CardTitle>Process Map</CardTitle>
                     <div className="flex items-center space-x-2">
+                      <Badge variant={showRawEvents ? "outline" : "secondary"} className="cursor-pointer" onClick={() => setShowRawEvents(!showRawEvents)}>
+                        <FileText className="h-3 w-3 mr-1" />
+                        {showRawEvents ? "Hide" : "View"} Raw Events
+                      </Badge>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -402,6 +349,12 @@ const ProcessDiscovery = () => {
                   </Tabs>
                 </CardContent>
               </Card>
+              
+              <EventLogs 
+                logs={filteredLogs} 
+                selectedNode={selectedNode} 
+                processNodes={processData.nodes} 
+              />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <ProcessInsights 
