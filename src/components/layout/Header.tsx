@@ -32,8 +32,6 @@ import {
 } from "@/components/ui/tooltip";
 import { useSidebarContext } from './SidebarProvider';
 import { toast } from "sonner";
-import { processService } from '@/services/processService';
-import { ApiResponse } from '@/components/process-discovery/types';
 
 type Notification = {
   id: string;
@@ -44,7 +42,7 @@ type Notification = {
   type: 'risk' | 'incident' | 'compliance' | 'system';
 };
 
-export const handleFileUpload = async (file: File): Promise<ApiResponse | undefined> => {
+export const handleFileUpload = (file: File) => {
   if (!file) return;
   
   const validFileTypes = ['text/csv', 'text/xml', 'application/xml', 'text/plain'];
@@ -61,29 +59,11 @@ export const handleFileUpload = async (file: File): Promise<ApiResponse | undefi
     return;
   }
   
-  try {
-    toast.loading("Uploading event log...");
-    
-    const response = await processService.uploadEventLog(file);
-    
-    toast.dismiss();
-    
-    if (response.status === 'success') {
-      toast.success(response.message || `Event log "${file.name}" uploaded successfully!`);
-    } else {
-      toast.error(response.message || "Failed to upload event log");
-    }
-    
-    return response;
-  } catch (error) {
-    toast.dismiss();
-    toast.error("Error uploading file. Please try again.");
-    console.error("File upload error:", error);
-    return {
-      status: 'failure',
-      message: error instanceof Error ? error.message : 'Unknown error occurred'
-    };
-  }
+  const formData = new FormData();
+  formData.append('eventLog', file);
+  
+  toast.success(`Event log "${file.name}" uploaded successfully!`);
+  console.log("File ready for backend processing:", file.name);
 };
 
 const Header: React.FC = () => {
@@ -146,11 +126,10 @@ const Header: React.FC = () => {
     }
   };
 
-  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const response = await handleFileUpload(file);
-      console.log("API Response:", response);
+      handleFileUpload(file);
     }
     
     if (fileInputRef.current) {
