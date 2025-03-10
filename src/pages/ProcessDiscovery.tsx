@@ -34,7 +34,7 @@ import { InsightItem } from '@/components/process-discovery/types';
 import { ProcessInsights } from '@/components/process-discovery/ProcessInsights';
 import { ProcessStatistics } from '@/components/process-discovery/ProcessStatistics';
 import { EventLogs } from '@/components/process-discovery/EventLogs';
-import { handleFileUpload } from '@/components/layout/Header';
+import { api } from '@/services/apiClient';
 
 const processData = {
   nodes: [
@@ -176,6 +176,36 @@ const ProcessDiscovery = () => {
     setSelectedNode(null);
   };
   
+  const handleFileUpload = async (file: File) => {
+    if (!file) return;
+    
+    const validFileTypes = ['text/csv', 'text/xml', 'application/xml', 'text/plain'];
+    const fileType = file.type;
+    
+    if (!validFileTypes.includes(fileType) && !file.name.endsWith('.xes')) {
+      toast.error("Invalid file type. Please upload a CSV, XES, or XML file.");
+      return;
+    }
+    
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error("File is too large. Maximum size is 10MB.");
+      return;
+    }
+    
+    try {
+      const result = await api.uploadEventLog(file);
+      if (result.status === 'success') {
+        toast.success(result.message);
+        // Handle the processed data here
+        console.log('Processed data:', result.data);
+      }
+    } catch (error) {
+      toast.error("Error uploading file. Please try again.");
+      console.error('Upload error:', error);
+    }
+  };
+
   return (
     <Layout>
       <div className="container py-6">

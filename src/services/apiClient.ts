@@ -1,4 +1,3 @@
-
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 // Define a base URL for your API
@@ -103,6 +102,18 @@ export const api = {
   
   delete: async <T>(url: string): Promise<T> => {
     const response = await apiClient.delete<T>(url);
+    return response.data;
+  },
+  
+  uploadEventLog: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await apiClient.post('/api/processdiscovery/eventlog', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    });
     return response.data;
   }
 };
