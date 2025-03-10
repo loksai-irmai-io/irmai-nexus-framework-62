@@ -4,7 +4,7 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequ
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Request timeout (in milliseconds)
-const REQUEST_TIMEOUT = 30000; // 30 seconds
+const REQUEST_TIMEOUT = 60000; // Increased to 60 seconds for large file uploads
 
 // Create an axios instance with default config
 export const apiClient = axios.create({
@@ -112,7 +112,8 @@ export const api = {
     const response = await apiClient.post('/api/processdiscovery/eventlog', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-      }
+      },
+      timeout: 120000, // 2 minutes timeout for large files
     });
     return response.data;
   }

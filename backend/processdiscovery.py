@@ -38,6 +38,24 @@ async def upload_event_log(file: UploadFile):
             "data": json_data
         }
         
+    except UnicodeDecodeError as e:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "status": "error",
+                "message": f"Error decoding file: The file is not properly encoded or not a valid CSV file. {str(e)}",
+                "data": None
+            }
+        )
+    except pd.errors.ParserError as e:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "status": "error",
+                "message": f"Error parsing CSV: The file format is incorrect or corrupted. {str(e)}",
+                "data": None
+            }
+        )
     except Exception as e:
         raise HTTPException(
             status_code=400,

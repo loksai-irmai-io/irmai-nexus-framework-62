@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -27,6 +28,7 @@ import {
   GitBranch,
   ChevronRight,
   ChevronLeft,
+  Loader2
 } from 'lucide-react';
 import ProcessMap from '@/components/process-discovery/ProcessMap';
 import ProcessDetailView from '@/components/process-discovery/ProcessDetailView';
@@ -127,6 +129,7 @@ const ProcessDiscovery = () => {
   const [timeframe, setTimeframe] = useState("all");
   const [caseVariant, setCaseVariant] = useState("all");
   const [orgUnit, setOrgUnit] = useState("all");
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleNodeClick = (nodeId: string) => {
@@ -187,22 +190,34 @@ const ProcessDiscovery = () => {
       return;
     }
     
-    const maxSize = 10 * 1024 * 1024;
+    // Increased file size limit to 50MB
+    const maxSize = 50 * 1024 * 1024;
     if (file.size > maxSize) {
-      toast.error("File is too large. Maximum size is 10MB.");
+      toast.error("File is too large. Maximum size is 50MB.");
       return;
     }
     
     try {
+      setUploading(true);
+      toast.info(`Uploading ${file.name}...`);
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
       const result = await api.uploadEventLog(file);
+      
+      setUploading(false);
+      
       if (result.status === 'success') {
         toast.success(result.message);
         // Handle the processed data here
         console.log('Processed data:', result.data);
       }
-    } catch (error) {
-      toast.error("Error uploading file. Please try again.");
+    } catch (error: any) {
+      setUploading(false);
       console.error('Upload error:', error);
+      const errorMessage = error?.response?.data?.detail?.message || "Error uploading file. Please try again.";
+      toast.error(errorMessage);
     }
   };
 
@@ -218,27 +233,38 @@ const ProcessDiscovery = () => {
               </p>
             </div>
             
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept=".csv,.xes,.xml,text/csv,application/xml,text/xml,text/plain"
-              onChange={onFileChange}
-            />
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button onClick={triggerFileUpload}>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload Event Log
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Upload your event log to start process mining</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <div className="flex items-center gap-2">
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept=".csv,.xes,.xml,text/csv,application/xml,text/xml,text/plain"
+                onChange={onFileChange}
+              />
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button onClick={triggerFileUpload} disabled={uploading}>
+                      {uploading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload Event Log
+                        </>
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Upload your event log to start process mining (Max: 50MB)</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
 
           {detailView ? (
