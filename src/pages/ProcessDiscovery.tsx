@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +15,8 @@ import {
   Loader2,
   Upload,
   Network,
-  GitBranch
+  GitBranch,
+  Image
 } from 'lucide-react';
 import ProcessMap from '@/components/process-discovery/ProcessMap';
 import ProcessDetailView from '@/components/process-discovery/ProcessDetailView';
@@ -22,6 +24,7 @@ import { InsightItem, EventLog, ProcessData } from '@/components/process-discove
 import { ProcessInsights } from '@/components/process-discovery/ProcessInsights';
 import { ProcessStatistics } from '@/components/process-discovery/ProcessStatistics';
 import { EventLogs } from '@/components/process-discovery/EventLogs';
+import ProcessGraphImage from '@/components/process-discovery/ProcessGraphImage';
 import { api } from '@/services/apiClient';
 import { mockApi } from '@/services/mockApiClient';
 
@@ -122,7 +125,26 @@ const ProcessDiscovery = () => {
   const [uploading, setUploading] = useState(false);
   const [processedData, setProcessedData] = useState<EventLog[]>([]);
   const [processMap, setProcessMap] = useState<ProcessData>(processData);
+  const [graphWidth, setGraphWidth] = useState(800);
+  const [graphHeight, setGraphHeight] = useState(600);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Update graph dimensions based on window size
+  useEffect(() => {
+    const updateDimensions = () => {
+      const width = Math.min(window.innerWidth - 100, 1200);
+      const height = Math.min(window.innerHeight - 300, 800);
+      setGraphWidth(width);
+      setGraphHeight(height);
+    };
+    
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    
+    return () => {
+      window.removeEventListener('resize', updateDimensions);
+    };
+  }, []);
   
   const handleNodeClick = (nodeId: string) => {
     setSelectedNode(nodeId);
@@ -177,7 +199,7 @@ const ProcessDiscovery = () => {
     const validFileTypes = ['text/csv', 'text/xml', 'application/xml', 'text/plain'];
     const fileType = file.type;
     
-    if (!validFileTypes.includes(fileType) && !file.name.endsWith('.xes')) {
+    if (!validFileTypes.includes(fileType) && !file.name.endsWith('.xes') && !file.name.endsWith('.csv')) {
       toast.error("Invalid file type. Please upload a CSV, XES, or XML file.");
       return;
     }
@@ -371,6 +393,7 @@ const ProcessDiscovery = () => {
                   <Tabs defaultValue="bpmn" value={viewType} onValueChange={setViewType}>
                     <TabsList className="mb-4">
                       <TabsTrigger value="bpmn">BPMN Diagram</TabsTrigger>
+                      <TabsTrigger value="image">Process Graph Image</TabsTrigger>
                       <TabsTrigger value="petri">Petri Net</TabsTrigger>
                       <TabsTrigger value="tree">Process Tree</TabsTrigger>
                     </TabsList>
@@ -380,6 +403,15 @@ const ProcessDiscovery = () => {
                         processData={processMap} 
                         selectedNode={selectedNode} 
                         onNodeClick={handleNodeClick} 
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="image">
+                      <ProcessGraphImage 
+                        processData={processMap}
+                        width={graphWidth}
+                        height={graphHeight}
+                        isLoading={uploading}
                       />
                     </TabsContent>
                     

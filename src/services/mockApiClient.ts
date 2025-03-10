@@ -1,5 +1,6 @@
 
 import { EventLog } from '@/components/process-discovery/types';
+import { parseCSV, convertToProcessGraph } from '@/utils/csvParser';
 
 // Sample process data for the mock response
 const sampleProcessData = {
@@ -102,7 +103,49 @@ export const mockApi = {
     
     console.log(`[Mock API] Uploading file: ${file.name} (${file.size} bytes)`);
     
-    // Return mock data
+    // For CSV files, parse the content and generate process map
+    if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+      try {
+        const fileContent = await file.text();
+        const parsedData = parseCSV(fileContent);
+        
+        // Convert the parsed data to event logs format
+        const eventLogs = parsedData.map((row, index) => ({
+          id: index + 1,
+          timestamp: row.timestamp || new Date().toISOString(),
+          activity: row.activity || 'Unknown Activity',
+          caseId: row.case_id || `Case-${Math.floor(Math.random() * 1000)}`,
+          user: row.resource || 'Unknown',
+          duration: row.duration || '0m 0s',
+          details: {
+            ...row,
+            resource: row.resource || 'Unknown',
+            cost: Number(row.cost) || 0,
+            outcome: Math.random() > 0.2 ? 'Success' : 'Failure'
+          }
+        }));
+        
+        // Generate process map from CSV data
+        const processMap = convertToProcessGraph(parsedData);
+        
+        return {
+          status: 'success',
+          message: `Successfully processed ${eventLogs.length} events from ${file.name}`,
+          data: eventLogs,
+          processMap
+        };
+      } catch (error) {
+        console.error('Error parsing CSV:', error);
+        return {
+          status: 'error',
+          message: `Error parsing CSV file: ${error}`,
+          data: mockEventLogs,
+          processMap: sampleProcessData
+        };
+      }
+    }
+    
+    // Return mock data for non-CSV files
     return {
       status: 'success',
       message: `Successfully processed ${mockEventLogs.length} events from ${file.name}`,
