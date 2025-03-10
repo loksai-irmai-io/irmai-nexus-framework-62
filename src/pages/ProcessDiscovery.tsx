@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -33,7 +34,7 @@ import ProcessDetailView from '@/components/process-discovery/ProcessDetailView'
 import { InsightItem } from '@/components/process-discovery/types';
 import { ProcessInsights } from '@/components/process-discovery/ProcessInsights';
 import { ProcessStatistics } from '@/components/process-discovery/ProcessStatistics';
-import { EventLogs } from '@/components/process-discovery/EventLogs';
+import { api } from '@/services/apiClient';
 import { handleFileUpload } from '@/components/layout/Header';
 
 const processData = {
@@ -160,10 +161,16 @@ const ProcessDiscovery = () => {
     }
   };
   
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      handleFileUpload(file);
+      try {
+        const result = await api.uploadEventLog(file);
+        toast.success(`Successfully processed event log with ${result.eventCount} events`);
+      } catch (error) {
+        console.error("Error uploading event log:", error);
+        toast.error("Failed to process event log. Please try again.");
+      }
     }
     
     if (fileInputRef.current) {
@@ -239,10 +246,6 @@ const ProcessDiscovery = () => {
                   <div className="flex justify-between items-center">
                     <CardTitle>Process Map</CardTitle>
                     <div className="flex items-center space-x-2">
-                      <Badge variant={showRawEvents ? "outline" : "secondary"} className="cursor-pointer" onClick={() => setShowRawEvents(!showRawEvents)}>
-                        <FileText className="h-3 w-3 mr-1" />
-                        {showRawEvents ? "Hide" : "View"} Raw Events
-                      </Badge>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -349,12 +352,6 @@ const ProcessDiscovery = () => {
                   </Tabs>
                 </CardContent>
               </Card>
-              
-              <EventLogs 
-                logs={filteredLogs} 
-                selectedNode={selectedNode} 
-                processNodes={processData.nodes} 
-              />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <ProcessInsights 
