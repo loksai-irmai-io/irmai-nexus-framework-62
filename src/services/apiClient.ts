@@ -1,10 +1,11 @@
+
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 // Define a base URL for your API
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Request timeout (in milliseconds)
-const REQUEST_TIMEOUT = 60000; // Increased to 60 seconds for large file uploads
+const REQUEST_TIMEOUT = 120000; // Increased to 120 seconds for large file uploads
 
 // Create an axios instance with default config
 export const apiClient = axios.create({
@@ -109,12 +110,16 @@ export const api = {
     const formData = new FormData();
     formData.append('file', file);
     
+    console.log(`Uploading file: ${file.name} (${file.size} bytes)`);
+    
     const response = await apiClient.post('/api/processdiscovery/eventlog', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      timeout: 120000, // 2 minutes timeout for large files
+      timeout: 180000, // 3 minutes timeout for large files
     });
+    
+    console.log('Upload response:', response.data);
     return response.data;
   }
 };

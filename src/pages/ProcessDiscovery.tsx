@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -130,6 +129,7 @@ const ProcessDiscovery = () => {
   const [caseVariant, setCaseVariant] = useState("all");
   const [orgUnit, setOrgUnit] = useState("all");
   const [uploading, setUploading] = useState(false);
+  const [processedData, setProcessedData] = useState<any[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleNodeClick = (nodeId: string) => {
@@ -190,7 +190,6 @@ const ProcessDiscovery = () => {
       return;
     }
     
-    // Increased file size limit to 50MB
     const maxSize = 50 * 1024 * 1024;
     if (file.size > maxSize) {
       toast.error("File is too large. Maximum size is 50MB.");
@@ -201,17 +200,22 @@ const ProcessDiscovery = () => {
       setUploading(true);
       toast.info(`Uploading ${file.name}...`);
       
-      const formData = new FormData();
-      formData.append('file', file);
-      
       const result = await api.uploadEventLog(file);
       
       setUploading(false);
       
       if (result.status === 'success') {
         toast.success(result.message);
-        // Handle the processed data here
-        console.log('Processed data:', result.data);
+        setProcessedData(result.data);
+        setFilteredLogs(result.data.slice(0, 10).map((item: any, index: number) => ({
+          id: index + 1,
+          timestamp: item.timestamp || new Date().toISOString(),
+          activity: item.activity || item.event || item.name || 'Unknown Activity',
+          caseId: item.case_id || item.caseId || item.case || 'Unknown Case',
+          user: item.resource || item.user || 'Unknown',
+          duration: item.duration || '0m 0s'
+        })));
+        toast.info(`Loaded ${result.data.length} events`);
       }
     } catch (error: any) {
       setUploading(false);
