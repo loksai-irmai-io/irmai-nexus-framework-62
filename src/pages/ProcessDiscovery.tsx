@@ -27,6 +27,7 @@ import {
   GitBranch,
   ChevronRight,
   ChevronLeft,
+  RefreshCw
 } from 'lucide-react';
 import ProcessMap from '@/components/process-discovery/ProcessMap';
 import ProcessDetailView from '@/components/process-discovery/ProcessDetailView';
@@ -35,18 +36,19 @@ import { ProcessInsights } from '@/components/process-discovery/ProcessInsights'
 import { ProcessStatistics } from '@/components/process-discovery/ProcessStatistics';
 import { EventLogs } from '@/components/process-discovery/EventLogs';
 import { handleFileUpload } from '@/components/layout/Header';
+import { getFxTradeData } from '@/services/apiService';
 
 const processData = {
   nodes: [
-    { id: 'start', type: 'event', label: 'Start', position: { x: 100, y: 150 }, compliant: true },
-    { id: 'checkout', type: 'activity', label: 'Checkout Cart', position: { x: 250, y: 150 }, compliant: true },
-    { id: 'gateway1', type: 'gateway', label: 'Payment Method?', position: { x: 400, y: 150 }, compliant: true },
-    { id: 'credit', type: 'activity', label: 'Process Credit Card', position: { x: 550, y: 100 }, compliant: false },
-    { id: 'bank', type: 'activity', label: 'Process Bank Transfer', position: { x: 550, y: 200 }, compliant: true },
-    { id: 'gateway2', type: 'gateway', label: 'Payment Successful?', position: { x: 700, y: 150 }, compliant: true },
-    { id: 'confirm', type: 'activity', label: 'Confirm Order', position: { x: 850, y: 150 }, compliant: true },
-    { id: 'error', type: 'activity', label: 'Handle Payment Error', position: { x: 700, y: 250 }, compliant: false },
-    { id: 'end', type: 'event', label: 'End', position: { x: 1000, y: 150 }, compliant: true },
+    { id: 'start', type: 'event', label: 'Start', position: { x: 100, y: 150 }, compliant: true, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+    { id: 'checkout', type: 'activity', label: 'Checkout Cart', position: { x: 250, y: 150 }, compliant: true, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+    { id: 'gateway1', type: 'gateway', label: 'Payment Method?', position: { x: 400, y: 150 }, compliant: true, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+    { id: 'credit', type: 'activity', label: 'Process Credit Card', position: { x: 550, y: 100 }, compliant: false, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+    { id: 'bank', type: 'activity', label: 'Process Bank Transfer', position: { x: 550, y: 200 }, compliant: true, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+    { id: 'gateway2', type: 'gateway', label: 'Payment Successful?', position: { x: 700, y: 150 }, compliant: true, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+    { id: 'confirm', type: 'activity', label: 'Confirm Order', position: { x: 850, y: 150 }, compliant: true, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+    { id: 'error', type: 'activity', label: 'Handle Payment Error', position: { x: 700, y: 250 }, compliant: false, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+    { id: 'end', type: 'event', label: 'End', position: { x: 1000, y: 150 }, compliant: true, metrics: { frequency: 0, avgDuration: '0m 0s' } },
   ],
   edges: [
     { id: 'e1', source: 'start', target: 'checkout' },
@@ -127,7 +129,66 @@ const ProcessDiscovery = () => {
   const [timeframe, setTimeframe] = useState("all");
   const [caseVariant, setCaseVariant] = useState("all");
   const [orgUnit, setOrgUnit] = useState("all");
+  const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [processData, setProcessData] = useState({
+    nodes: [
+      { id: 'start', type: 'event', label: 'Start', position: { x: 100, y: 150 }, compliant: true, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+      { id: 'checkout', type: 'activity', label: 'Checkout Cart', position: { x: 250, y: 150 }, compliant: true, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+      { id: 'gateway1', type: 'gateway', label: 'Payment Method?', position: { x: 400, y: 150 }, compliant: true, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+      { id: 'credit', type: 'activity', label: 'Process Credit Card', position: { x: 550, y: 100 }, compliant: false, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+      { id: 'bank', type: 'activity', label: 'Process Bank Transfer', position: { x: 550, y: 200 }, compliant: true, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+      { id: 'gateway2', type: 'gateway', label: 'Payment Successful?', position: { x: 700, y: 150 }, compliant: true, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+      { id: 'confirm', type: 'activity', label: 'Confirm Order', position: { x: 850, y: 150 }, compliant: true, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+      { id: 'error', type: 'activity', label: 'Handle Payment Error', position: { x: 700, y: 250 }, compliant: false, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+      { id: 'end', type: 'event', label: 'End', position: { x: 1000, y: 150 }, compliant: true, metrics: { frequency: 0, avgDuration: '0m 0s' } },
+    ],
+    edges: [
+      { id: 'e1', source: 'start', target: 'checkout' },
+      { id: 'e2', source: 'checkout', target: 'gateway1' },
+      { id: 'e3', source: 'gateway1', target: 'credit', label: 'Credit Card' },
+      { id: 'e4', source: 'gateway1', target: 'bank', label: 'Bank Transfer' },
+      { id: 'e5', source: 'credit', target: 'gateway2' },
+      { id: 'e6', source: 'bank', target: 'gateway2' },
+      { id: 'e7', source: 'gateway2', target: 'confirm', label: 'Yes' },
+      { id: 'e8', source: 'gateway2', target: 'error', label: 'No' },
+      { id: 'e9', source: 'confirm', target: 'end' },
+      { id: 'e10', source: 'error', target: 'checkout', label: 'Retry' },
+    ]
+  });
+  
+  useEffect(() => {
+    const savedBpmnData = localStorage.getItem('bpmn_data');
+    if (savedBpmnData) {
+      try {
+        const parsedData = JSON.parse(savedBpmnData);
+        setProcessData(parsedData);
+      } catch (error) {
+        console.error('Error parsing saved BPMN data:', error);
+      }
+    }
+  }, []);
+  
+  const fetchFxTradeData = async () => {
+    setIsLoading(true);
+    try {
+      const response = await getFxTradeData();
+      
+      if (response.status === 'success' && response.bpmn) {
+        setProcessData(response.bpmn);
+        toast.success(response.msg || 'FX trade data loaded successfully');
+        localStorage.setItem('bpmn_data', JSON.stringify(response.bpmn));
+      } else {
+        toast.error(response.msg || 'Failed to load FX trade data');
+      }
+    } catch (error) {
+      console.error('Error fetching FX trade data:', error);
+      toast.error('Failed to load FX trade data. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   const handleNodeClick = (nodeId: string) => {
     setSelectedNode(nodeId);
@@ -188,27 +249,47 @@ const ProcessDiscovery = () => {
               </p>
             </div>
             
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept=".csv,.xes,.xml,text/csv,application/xml,text/xml,text/plain"
-              onChange={onFileChange}
-            />
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button onClick={triggerFileUpload}>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload Event Log
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Upload your event log to start process mining</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <div className="flex gap-2">
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept=".csv,.xes,.xml,text/csv,application/xml,text/xml,text/plain"
+                onChange={onFileChange}
+              />
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button onClick={triggerFileUpload}>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload Event Log
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Upload your event log to start process mining</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      onClick={fetchFxTradeData}
+                      disabled={isLoading}
+                    >
+                      <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                      Load FX Example
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Load FX trade example data from API</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
 
           {detailView ? (

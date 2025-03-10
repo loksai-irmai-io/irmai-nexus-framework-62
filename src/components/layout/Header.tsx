@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useSidebarContext } from './SidebarProvider';
 import { toast } from "sonner";
+import { uploadEventLog } from '@/services/apiService';
 
 type Notification = {
   id: string;
@@ -42,7 +43,7 @@ type Notification = {
   type: 'risk' | 'incident' | 'compliance' | 'system';
 };
 
-export const handleFileUpload = (file: File) => {
+export const handleFileUpload = async (file: File) => {
   if (!file) return;
   
   const validFileTypes = ['text/csv', 'text/xml', 'application/xml', 'text/plain'];
@@ -59,11 +60,26 @@ export const handleFileUpload = (file: File) => {
     return;
   }
   
-  const formData = new FormData();
-  formData.append('eventLog', file);
+  toast.loading("Uploading event log...");
   
-  toast.success(`Event log "${file.name}" uploaded successfully!`);
-  console.log("File ready for backend processing:", file.name);
+  try {
+    // Call the API to upload the event log
+    const response = await uploadEventLog(file);
+    
+    if (response.status === 'success') {
+      toast.success(response.msg || `Event log "${file.name}" uploaded successfully!`);
+      
+      // Store the BPMN data in local storage if available
+      if (response.bpmn) {
+        localStorage.setItem('bpmn_data', JSON.stringify(response.bpmn));
+      }
+    } else {
+      toast.error(response.msg || "Failed to upload event log");
+    }
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    toast.error("Failed to upload event log. Please try again.");
+  }
 };
 
 const Header: React.FC = () => {
