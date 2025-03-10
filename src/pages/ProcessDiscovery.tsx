@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -139,7 +140,7 @@ const ProcessDiscovery = () => {
     const node = processData.nodes.find(n => n.id === nodeId);
     if (node) {
       const nodeLabel = node.label;
-      const filtered = eventLogs.filter(log => log.activity.includes(nodeLabel));
+      const filtered = filteredLogs.filter(log => log.activity.includes(nodeLabel));
       setFilteredLogs(filtered);
     }
   };
@@ -451,4 +452,3 @@ const ProcessDiscovery = () => {
 };
 
 export default ProcessDiscovery;
-
