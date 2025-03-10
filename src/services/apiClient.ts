@@ -138,6 +138,21 @@ export const api = {
       console.error(`DELETE ${url} failed:`, error);
       throw error;
     }
+  },
+  
+  uploadFile: async <T>(url: string, formData: FormData): Promise<T> => {
+    try {
+      const config: AxiosRequestConfig = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      const response = await apiClient.post<T>(url, formData, config);
+      return response.data;
+    } catch (error) {
+      console.error(`File upload to ${url} failed:`, error);
+      throw error;
+    }
   }
 };
 
