@@ -73,3 +73,9 @@ export interface DrilldownData {
   filter?: Record<string, any>;
   view?: string;
 }
+
+export interface ApiResponse {
+  status: 'success' | 'failure';
+  message: string;
+  bpmn?: ProcessData;
+}
