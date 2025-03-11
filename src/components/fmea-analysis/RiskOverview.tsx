@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,21 +33,18 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ selectedRole, onDrilldown }
   const [process, setProcess] = useState<string>("all");
   const [timeframe, setTimeframe] = useState<string>("quarter");
   
-  // Filter data based on role
   const filteredData = mockRiskData.filter(risk => {
     if (selectedRole === 'exec') return risk.severity === 'high' || risk.severity === 'critical';
     if (selectedRole === 'process') return risk.category === 'operational' || risk.category === 'process';
     return true; // Risk managers and analysts see all
   });
   
-  // Calculate risk metrics
   const criticalRisks = filteredData.filter(risk => risk.severity === 'critical').length;
   const highRisks = filteredData.filter(risk => risk.severity === 'high').length;
   const riskExposureScore = Math.round((criticalRisks * 5 + highRisks * 3) / filteredData.length * 100);
   const riskChangePercent = 8; // Simulated percent change
   const predictedTrend = riskExposureScore > 50 ? 'up' as const : 'down' as const;
   
-  // Chart data
   const riskByCategory = [
     { name: 'Operational', value: filteredData.filter(r => r.category === 'operational').length },
     { name: 'Financial', value: filteredData.filter(r => r.category === 'financial').length },
@@ -79,6 +75,29 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ selectedRole, onDrilldown }
     { name: 'Predicted Risk Score', dataKey: 'predicted', color: '#f43f5e' }
   ];
   
+  const controlEffectivenessData = [
+    { name: 'Fully Effective', value: 45 },
+    { name: 'Partially Effective', value: 35 },
+    { name: 'Needs Improvement', value: 20 },
+  ];
+
+  const riskTrendData = [
+    { month: 'Jan', current: 65, previous: 70 },
+    { month: 'Feb', current: 58, previous: 62 },
+    { month: 'Mar', current: 70, previous: 65 },
+    { month: 'Apr', current: 84, previous: 75 },
+    { month: 'May', current: 72, previous: 80 },
+    { month: 'Jun', current: 76, previous: 72 },
+  ];
+
+  const riskMaturityData = [
+    { category: 'Policy', score: 85 },
+    { category: 'Process', score: 72 },
+    { category: 'Technology', score: 68 },
+    { category: 'People', score: 76 },
+    { category: 'Governance', score: 82 },
+  ];
+
   const riskWidgets = [
     {
       id: 'risk-exposure',
@@ -254,6 +273,57 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ selectedRole, onDrilldown }
             }}
           />
         ))}
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Chart 
+          title="Control Effectiveness"
+          description="Distribution of control effectiveness ratings"
+          data={controlEffectivenessData}
+          series={[{ name: 'Controls', dataKey: 'value', color: '#10b981' }]}
+          type="pie"
+          showPercentages
+          height={300}
+        />
+        
+        <Chart 
+          title="Risk Trend Analysis"
+          description="Current vs Previous Period"
+          data={riskTrendData}
+          series={[
+            { name: 'Current Period', dataKey: 'current', color: '#8b5cf6' },
+            { name: 'Previous Period', dataKey: 'previous', color: '#94a3b8' }
+          ]}
+          type="line"
+          xAxisKey="month"
+          height={300}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Chart 
+          title="Risk Maturity Assessment"
+          description="Organizational risk maturity by category"
+          data={riskMaturityData}
+          series={[{ name: 'Maturity Score', dataKey: 'score', color: '#f59e0b' }]}
+          type="bar"
+          xAxisKey="category"
+          height={300}
+        />
+        
+        <Chart 
+          title="Risk Treatment Progress"
+          description="Status of risk treatment actions"
+          data={[
+            { status: 'Completed', value: 45 },
+            { status: 'In Progress', value: 35 },
+            { status: 'Not Started', value: 20 }
+          ]}
+          series={[{ name: 'Actions', dataKey: 'value', color: '#6366f1' }]}
+          type="pie"
+          showPercentages
+          height={300}
+        />
       </div>
       
       <div className="space-y-4">
