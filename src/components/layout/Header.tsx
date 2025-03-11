@@ -31,7 +31,7 @@ import {
 import { useSidebarContext } from './SidebarProvider';
 import { toast } from "sonner";
 import { processFileUpload } from './fileHelper';
-import { processService } from '@/services/processService';
+import { EventLogResponse, processService } from '@/services/processService';
 
 type Notification = {
   id: string;
@@ -361,3 +361,4 @@ const Header: React.FC = () => {
 };
 
 export default Header;
+
