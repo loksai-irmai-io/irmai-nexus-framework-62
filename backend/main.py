@@ -86,7 +86,7 @@ MOCK_BPMN_DATA = {
 def read_root():
     return {"message": "FX Trade Log API is running"}
 
-@app.post("/upload-event-log/", response_model=UploadResponse)
+@app.post("/app/process-discovery/upload-event", response_model=UploadResponse)
 async def upload_event_log(file: Optional[UploadFile] = None):
     # If no file is provided, return example data
     if file is None:

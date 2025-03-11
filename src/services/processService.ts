@@ -16,7 +16,7 @@ export const processService = {
       const formData = new FormData();
       formData.append('file', file);
       
-      const response = await fetch(`${BACKEND_URL}/upload-event-log/`, {
+      const response = await fetch(`${BACKEND_URL}/app/process-discovery/upload-event`, {
         method: 'POST',
         body: formData,
       });
@@ -34,7 +34,7 @@ export const processService = {
   getExampleData: async (): Promise<EventLogResponse> => {
     try {
       // No file uploaded means we get example data
-      const response = await fetch(`${BACKEND_URL}/upload-event-log/`, {
+      const response = await fetch(`${BACKEND_URL}/app/process-discovery/upload-event`, {
         method: 'POST',
       });
       return await response.json();
