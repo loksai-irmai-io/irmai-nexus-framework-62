@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight, ExternalLink, Filter, Info, Maximize2, SlidersHorizontal } from 'lucide-react';
@@ -80,22 +81,23 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
   const [timeRange, setTimeRange] = useState<string>("all");
   
   const statusColors = {
-    success: 'border-green-500 dark:border-green-600',
+    success: 'border-green-500 dark:border-green-600', // Green for compliant indicators
     warning: 'border-amber-500 dark:border-amber-600',
-    error: 'border-red-500 dark:border-red-600',
-    info: 'border-blue-500 dark:border-blue-600',
+    error: 'border-red-500 dark:border-red-600', // Red for critical alerts
+    info: 'border-blue-500 dark:border-blue-600', // Blue for interactive elements
   };
   
   const statusBg = {
-    success: 'bg-green-50 dark:bg-green-950/20',
+    success: 'bg-green-50 dark:bg-green-950/20', // Green for compliant
     warning: 'bg-amber-50 dark:bg-amber-950/20',
-    error: 'bg-red-50 dark:bg-red-950/20',
-    info: 'bg-blue-50 dark:bg-blue-950/20',
+    error: 'bg-red-50 dark:bg-red-950/20', // Red for critical alerts
+    info: 'bg-blue-50 dark:bg-blue-950/20', // Blue for interactive elements
   };
   
   const handleActionClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (data.actionHref) {
+      // Ensure we use navigate instead of direct URL changes to prevent full page reload
       navigate(data.actionHref);
       console.log("Navigating to:", data.actionHref);
     } else if (onClick) {
@@ -123,13 +125,16 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
     );
   };
   
+  // Filter chart data based on selected view
   const filteredChartData = React.useMemo(() => {
     if (filterView === 'all') {
       return data.chartData;
     }
     
+    // Example filtering logic - adjust based on your actual data structure
     if (data.chartType === 'pie') {
       return data.chartData.filter(item => {
+        // For pie charts, filter based on category or name
         if (filterView === 'critical') return String(item.name).toLowerCase().includes('critical');
         if (filterView === 'high') return String(item.name).toLowerCase().includes('high');
         if (filterView === 'medium') return String(item.name).toLowerCase().includes('medium');
@@ -141,6 +146,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
     return data.chartData;
   }, [data.chartData, data.chartType, filterView]);
   
+  // Filter chart series based on visibility selection
   const filteredChartSeries = React.useMemo(() => {
     return data.chartSeries.filter(series => visibleSeries.includes(series.name));
   }, [data.chartSeries, visibleSeries]);
@@ -149,7 +155,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
     <div 
       className={cn(
         "rounded-lg border shadow-sm overflow-hidden transition-all hover:shadow-lg",
-        "flex flex-col h-full w-full",
+        "flex flex-col h-full w-full", // Added w-full to ensure consistent width
         statusColors[data.status],
         "hover:scale-[1.01] transition-transform duration-200",
         onClick ? "cursor-pointer" : "",
@@ -187,10 +193,14 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
             </div>
             
             <div className="flex items-center space-x-2">
+              {/* Time range filter */}
               <Select 
                 value={timeRange} 
                 onValueChange={setTimeRange} 
-                onOpenChange={(open: boolean) => {}}
+                onOpenChange={(open: boolean) => {
+                  // Fixed: Using event parameter for stopPropagation
+                  // This isn't actually an event handler, so no need to call stopPropagation
+                }}
               >
                 <SelectTrigger 
                   className="w-[125px] h-8 text-xs border-blue-200 bg-blue-50/50 dark:bg-blue-900/10" 
@@ -208,6 +218,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({
                 </SelectContent>
               </Select>
               
+              {/* Filter and visualization options */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
                   <button className="p-1.5 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-600 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400">

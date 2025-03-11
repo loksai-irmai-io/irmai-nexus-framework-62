@@ -113,62 +113,6 @@ const populatedPredictiveRiskData = [
   { name: 'Operations', probability: 0.6, impact: 60 },
 ];
 
-// Control Effectiveness Data
-const emptyControlEffectivenessData = [
-  { name: 'No Data', value: 100 }
-];
-
-const populatedControlEffectivenessData = [
-  { name: 'Effective', value: 65 },
-  { name: 'Partially Effective', value: 25 },
-  { name: 'Ineffective', value: 10 }
-];
-
-// Risk Trend Analysis Data
-const emptyRiskTrendData = Array(6).fill(0).map((_, idx) => ({
-  name: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'][idx],
-  high: 0,
-  medium: 0,
-  low: 0
-}));
-
-const populatedRiskTrendData = [
-  { name: 'Jan', high: 3, medium: 7, low: 12 },
-  { name: 'Feb', high: 5, medium: 8, low: 14 },
-  { name: 'Mar', high: 4, medium: 10, low: 15 },
-  { name: 'Apr', high: 3, medium: 9, low: 17 },
-  { name: 'May', high: 5, medium: 11, low: 14 },
-  { name: 'Jun', high: 4, medium: 10, low: 13 }
-];
-
-// Risk Maturity Assessment Data
-const emptyRiskMaturityData = [
-  { name: 'Risk Culture', value: 0 },
-  { name: 'Risk Governance', value: 0 },
-  { name: 'Risk Assessment', value: 0 },
-  { name: 'Risk Response', value: 0 },
-  { name: 'Risk Monitoring', value: 0 }
-];
-
-const populatedRiskMaturityData = [
-  { name: 'Risk Culture', value: 3.2 },
-  { name: 'Risk Governance', value: 4.1 },
-  { name: 'Risk Assessment', value: 3.5 },
-  { name: 'Risk Response', value: 2.8 },
-  { name: 'Risk Monitoring', value: 3.7 }
-];
-
-// Risk Treatment Progress Data
-const emptyRiskTreatmentData = [
-  { name: 'No Data', value: 100 }
-];
-
-const populatedRiskTreatmentData = [
-  { name: 'Completed', value: 35 },
-  { name: 'In Progress', value: 45 },
-  { name: 'Not Started', value: 20 }
-];
-
 const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
   return [
     {
@@ -192,151 +136,6 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       status: 'info',
       actionText: 'View Risk Analytics',
       actionHref: '/fmea-analysis',
-      chartHeight: 200,
-    },
-    {
-      id: 'control-effectiveness',
-      title: 'Control Effectiveness',
-      subtitle: 'Control Performance Overview',
-      icon: <CheckCheck className="h-5 w-5 text-primary" />,
-      metrics: [
-        { label: 'Effective', value: '0%', icon: 'circle-check' },
-        { label: 'Partially', value: '0%', icon: 'trending-up' },
-        { label: 'Ineffective', value: '0%', icon: 'trending-down' },
-        { label: 'Total Controls', value: '0', icon: 'gauge' },
-      ],
-      insights: [
-        'No control data available yet',
-        'Upload a file to see control insights'
-      ],
-      chartData: emptyControlEffectivenessData,
-      chartSeries: [{ name: 'Percentage', dataKey: 'value', color: '#4ade80' }],
-      chartType: 'pie',
-      status: 'info',
-      actionText: 'View Control Details',
-      actionHref: '/controls-testing',
-      chartHeight: 200,
-    },
-    {
-      id: 'risk-trend-analysis',
-      title: 'Risk Trend Analysis',
-      subtitle: 'Risk Level Trends Over Time',
-      icon: <BarChart4 className="h-5 w-5 text-primary" />,
-      metrics: [
-        { label: 'High Risks', value: '0', icon: 'trending-up' },
-        { label: 'Medium Risks', value: '0', icon: 'trending-up' },
-        { label: 'Low Risks', value: '0', icon: 'trending-down' },
-        { label: 'Risk Score', value: '0', icon: 'gauge' },
-      ],
-      insights: [
-        'No trend data available yet',
-        'Upload a file to see risk trends'
-      ],
-      chartData: emptyRiskTrendData,
-      chartSeries: [
-        { name: 'High', dataKey: 'high', color: '#ef4444' },
-        { name: 'Medium', dataKey: 'medium', color: '#f97316' },
-        { name: 'Low', dataKey: 'low', color: '#22c55e' },
-      ],
-      chartType: 'line',
-      xAxisKey: 'name',
-      status: 'info',
-      actionText: 'View Trend Details',
-      actionHref: '/fmea-analysis',
-      chartHeight: 200,
-    },
-    {
-      id: 'risk-maturity',
-      title: 'Risk Maturity Assessment',
-      subtitle: 'Maturity Level by Category',
-      icon: <Gauge className="h-5 w-5 text-primary" />,
-      metrics: [
-        { label: 'Overall Score', value: '0', icon: 'gauge' },
-        { label: 'Highest Area', value: 'N/A', icon: 'trending-up' },
-        { label: 'Lowest Area', value: 'N/A', icon: 'trending-down' },
-        { label: 'Target Score', value: '4.0', icon: 'check' },
-      ],
-      insights: [
-        'No maturity data available yet',
-        'Upload a file to see maturity assessment'
-      ],
-      chartData: emptyRiskMaturityData,
-      chartSeries: [{ name: 'Score', dataKey: 'value', color: '#8b5cf6' }],
-      chartType: 'bar',
-      xAxisKey: 'name',
-      status: 'info',
-      actionText: 'View Maturity Details',
-      actionHref: '/gap-analysis',
-      chartHeight: 200,
-    },
-    {
-      id: 'risk-treatment',
-      title: 'Risk Treatment Progress',
-      subtitle: 'Status of Mitigation Actions',
-      icon: <TestTube className="h-5 w-5 text-primary" />,
-      metrics: [
-        { label: 'Completed', value: '0%', icon: 'check' },
-        { label: 'In Progress', value: '0%', icon: 'trending-up' },
-        { label: 'Not Started', value: '0%', icon: 'circle' },
-        { label: 'Total Actions', value: '0', icon: 'activity' },
-      ],
-      insights: [
-        'No treatment data available yet',
-        'Upload a file to see treatment progress'
-      ],
-      chartData: emptyRiskTreatmentData,
-      chartSeries: [{ name: 'Percentage', dataKey: 'value', color: '#06b6d4' }],
-      chartType: 'pie',
-      status: 'info',
-      actionText: 'View Treatment Details',
-      actionHref: '/controls-testing',
-      chartHeight: 200,
-    },
-    {
-      id: 'incident-severity',
-      title: 'Incident Severity Distribution',
-      subtitle: 'Breakdown by Impact Level',
-      icon: <AlertTriangle className="h-5 w-5 text-primary" />,
-      metrics: [
-        { label: 'Critical', value: '0', icon: 'trending-up' },
-        { label: 'High', value: '0', icon: 'trending-up' },
-        { label: 'Medium', value: '0', icon: 'trending-up' },
-        { label: 'Low', value: '0', icon: 'trending-down' },
-      ],
-      insights: [
-        'No incident data available yet',
-        'Upload a file to see incident insights'
-      ],
-      chartData: emptyIncidentSeverityData,
-      chartSeries: [{ name: 'Count', dataKey: 'value', color: '#f97316' }],
-      chartType: 'bar',
-      xAxisKey: 'name',
-      status: 'info',
-      actionText: 'View Incident Details',
-      actionHref: '/incident-management',
-      chartHeight: 200,
-    },
-    {
-      id: 'process-discovery',
-      title: 'Process Discovery',
-      subtitle: 'Discovered Process Analysis',
-      icon: <GitBranch className="h-5 w-5 text-primary" />,
-      metrics: [
-        { label: 'Processes', value: '0', icon: 'git-branch' },
-        { label: 'Activities', value: '0', icon: 'activity' },
-        { label: 'Critical Paths', value: '0', icon: 'alert-triangle' },
-        { label: 'Bottlenecks', value: '0', icon: 'trending-down' },
-      ],
-      insights: [
-        'No process data available yet',
-        'Upload a file to see process insights'
-      ],
-      chartData: emptyProcessDiscoveryData,
-      chartSeries: [{ name: 'Count', dataKey: 'value', color: '#8b5cf6' }],
-      chartType: 'pie',
-      status: 'info',
-      actionText: 'View Process Analysis',
-      actionHref: '/process-discovery',
       chartHeight: 200,
     },
   ];
@@ -381,300 +180,20 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
         'Payment fraud risk increased by 12% this month',
         'Data privacy risks require immediate attention'
       ],
-      chartData: [
-        { name: 'Fraud', probability: 70, impact: 85, size: 60 },
-        { name: 'Data Breach', probability: 40, impact: 95, size: 38 },
-        { name: 'System Failure', probability: 30, impact: 80, size: 24 },
-        { name: 'Compliance', probability: 50, impact: 70, size: 35 },
-        { name: 'Operations', probability: 60, impact: 60, size: 36 }
-      ],
+      chartData: populatedPredictiveRiskData.map(item => ({
+        ...item,
+        size: Math.round(item.probability * item.impact)
+      })),
       chartSeries: [
         { name: 'Probability', dataKey: 'probability', color: '#8b5cf6' },
-        { name: 'Impact', dataKey: 'impact', color: '#ef4444' }
+        { name: 'Impact', dataKey: 'impact', color: '#ef4444' },
+        { name: 'Size', dataKey: 'size', color: '#d946ef' }
       ],
-      chartType: 'bar',
+      chartType: 'composed',
+      xAxisKey: 'name',
       status: 'error',
       actionText: 'View Risk Analytics',
       actionHref: '/fmea-analysis',
-      xAxisKey: 'name'
-    },
-    {
-      id: 'control-effectiveness',
-      title: 'Control Effectiveness',
-      subtitle: 'Control Performance Overview',
-      icon: <CheckCheck className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Effective', 
-          value: '65%', 
-          icon: 'circle-check',
-          tooltip: 'Percentage of fully effective controls',
-          trend: { direction: 'up', value: 3 }
-        },
-        { 
-          label: 'Partially', 
-          value: '25%', 
-          icon: 'trending-up',
-          tooltip: 'Percentage of partially effective controls',
-          trend: { direction: 'down', value: 2 }
-        },
-        { 
-          label: 'Ineffective', 
-          value: '10%', 
-          icon: 'trending-down',
-          tooltip: 'Percentage of ineffective controls',
-          trend: { direction: 'down', value: 5 }
-        },
-        { 
-          label: 'Total Controls', 
-          value: '124', 
-          icon: 'gauge',
-          tooltip: 'Total number of controls'
-        },
-      ],
-      insights: [
-        'Control effectiveness up 3% from previous quarter',
-        'IT controls show highest improvement rate'
-      ],
-      chartData: populatedControlEffectivenessData,
-      chartSeries: [{ name: 'Percentage', dataKey: 'value', color: '#4ade80' }],
-      chartType: 'pie',
-      status: 'success',
-      actionText: 'View Control Details',
-      actionHref: '/controls-testing',
-      chartHeight: 200,
-    },
-    {
-      id: 'risk-trend-analysis',
-      title: 'Risk Trend Analysis',
-      subtitle: 'Risk Level Trends Over Time',
-      icon: <BarChart4 className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'High Risks', 
-          value: '5', 
-          icon: 'trending-up',
-          tooltip: 'Current high severity risks',
-          trend: { direction: 'down', value: 2 }
-        },
-        { 
-          label: 'Medium Risks', 
-          value: '18', 
-          icon: 'trending-up',
-          tooltip: 'Current medium severity risks',
-          trend: { direction: 'up', value: 3 }
-        },
-        { 
-          label: 'Low Risks', 
-          value: '23', 
-          icon: 'trending-down',
-          tooltip: 'Current low severity risks',
-          trend: { direction: 'up', value: 1 }
-        },
-        { 
-          label: 'Risk Score', 
-          value: '3.2', 
-          icon: 'gauge',
-          tooltip: 'Overall weighted risk score'
-        },
-      ],
-      insights: [
-        'High severity risks are trending down',
-        'June showed decrease in overall risk exposure'
-      ],
-      chartData: populatedRiskTrendData,
-      chartSeries: [
-        { name: 'High', dataKey: 'high', color: '#ef4444' },
-        { name: 'Medium', dataKey: 'medium', color: '#f97316' },
-        { name: 'Low', dataKey: 'low', color: '#22c55e' },
-      ],
-      chartType: 'line',
-      xAxisKey: 'name',
-      status: 'warning',
-      actionText: 'View Trend Details',
-      actionHref: '/fmea-analysis',
-      chartHeight: 200,
-    },
-    {
-      id: 'risk-maturity',
-      title: 'Risk Maturity Assessment',
-      subtitle: 'Maturity Level by Category',
-      icon: <Gauge className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Overall Score', 
-          value: '3.5', 
-          icon: 'gauge',
-          tooltip: 'Average maturity score (1-5)',
-          trend: { direction: 'up', value: 10 }
-        },
-        { 
-          label: 'Highest Area', 
-          value: 'Governance', 
-          icon: 'trending-up',
-          tooltip: 'Category with highest maturity'
-        },
-        { 
-          label: 'Lowest Area', 
-          value: 'Response', 
-          icon: 'trending-down',
-          tooltip: 'Category with lowest maturity'
-        },
-        { 
-          label: 'Target Score', 
-          value: '4.0', 
-          icon: 'check',
-          tooltip: 'Target maturity level'
-        },
-      ],
-      insights: [
-        'Risk governance has highest maturity score',
-        'Risk response processes need improvement'
-      ],
-      chartData: populatedRiskMaturityData,
-      chartSeries: [{ name: 'Score', dataKey: 'value', color: '#8b5cf6' }],
-      chartType: 'bar',
-      xAxisKey: 'name',
-      status: 'warning',
-      actionText: 'View Maturity Details',
-      actionHref: '/gap-analysis',
-      chartHeight: 200,
-    },
-    {
-      id: 'risk-treatment',
-      title: 'Risk Treatment Progress',
-      subtitle: 'Status of Mitigation Actions',
-      icon: <TestTube className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Completed', 
-          value: '35%', 
-          icon: 'check',
-          tooltip: 'Percentage of completed actions',
-          trend: { direction: 'up', value: 5 }
-        },
-        { 
-          label: 'In Progress', 
-          value: '45%', 
-          icon: 'trending-up',
-          tooltip: 'Percentage of in-progress actions',
-          trend: { direction: 'down', value: 2 }
-        },
-        { 
-          label: 'Not Started', 
-          value: '20%', 
-          icon: 'circle',
-          tooltip: 'Percentage of not started actions',
-          trend: { direction: 'down', value: 3 }
-        },
-        { 
-          label: 'Total Actions', 
-          value: '84', 
-          icon: 'activity',
-          tooltip: 'Total mitigation actions'
-        },
-      ],
-      insights: [
-        'Completion rate increased 5% since last month',
-        'High-risk issues being addressed with priority'
-      ],
-      chartData: populatedRiskTreatmentData,
-      chartSeries: [{ name: 'Percentage', dataKey: 'value', color: '#06b6d4' }],
-      chartType: 'pie',
-      status: 'warning',
-      actionText: 'View Treatment Details',
-      actionHref: '/controls-testing',
-      chartHeight: 200,
-    },
-    {
-      id: 'incident-severity',
-      title: 'Incident Severity Distribution',
-      subtitle: 'Breakdown by Impact Level',
-      icon: <AlertTriangle className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Critical', 
-          value: '2', 
-          icon: 'trending-up',
-          tooltip: 'Critical severity incidents',
-          trend: { direction: 'neutral', value: 0 }
-        },
-        { 
-          label: 'High', 
-          value: '5', 
-          icon: 'trending-up',
-          tooltip: 'High severity incidents',
-          trend: { direction: 'down', value: 2 }
-        },
-        { 
-          label: 'Medium', 
-          value: '12', 
-          icon: 'trending-up',
-          tooltip: 'Medium severity incidents',
-          trend: { direction: 'up', value: 1 }
-        },
-        { 
-          label: 'Low', 
-          value: '28', 
-          icon: 'trending-down',
-          tooltip: 'Low severity incidents',
-          trend: { direction: 'up', value: 3 }
-        },
-      ],
-      insights: [
-        'Critical incidents require immediate action',
-        'Incident reporting compliance at 94%'
-      ],
-      chartData: populatedIncidentSeverityData,
-      chartSeries: [{ name: 'Count', dataKey: 'value', color: '#f97316' }],
-      chartType: 'bar',
-      xAxisKey: 'name',
-      status: 'error',
-      actionText: 'View Incident Details',
-      actionHref: '/incident-management',
-      chartHeight: 200,
-    },
-    {
-      id: 'process-discovery',
-      title: 'Process Discovery',
-      subtitle: 'Discovered Process Analysis',
-      icon: <GitBranch className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Processes', 
-          value: '5', 
-          icon: 'git-branch',
-          tooltip: 'Discovered core processes'
-        },
-        { 
-          label: 'Activities', 
-          value: '32', 
-          icon: 'activity',
-          tooltip: 'Total process activities'
-        },
-        { 
-          label: 'Critical Paths', 
-          value: '3', 
-          icon: 'alert-triangle',
-          tooltip: 'High-risk process paths'
-        },
-        { 
-          label: 'Bottlenecks', 
-          value: '4', 
-          icon: 'trending-down',
-          tooltip: 'Identified process bottlenecks'
-        },
-      ],
-      insights: [
-        'Payment processing has most automation potential',
-        'Customer onboarding has highest exception rate'
-      ],
-      chartData: populatedProcessDiscoveryData,
-      chartSeries: [{ name: 'Count', dataKey: 'value', color: '#8b5cf6' }],
-      chartType: 'pie',
-      status: 'info',
-      actionText: 'View Process Analysis',
-      actionHref: '/process-discovery',
       chartHeight: 200,
     },
   ];
@@ -870,7 +389,16 @@ const Index = () => {
           Risk Insights
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '700ms' }}>
-          {infoWidgetData.map(module => (
+          {infoWidgetData.slice(0, 7).map(module => (
+            <InfoWidget 
+              key={module.id} 
+              data={module} 
+              isLoading={loading}
+              onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
+            />
+          ))}
+          
+          {infoWidgetData.slice(7, 8).map(module => (
             <InfoWidget 
               key={module.id} 
               data={module} 
@@ -954,4 +482,3 @@ const Index = () => {
 };
 
 export default Index;
-
