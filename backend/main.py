@@ -109,7 +109,7 @@ async def upload_event_log(file: Optional[UploadFile] = None):
         if file_ext not in valid_extensions:
             return UploadResponse(
                 status="failure",
-                msg=f"Invalid file type. Please upload a CSV, XES, XML or TXT file."
+                msg=f"Failed uploading file. Invalid file type. Please upload a CSV, XES, XML or TXT file."
             )
             
         # Simulating file size check
@@ -120,24 +120,24 @@ async def upload_event_log(file: Optional[UploadFile] = None):
         if file_size > max_size:
             return UploadResponse(
                 status="failure",
-                msg=f"File size exceeds the 10MB limit. Your file is {file_size / (1024 * 1024):.2f}MB."
+                msg=f"Failed uploading file. File size exceeds the 10MB limit. Your file is {file_size / (1024 * 1024):.2f}MB."
             )
             
         # Randomly succeed or fail for testing purposes (90% success rate)
         if random.random() < 0.9:
             return UploadResponse(
                 status="success",
-                msg=f"Event log '{filename}' processed successfully",
+                msg=f"File uploaded successfully",
                 bpmn=MOCK_BPMN_DATA
             )
         else:
             return UploadResponse(
                 status="failure",
-                msg=f"Processing failed: Could not parse the event log format."
+                msg=f"Failed uploading file. Could not parse the event log format."
             )
             
     except Exception as e:
         return UploadResponse(
             status="failure",
-            msg=f"Server error: {str(e)}"
+            msg=f"Failed uploading file. Server error: {str(e)}"
         )

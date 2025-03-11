@@ -26,7 +26,7 @@ export const processService = {
       console.error('Error uploading event log:', error);
       return {
         status: 'failure',
-        msg: 'Failed to connect to the server. Please try again later.'
+        msg: 'Failed uploading file. Could not connect to the server. Please try again later.'
       };
     }
   },
