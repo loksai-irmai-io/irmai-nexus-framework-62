@@ -187,18 +187,18 @@ const ProcessDiscovery = () => {
         const response = await processService.uploadEventLog(file);
         setApiResponse(response);
         
-        if (response.status === 'success' && response.bpmn) {
-          setCurrentProcessData(response.bpmn);
-          toast.success(response.msg);
+        if (response.status_code === 'success' && response.data) {
+          setCurrentProcessData(response.data);
+          toast.success(response.message);
         } else {
-          toast.error(response.msg);
+          toast.error(response.message);
         }
       } catch (error) {
         console.error("Error uploading file:", error);
         toast.error('Failed to process the file');
         setApiResponse({
-          status: 'failure',
-          msg: 'Failed to process the file'
+          status_code: 'failed',
+          message: 'Failed to process the file'
         });
       } finally {
         setIsLoading(false);
@@ -241,7 +241,7 @@ const ProcessDiscovery = () => {
                   <TooltipTrigger asChild>
                     <Button 
                       onClick={triggerFileUpload}
-                      variant={isLoading ? "outline" : apiResponse?.status === "success" ? "success" : apiResponse?.status === "failure" ? "error" : "default"}
+                      variant={isLoading ? "outline" : apiResponse?.status_code === "success" ? "success" : apiResponse?.status_code === "failed" ? "error" : "default"}
                       disabled={isLoading}
                     >
                       {isLoading ? (
@@ -256,7 +256,7 @@ const ProcessDiscovery = () => {
                     {isLoading 
                       ? "Processing your event log..." 
                       : apiResponse 
-                        ? apiResponse.msg 
+                        ? apiResponse.message 
                         : "Upload your event log to start process mining"}
                   </TooltipContent>
                 </Tooltip>

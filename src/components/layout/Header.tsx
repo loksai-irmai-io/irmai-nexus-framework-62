@@ -52,8 +52,8 @@ export const handleFileUpload = async (file: File): Promise<EventLogResponse | n
   if (!validFileTypes.includes(fileType) && !file.name.endsWith('.xes')) {
     toast.error("Invalid file type. Please upload a CSV, XES, or XML file.");
     return {
-      status: 'failure',
-      msg: "Invalid file type. Please upload a CSV, XES, or XML file."
+      status_code: 'failed',
+      message: "Invalid file type. Please upload a CSV, XES, or XML file."
     };
   }
   
@@ -61,8 +61,8 @@ export const handleFileUpload = async (file: File): Promise<EventLogResponse | n
   if (file.size > maxSize) {
     toast.error("File is too large. Maximum size is 10MB.");
     return {
-      status: 'failure',
-      msg: "File is too large. Maximum size is 10MB."
+      status_code: 'failed',
+      message: "File is too large. Maximum size is 10MB."
     };
   }
   
@@ -73,18 +73,18 @@ export const handleFileUpload = async (file: File): Promise<EventLogResponse | n
     
     toast.dismiss(loadingToast);
     
-    if (response.status === 'success') {
-      toast.success(response.msg);
+    if (response.status_code === 'success') {
+      toast.success(response.message);
     } else {
-      toast.error(response.msg);
+      toast.error(response.message);
     }
     
     return response;
   } catch (error) {
     toast.error(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     return {
-      status: 'failure',
-      msg: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      status_code: 'failed',
+      message: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
     };
   }
 };
@@ -159,9 +159,9 @@ const Header: React.FC = () => {
       setUploadResponse(response);
       setIsLoading(false);
       
-      if (response && response.status === 'success' && response.bpmn) {
+      if (response && response.status_code === 'success' && response.data) {
         const event = new CustomEvent('processDataUpdated', { 
-          detail: { processData: response.bpmn } 
+          detail: { processData: response.data } 
         });
         window.dispatchEvent(event);
       }
@@ -232,7 +232,7 @@ const Header: React.FC = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button 
-                    variant={isLoading ? "outline" : uploadResponse?.status === "success" ? "success" : uploadResponse?.status === "failure" ? "error" : "outline"} 
+                    variant={isLoading ? "outline" : uploadResponse?.status_code === "success" ? "success" : uploadResponse?.status_code === "failed" ? "error" : "outline"} 
                     size="sm" 
                     className="gap-2 transition-all" 
                     onClick={triggerFileUpload}
@@ -250,7 +250,7 @@ const Header: React.FC = () => {
                   {isLoading 
                     ? "Processing your event log..." 
                     : uploadResponse 
-                      ? uploadResponse.msg
+                      ? uploadResponse.message
                       : "Upload event logs for process mining"}
                 </TooltipContent>
               </Tooltip>

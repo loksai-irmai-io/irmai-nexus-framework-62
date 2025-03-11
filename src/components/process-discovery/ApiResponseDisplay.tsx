@@ -26,7 +26,7 @@ const ApiResponseDisplay: React.FC<ApiResponseDisplayProps> = ({ response, isLoa
   
   if (!response) return null;
   
-  const isSuccess = response.status === 'success';
+  const isSuccess = response.status_code === 'success';
   
   return (
     <Alert 
@@ -41,7 +41,7 @@ const ApiResponseDisplay: React.FC<ApiResponseDisplayProps> = ({ response, isLoa
         {isSuccess ? 'Success' : 'Error'}
       </AlertTitle>
       <AlertDescription>
-        {response.msg}
+        {response.message}
       </AlertDescription>
     </Alert>
   );

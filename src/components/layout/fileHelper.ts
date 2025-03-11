@@ -6,20 +6,20 @@ export const handleFileUpload = async (file: File): Promise<EventLogResponse> =>
   try {
     const response = await processService.uploadEventLog(file);
     
-    if (response.status === 'success') {
-      toast.success(response.msg);
+    if (response.status_code === 'success') {
+      toast.success(response.message);
     } else {
-      toast.error(response.msg);
+      toast.error(response.message);
     }
     
     return response;
   } catch (error) {
     console.error('Error handling file upload:', error);
     const errorResponse: EventLogResponse = {
-      status: 'failure',
-      msg: 'Failed to upload and process the file. Please try again.'
+      status_code: 'failed',
+      message: 'Failed to upload and process the file. Please try again.'
     };
-    toast.error(errorResponse.msg);
+    toast.error(errorResponse.message);
     return errorResponse;
   }
 };
