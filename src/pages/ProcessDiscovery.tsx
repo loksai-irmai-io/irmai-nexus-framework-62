@@ -27,6 +27,7 @@ import {
   GitBranch,
   ChevronRight,
   ChevronLeft,
+  Database
 } from 'lucide-react';
 import ProcessMap from '@/components/process-discovery/ProcessMap';
 import ProcessDetailView from '@/components/process-discovery/ProcessDetailView';
@@ -35,6 +36,8 @@ import { ProcessInsights } from '@/components/process-discovery/ProcessInsights'
 import { ProcessStatistics } from '@/components/process-discovery/ProcessStatistics';
 import { EventLogs } from '@/components/process-discovery/EventLogs';
 import { handleFileUpload } from '@/components/layout/Header';
+import ApiResponseDisplay from '@/components/process-discovery/ApiResponseDisplay';
+import { processService, EventLogResponse } from '@/services/processService';
 
 const processData = {
   nodes: [
@@ -128,12 +131,30 @@ const ProcessDiscovery = () => {
   const [caseVariant, setCaseVariant] = useState("all");
   const [orgUnit, setOrgUnit] = useState("all");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [apiResponse, setApiResponse] = useState<EventLogResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentProcessData, setCurrentProcessData] = useState(processData);
+  
+  useEffect(() => {
+    const handleProcessDataUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail && customEvent.detail.processData) {
+        setCurrentProcessData(customEvent.detail.processData);
+      }
+    };
+    
+    window.addEventListener('processDataUpdated', handleProcessDataUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('processDataUpdated', handleProcessDataUpdate as EventListener);
+    };
+  }, []);
   
   const handleNodeClick = (nodeId: string) => {
     setSelectedNode(nodeId);
     setDetailView(true);
     
-    const node = processData.nodes.find(n => n.id === nodeId);
+    const node = currentProcessData.nodes.find(n => n.id === nodeId);
     if (node) {
       const nodeLabel = node.label;
       const filtered = eventLogs.filter(log => log.activity.includes(nodeLabel));
@@ -160,14 +181,44 @@ const ProcessDiscovery = () => {
     }
   };
   
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      handleFileUpload(file);
+      setIsLoading(true);
+      const response = await handleFileUpload(file);
+      setApiResponse(response);
+      setIsLoading(false);
+      
+      if (response && response.status === 'success' && response.bpmn) {
+        setCurrentProcessData(response.bpmn);
+      }
     }
     
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  const loadFxTradeExample = async () => {
+    setIsLoading(true);
+    try {
+      const response = await processService.getFxTradeExample();
+      setApiResponse(response);
+      
+      if (response.status === 'success' && response.bpmn) {
+        setCurrentProcessData(response.bpmn);
+        toast.success(response.msg);
+      } else {
+        toast.error(response.msg);
+      }
+    } catch (error) {
+      toast.error('Failed to load example data');
+      setApiResponse({
+        status: 'failure',
+        msg: 'Failed to load example data'
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -188,28 +239,67 @@ const ProcessDiscovery = () => {
               </p>
             </div>
             
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept=".csv,.xes,.xml,text/csv,application/xml,text/xml,text/plain"
-              onChange={onFileChange}
-            />
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button onClick={triggerFileUpload}>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload Event Log
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Upload your event log to start process mining</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <div className="flex gap-2">
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept=".csv,.xes,.xml,text/csv,application/xml,text/xml,text/plain"
+                onChange={onFileChange}
+              />
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      onClick={triggerFileUpload}
+                      variant={isLoading ? "outline" : apiResponse?.status === "success" ? "success" : apiResponse?.status === "failure" ? "error" : "default"}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <span className="animate-spin h-4 w-4 rounded-full border-2 border-current border-r-transparent mr-2"></span>
+                      ) : (
+                        <Upload className="h-4 w-4 mr-2" />
+                      )}
+                      Upload Event Log
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {isLoading 
+                      ? "Processing your event log..." 
+                      : apiResponse 
+                        ? apiResponse.msg 
+                        : "Upload your event log to start process mining"}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      onClick={loadFxTradeExample}
+                      disabled={isLoading}
+                    >
+                      <Database className="h-4 w-4 mr-2" />
+                      Load FX Example
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Load an example FX trade process model
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
+
+          {apiResponse && (
+            <ApiResponseDisplay 
+              response={apiResponse} 
+              isLoading={isLoading} 
+            />
+          )}
 
           {detailView ? (
             <>
@@ -227,7 +317,7 @@ const ProcessDiscovery = () => {
 
               <ProcessDetailView 
                 nodeId={selectedNode || ''} 
-                processData={processData}
+                processData={currentProcessData}
                 insights={insights.filter(i => i.nodeId === selectedNode)}
                 eventLogs={filteredLogs}
               />
@@ -311,7 +401,7 @@ const ProcessDiscovery = () => {
                     
                     <TabsContent value="bpmn">
                       <ProcessMap 
-                        processData={processData} 
+                        processData={currentProcessData} 
                         selectedNode={selectedNode} 
                         onNodeClick={handleNodeClick} 
                       />
@@ -353,7 +443,7 @@ const ProcessDiscovery = () => {
               <EventLogs 
                 logs={filteredLogs} 
                 selectedNode={selectedNode} 
-                processNodes={processData.nodes} 
+                processNodes={currentProcessData.nodes} 
               />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useSidebarContext } from './SidebarProvider';
 import { toast } from "sonner";
+import { processService, EventLogResponse } from '@/services/processService';
 
 type Notification = {
   id: string;
@@ -42,28 +43,50 @@ type Notification = {
   type: 'risk' | 'incident' | 'compliance' | 'system';
 };
 
-export const handleFileUpload = (file: File) => {
-  if (!file) return;
+export const handleFileUpload = async (file: File): Promise<EventLogResponse | null> => {
+  if (!file) return null;
   
   const validFileTypes = ['text/csv', 'text/xml', 'application/xml', 'text/plain'];
   const fileType = file.type;
   
   if (!validFileTypes.includes(fileType) && !file.name.endsWith('.xes')) {
     toast.error("Invalid file type. Please upload a CSV, XES, or XML file.");
-    return;
+    return {
+      status: 'failure',
+      msg: "Invalid file type. Please upload a CSV, XES, or XML file."
+    };
   }
   
   const maxSize = 10 * 1024 * 1024;
   if (file.size > maxSize) {
     toast.error("File is too large. Maximum size is 10MB.");
-    return;
+    return {
+      status: 'failure',
+      msg: "File is too large. Maximum size is 10MB."
+    };
   }
   
-  const formData = new FormData();
-  formData.append('eventLog', file);
-  
-  toast.success(`Event log "${file.name}" uploaded successfully!`);
-  console.log("File ready for backend processing:", file.name);
+  try {
+    const loadingToast = toast.loading(`Uploading "${file.name}"...`);
+    
+    const response = await processService.uploadEventLog(file);
+    
+    toast.dismiss(loadingToast);
+    
+    if (response.status === 'success') {
+      toast.success(response.msg);
+    } else {
+      toast.error(response.msg);
+    }
+    
+    return response;
+  } catch (error) {
+    toast.error(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    return {
+      status: 'failure',
+      msg: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    };
+  }
 };
 
 const Header: React.FC = () => {
@@ -71,6 +94,8 @@ const Header: React.FC = () => {
   const [searchValue, setSearchValue] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadResponse, setUploadResponse] = useState<EventLogResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   
   const [notifications, setNotifications] = useState<Notification[]>([
     {
@@ -126,10 +151,20 @@ const Header: React.FC = () => {
     }
   };
 
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      handleFileUpload(file);
+      setIsLoading(true);
+      const response = await handleFileUpload(file);
+      setUploadResponse(response);
+      setIsLoading(false);
+      
+      if (response && response.status === 'success' && response.bpmn) {
+        const event = new CustomEvent('processDataUpdated', { 
+          detail: { processData: response.bpmn } 
+        });
+        window.dispatchEvent(event);
+      }
     }
     
     if (fileInputRef.current) {
@@ -196,12 +231,28 @@ const Header: React.FC = () => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2 transition-all" onClick={triggerFileUpload}>
-                    <FileUp className="h-4 w-4" />
+                  <Button 
+                    variant={isLoading ? "outline" : uploadResponse?.status === "success" ? "success" : uploadResponse?.status === "failure" ? "error" : "outline"} 
+                    size="sm" 
+                    className="gap-2 transition-all" 
+                    onClick={triggerFileUpload}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <span className="animate-spin h-4 w-4 rounded-full border-2 border-current border-r-transparent"></span>
+                    ) : (
+                      <FileUp className="h-4 w-4" />
+                    )}
                     <span>Upload Event Log</span>
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom">Upload event logs for process mining</TooltipContent>
+                <TooltipContent side="bottom">
+                  {isLoading 
+                    ? "Processing your event log..." 
+                    : uploadResponse 
+                      ? uploadResponse.msg
+                      : "Upload event logs for process mining"}
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
             
