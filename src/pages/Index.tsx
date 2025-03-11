@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -382,10 +381,13 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
         'Payment fraud risk increased by 12% this month',
         'Data privacy risks require immediate attention'
       ],
-      chartData: populatedPredictiveRiskData.map(item => ({
-        ...item,
-        size: Math.round(item.probability * item.impact)
-      })),
+      chartData: [
+        { name: 'Fraud', probability: 0.7, impact: 85, size: 60 },
+        { name: 'Data Breach', probability: 0.4, impact: 95, size: 38 },
+        { name: 'System Failure', probability: 0.3, impact: 80, size: 24 },
+        { name: 'Compliance', probability: 0.5, impact: 70, size: 35 },
+        { name: 'Operations', probability: 0.6, impact: 60, size: 36 }
+      ],
       chartSeries: [
         { name: 'Probability', dataKey: 'probability', color: '#8b5cf6' },
         { name: 'Impact', dataKey: 'impact', color: '#ef4444' },
@@ -954,3 +956,4 @@ const Index = () => {
 };
 
 export default Index;
+
