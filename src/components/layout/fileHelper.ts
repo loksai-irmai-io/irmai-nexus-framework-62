@@ -8,6 +8,12 @@ export const handleFileUpload = async (file: File): Promise<EventLogResponse> =>
     
     if (response.status_code === 'success') {
       toast.success(response.message);
+      
+      // Dispatch event to update dashboard
+      const event = new CustomEvent('processDataUpdated', {
+        detail: { processData: response.data }
+      });
+      window.dispatchEvent(event);
     } else {
       toast.error(response.message);
     }

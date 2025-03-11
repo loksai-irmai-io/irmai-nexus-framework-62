@@ -3,10 +3,8 @@ import {
   Bell, 
   Menu, 
   Search, 
-  Upload, 
   AlertTriangle, 
   PlusCircle, 
-  ChevronDown, 
   X,
   Settings,
   HelpCircle,
@@ -32,7 +30,8 @@ import {
 } from "@/components/ui/tooltip";
 import { useSidebarContext } from './SidebarProvider';
 import { toast } from "sonner";
-import { processService, EventLogResponse } from '@/services/processService';
+import { handleFileUpload } from './fileHelper';
+import { EventLogResponse } from '@/services/processService';
 
 type Notification = {
   id: string;
@@ -155,16 +154,15 @@ const Header: React.FC = () => {
     const file = e.target.files?.[0];
     if (file) {
       setIsLoading(true);
+      
+      const loadingToast = toast.loading(`Uploading "${file.name}"...`);
+      
       const response = await handleFileUpload(file);
+      
+      toast.dismiss(loadingToast);
+      
       setUploadResponse(response);
       setIsLoading(false);
-      
-      if (response && response.status_code === 'success' && response.data) {
-        const event = new CustomEvent('processDataUpdated', { 
-          detail: { processData: response.data } 
-        });
-        window.dispatchEvent(event);
-      }
     }
     
     if (fileInputRef.current) {
