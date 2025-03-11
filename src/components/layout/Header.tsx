@@ -30,8 +30,8 @@ import {
 } from "@/components/ui/tooltip";
 import { useSidebarContext } from './SidebarProvider';
 import { toast } from "sonner";
-import { handleFileUpload } from './fileHelper';
-import { EventLogResponse } from '@/services/processService';
+import { processFileUpload } from './fileHelper';
+import { processService } from '@/services/processService';
 
 type Notification = {
   id: string;
@@ -40,52 +40,6 @@ type Notification = {
   time: string;
   read: boolean;
   type: 'risk' | 'incident' | 'compliance' | 'system';
-};
-
-export const handleFileUpload = async (file: File): Promise<EventLogResponse | null> => {
-  if (!file) return null;
-  
-  const validFileTypes = ['text/csv', 'text/xml', 'application/xml', 'text/plain'];
-  const fileType = file.type;
-  
-  if (!validFileTypes.includes(fileType) && !file.name.endsWith('.xes')) {
-    toast.error("Invalid file type. Please upload a CSV, XES, or XML file.");
-    return {
-      status_code: 'failed',
-      message: "Invalid file type. Please upload a CSV, XES, or XML file."
-    };
-  }
-  
-  const maxSize = 10 * 1024 * 1024;
-  if (file.size > maxSize) {
-    toast.error("File is too large. Maximum size is 10MB.");
-    return {
-      status_code: 'failed',
-      message: "File is too large. Maximum size is 10MB."
-    };
-  }
-  
-  try {
-    const loadingToast = toast.loading(`Uploading "${file.name}"...`);
-    
-    const response = await processService.uploadEventLog(file);
-    
-    toast.dismiss(loadingToast);
-    
-    if (response.status_code === 'success') {
-      toast.success(response.message);
-    } else {
-      toast.error(response.message);
-    }
-    
-    return response;
-  } catch (error) {
-    toast.error(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    return {
-      status_code: 'failed',
-      message: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-    };
-  }
 };
 
 const Header: React.FC = () => {
@@ -139,7 +93,7 @@ const Header: React.FC = () => {
     switch(type) {
       case 'risk': return <AlertTriangle className="w-4 h-4 text-risk-high" />;
       case 'incident': return <Bell className="w-4 h-4 text-risk-medium" />;
-      case 'compliance': return <Upload className="w-4 h-4 text-risk-low" />;
+      case 'compliance': return <FileUp className="w-4 h-4 text-risk-low" />;
       default: return <Bell className="w-4 h-4" />;
     }
   };
@@ -157,7 +111,7 @@ const Header: React.FC = () => {
       
       const loadingToast = toast.loading(`Uploading "${file.name}"...`);
       
-      const response = await handleFileUpload(file);
+      const response = await processFileUpload(file);
       
       toast.dismiss(loadingToast);
       
