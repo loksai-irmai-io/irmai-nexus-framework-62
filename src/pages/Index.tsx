@@ -382,23 +382,21 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
         'Data privacy risks require immediate attention'
       ],
       chartData: [
-        { name: 'Fraud', probability: 0.7, impact: 85, size: 60 },
-        { name: 'Data Breach', probability: 0.4, impact: 95, size: 38 },
-        { name: 'System Failure', probability: 0.3, impact: 80, size: 24 },
-        { name: 'Compliance', probability: 0.5, impact: 70, size: 35 },
-        { name: 'Operations', probability: 0.6, impact: 60, size: 36 }
+        { name: 'Fraud', probability: 70, impact: 85, size: 60 },
+        { name: 'Data Breach', probability: 40, impact: 95, size: 38 },
+        { name: 'System Failure', probability: 30, impact: 80, size: 24 },
+        { name: 'Compliance', probability: 50, impact: 70, size: 35 },
+        { name: 'Operations', probability: 60, impact: 60, size: 36 }
       ],
       chartSeries: [
         { name: 'Probability', dataKey: 'probability', color: '#8b5cf6' },
-        { name: 'Impact', dataKey: 'impact', color: '#ef4444' },
-        { name: 'Size', dataKey: 'size', color: '#d946ef' }
+        { name: 'Impact', dataKey: 'impact', color: '#ef4444' }
       ],
-      chartType: 'composed',
-      xAxisKey: 'name',
+      chartType: 'bar',
       status: 'error',
       actionText: 'View Risk Analytics',
       actionHref: '/fmea-analysis',
-      chartHeight: 200,
+      xAxisKey: 'name'
     },
     {
       id: 'control-effectiveness',
