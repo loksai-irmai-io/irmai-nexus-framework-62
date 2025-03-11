@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, List
@@ -58,15 +57,15 @@ class ProcessData(BaseModel):
     edges: List[ProcessEdge]
 
 class UploadResponse(BaseModel):
-    status: str
-    msg: str
-    bpmn: Optional[ProcessData] = None
+    message: str
+    status_code: str
+    data: Optional[ProcessData] = None
 
 # Global variable to store the latest response data
 latest_response = {
     "message": "FX Trade Log API is running",
-    "status": "Waiting for file upload...",
-    "bpmn": None
+    "status_code": "waiting",
+    "data": None
 }
 
 # Mock BPMN data for FX trade log
@@ -109,14 +108,14 @@ async def upload_event_log(file: Optional[UploadFile] = None):
     if file is None:
         logging.info("No file uploaded. Returning mock BPMN data")
         latest_response = {
-            "message": "FX Trade Log API is running",
-            "status": "Example data loaded successfully",
-            "bpmn": MOCK_BPMN_DATA
+            "message": "Example data loaded successfully",
+            "status_code": "success",
+            "data": MOCK_BPMN_DATA
         }
         return UploadResponse(
-            status="success",
-            msg="Example data loaded successfully",
-            bpmn=MOCK_BPMN_DATA
+            message="Example data loaded successfully",
+            status_code="success",
+            data=MOCK_BPMN_DATA
         )
     
     try:
@@ -134,13 +133,14 @@ async def upload_event_log(file: Optional[UploadFile] = None):
         if file_ext not in valid_extensions:
             logging.warning(f"Invalid file type: {file_ext}")
             latest_response = {
-                "message": "FX Trade Log API is running",
-                "status": f"Failed uploading file: Invalid file type. Please upload a CSV, XES, XML, or TXT file.",
-                "bpmn": None
+                "message": "Failed uploading file: Invalid file type. Please upload a CSV, XES, XML, or TXT file.",
+                "status_code": "failed",
+                "data": None
             }
             return UploadResponse(
-                status="failure",
-                msg=f"Failed uploading file: Invalid file type. Please upload a CSV, XES, XML, or TXT file."
+                message="Failed uploading file: Invalid file type. Please upload a CSV, XES, XML, or TXT file.",
+                status_code="failed",
+                data=None
             )
         
         # Simulating file size check
@@ -151,48 +151,51 @@ async def upload_event_log(file: Optional[UploadFile] = None):
         if file_size > max_size:
             logging.warning(f"File too large: {file_size / (1024 * 1024):.2f}MB")
             latest_response = {
-                "message": "FX Trade Log API is running",
-                "status": f"Failed uploading file: File size exceeds the 10MB limit. Your file is {file_size / (1024 * 1024):.2f}MB.",
-                "bpmn": None
+                "message": f"Failed uploading file: File size exceeds the 10MB limit. Your file is {file_size / (1024 * 1024):.2f}MB.",
+                "status_code": "failed",
+                "data": None
             }
             return UploadResponse(
-                status="failure",
-                msg=f"Failed uploading file: File size exceeds the 10MB limit. Your file is {file_size / (1024 * 1024):.2f}MB."
+                message=f"Failed uploading file: File size exceeds the 10MB limit. Your file is {file_size / (1024 * 1024):.2f}MB.",
+                status_code="failed",
+                data=None
             )
         
         # Randomly succeed or fail for testing purposes (90% success rate)
         if random.random() < 0.9:
-            logging.info(f"File '{filename}' processed successfully")
+            logging.info("File processed successfully")
             latest_response = {
-                "message": "FX Trade Log API is running",
-                "status": "File uploaded successfully",
-                "bpmn": MOCK_BPMN_DATA
+                "message": "File uploaded successfully",
+                "status_code": "success",
+                "data": MOCK_BPMN_DATA
             }
             return UploadResponse(
-                status="success",
-                msg="File uploaded successfully",
-                bpmn=MOCK_BPMN_DATA
+                message="File uploaded successfully",
+                status_code="success",
+                data=MOCK_BPMN_DATA
             )
         else:
             logging.error("Processing failed: Could not parse the event log format.")
             latest_response = {
-                "message": "FX Trade Log API is running",
-                "status": "Failed uploading file: Could not parse the event log format.",
-                "bpmn": None
+                "message": "Failed uploading file: Could not parse the event log format.",
+                "status_code": "failed",
+                "data": None
             }
             return UploadResponse(
-                status="failure",
-                msg="Failed uploading file: Could not parse the event log format."
+                message="Failed uploading file: Could not parse the event log format.",
+                status_code="failed",
+                data=None
             )
             
     except Exception as e:
         logging.error(f"Server error: {str(e)}")
         latest_response = {
-            "message": "FX Trade Log API is running",
-            "status": f"Failed uploading file: Server error - {str(e)}",
-            "bpmn": None
+            "message": f"Failed uploading file: Server error - {str(e)}",
+            "status_code": "failed",
+            "data": None
         }
         return UploadResponse(
-            status="failure",
-            msg=f"Failed uploading file: Server error - {str(e)}"
+            message=f"Failed uploading file: Server error - {str(e)}",
+            status_code="failed",
+            data=None
         )

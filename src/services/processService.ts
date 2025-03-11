@@ -3,9 +3,9 @@ import { api } from './apiClient';
 import { ProcessData } from '@/components/process-discovery/types';
 
 export interface EventLogResponse {
-  status: 'success' | 'failure';
-  msg: string;
-  bpmn?: ProcessData;
+  message: string;
+  status_code: string;
+  data?: ProcessData;
 }
 
 const BACKEND_URL = 'http://localhost:8000';
@@ -25,8 +25,8 @@ export const processService = {
     } catch (error) {
       console.error('Error uploading event log:', error);
       return {
-        status: 'failure',
-        msg: 'Failed uploading file: Could not connect to the server. Please try again later.'
+        message: 'Failed uploading file: Could not connect to the server. Please try again later.',
+        status_code: 'failed'
       };
     }
   },
@@ -41,8 +41,8 @@ export const processService = {
     } catch (error) {
       console.error('Error fetching example data:', error);
       return {
-        status: 'failure',
-        msg: 'Failed to connect to the server. Please try again later.'
+        message: 'Failed to connect to the server. Please try again later.',
+        status_code: 'failed'
       };
     }
   }
