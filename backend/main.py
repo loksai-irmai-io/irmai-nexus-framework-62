@@ -87,7 +87,15 @@ def read_root():
     return {"message": "FX Trade Log API is running"}
 
 @app.post("/upload-event-log/", response_model=UploadResponse)
-async def upload_event_log(file: UploadFile = File(...)):
+async def upload_event_log(file: Optional[UploadFile] = None):
+    # If no file is provided, return example data
+    if file is None:
+        return UploadResponse(
+            status="success",
+            msg="Example data loaded successfully",
+            bpmn=MOCK_BPMN_DATA
+        )
+    
     try:
         # Check if file extension is valid
         filename = file.filename
@@ -133,12 +141,3 @@ async def upload_event_log(file: UploadFile = File(...)):
             status="failure",
             msg=f"Server error: {str(e)}"
         )
-
-# Example endpoint to get FX Trade sample data without uploading
-@app.get("/fx-trade-example/", response_model=UploadResponse)
-def get_fx_trade_example():
-    return UploadResponse(
-        status="success",
-        msg="Example FX Trade data loaded successfully",
-        bpmn=MOCK_BPMN_DATA
-    )

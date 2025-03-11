@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -27,8 +26,7 @@ import {
   Network,
   GitBranch,
   ChevronRight,
-  ChevronLeft,
-  Database
+  ChevronLeft
 } from 'lucide-react';
 import ProcessMap from '@/components/process-discovery/ProcessMap';
 import ProcessDetailView from '@/components/process-discovery/ProcessDetailView';
@@ -212,29 +210,6 @@ const ProcessDiscovery = () => {
     }
   };
 
-  const loadFxTradeExample = async () => {
-    setIsLoading(true);
-    try {
-      const response = await processService.getFxTradeExample();
-      setApiResponse(response);
-      
-      if (response.status === 'success' && response.bpmn) {
-        setCurrentProcessData(response.bpmn);
-        toast.success(response.msg);
-      } else {
-        toast.error(response.msg);
-      }
-    } catch (error) {
-      toast.error('Failed to load example data');
-      setApiResponse({
-        status: 'failure',
-        msg: 'Failed to load example data'
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleBackToMap = () => {
     setDetailView(false);
     setSelectedNode(null);
@@ -283,24 +258,6 @@ const ProcessDiscovery = () => {
                       : apiResponse 
                         ? apiResponse.msg 
                         : "Upload your event log to start process mining"}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      onClick={loadFxTradeExample}
-                      disabled={isLoading}
-                    >
-                      <Database className="h-4 w-4 mr-2" />
-                      Load FX Example
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    Load an example FX trade process model
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

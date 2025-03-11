@@ -31,12 +31,15 @@ export const processService = {
     }
   },
   
-  getFxTradeExample: async (): Promise<EventLogResponse> => {
+  getExampleData: async (): Promise<EventLogResponse> => {
     try {
-      const response = await fetch(`${BACKEND_URL}/fx-trade-example/`);
+      // No file uploaded means we get example data
+      const response = await fetch(`${BACKEND_URL}/upload-event-log/`, {
+        method: 'POST',
+      });
       return await response.json();
     } catch (error) {
-      console.error('Error fetching FX trade example:', error);
+      console.error('Error fetching example data:', error);
       return {
         status: 'failure',
         msg: 'Failed to connect to the server. Please try again later.'
