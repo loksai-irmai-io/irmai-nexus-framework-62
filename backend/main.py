@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Optional
+from typing import Optional, Dict, List, Union
 import json
 import random
 import os
@@ -18,17 +18,57 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class Position(BaseModel):
+    x: int
+    y: int
+
+class NodeMetrics(BaseModel):
+    frequency: Optional[int] = None
+    avgDuration: Optional[str] = None
+    waitTime: Optional[str] = None
+    resourceUtilization: Optional[float] = None
+
+class EdgeMetrics(BaseModel):
+    frequency: Optional[int] = None
+    avgDuration: Optional[str] = None
+    waitTime: Optional[str] = None
+    resourceUtilization: Optional[float] = None
+
+class ProcessNode(BaseModel):
+    id: str
+    type: str
+    label: str
+    position: Position
+    compliant: bool
+    metrics: Optional[NodeMetrics] = None
+
+class ProcessEdge(BaseModel):
+    id: str
+    source: str
+    target: str
+    label: Optional[str] = None
+    metrics: Optional[EdgeMetrics] = None
+
+class ProcessData(BaseModel):
+    nodes: List[ProcessNode]
+    edges: List[ProcessEdge]
+
+class UploadResponse(BaseModel):
+    status: str
+    msg: str
+    bpmn: Optional[ProcessData] = None
+
 # Mock BPMN data for FX trade log
 MOCK_BPMN_DATA = {
     "nodes": [
-        {"id": "start", "type": "event", "label": "Start FX Trade", "position": {"x": 100, "y": 150}},
-        {"id": "request", "type": "activity", "label": "Request Quote", "position": {"x": 250, "y": 150}},
-        {"id": "gateway1", "type": "gateway", "label": "Quote Acceptable?", "position": {"x": 400, "y": 150}},
-        {"id": "negotiate", "type": "activity", "label": "Negotiate Terms", "position": {"x": 550, "y": 100}},
-        {"id": "accept", "type": "activity", "label": "Accept Quote", "position": {"x": 550, "y": 200}},
-        {"id": "execute", "type": "activity", "label": "Execute Trade", "position": {"x": 700, "y": 150}},
-        {"id": "settle", "type": "activity", "label": "Settle Trade", "position": {"x": 850, "y": 150}},
-        {"id": "end", "type": "event", "label": "End FX Trade", "position": {"x": 1000, "y": 150}}
+        {"id": "start", "type": "event", "label": "Start FX Trade", "position": {"x": 100, "y": 150}, "compliant": True},
+        {"id": "request", "type": "activity", "label": "Request Quote", "position": {"x": 250, "y": 150}, "compliant": True},
+        {"id": "gateway1", "type": "gateway", "label": "Quote Acceptable?", "position": {"x": 400, "y": 150}, "compliant": True},
+        {"id": "negotiate", "type": "activity", "label": "Negotiate Terms", "position": {"x": 550, "y": 100}, "compliant": False},
+        {"id": "accept", "type": "activity", "label": "Accept Quote", "position": {"x": 550, "y": 200}, "compliant": True},
+        {"id": "execute", "type": "activity", "label": "Execute Trade", "position": {"x": 700, "y": 150}, "compliant": True},
+        {"id": "settle", "type": "activity", "label": "Settle Trade", "position": {"x": 850, "y": 150}, "compliant": True},
+        {"id": "end", "type": "event", "label": "End FX Trade", "position": {"x": 1000, "y": 150}, "compliant": True}
     ],
     "edges": [
         {"id": "e1", "source": "start", "target": "request"},
@@ -41,11 +81,6 @@ MOCK_BPMN_DATA = {
         {"id": "e8", "source": "settle", "target": "end"}
     ]
 }
-
-class UploadResponse(BaseModel):
-    status: str
-    msg: str
-    bpmn: Optional[dict] = None
 
 @app.get("/")
 def read_root():

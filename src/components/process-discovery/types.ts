@@ -37,6 +37,8 @@ export interface ProcessEdge {
   metrics?: {
     frequency?: number;
     avgDuration?: string;
+    waitTime?: string;
+    resourceUtilization?: number;
   };
 }
 

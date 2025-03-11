@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -31,15 +32,14 @@ import {
 } from 'lucide-react';
 import ProcessMap from '@/components/process-discovery/ProcessMap';
 import ProcessDetailView from '@/components/process-discovery/ProcessDetailView';
-import { InsightItem } from '@/components/process-discovery/types';
+import { InsightItem, ProcessData } from '@/components/process-discovery/types';
 import { ProcessInsights } from '@/components/process-discovery/ProcessInsights';
 import { ProcessStatistics } from '@/components/process-discovery/ProcessStatistics';
 import { EventLogs } from '@/components/process-discovery/EventLogs';
-import { handleFileUpload } from '@/components/layout/Header';
 import ApiResponseDisplay from '@/components/process-discovery/ApiResponseDisplay';
 import { processService, EventLogResponse } from '@/services/processService';
 
-const processData = {
+const processData: ProcessData = {
   nodes: [
     { id: 'start', type: 'event', label: 'Start', position: { x: 100, y: 150 }, compliant: true },
     { id: 'checkout', type: 'activity', label: 'Checkout Cart', position: { x: 250, y: 150 }, compliant: true },
@@ -133,7 +133,7 @@ const ProcessDiscovery = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [apiResponse, setApiResponse] = useState<EventLogResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentProcessData, setCurrentProcessData] = useState(processData);
+  const [currentProcessData, setCurrentProcessData] = useState<ProcessData>(processData);
   
   useEffect(() => {
     const handleProcessDataUpdate = (event: Event) => {
@@ -185,12 +185,25 @@ const ProcessDiscovery = () => {
     const file = e.target.files?.[0];
     if (file) {
       setIsLoading(true);
-      const response = await handleFileUpload(file);
-      setApiResponse(response);
-      setIsLoading(false);
-      
-      if (response && response.status === 'success' && response.bpmn) {
-        setCurrentProcessData(response.bpmn);
+      try {
+        const response = await processService.uploadEventLog(file);
+        setApiResponse(response);
+        
+        if (response.status === 'success' && response.bpmn) {
+          setCurrentProcessData(response.bpmn);
+          toast.success(response.msg);
+        } else {
+          toast.error(response.msg);
+        }
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        toast.error('Failed to process the file');
+        setApiResponse({
+          status: 'failure',
+          msg: 'Failed to process the file'
+        });
+      } finally {
+        setIsLoading(false);
       }
     }
     
