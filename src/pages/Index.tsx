@@ -199,6 +199,45 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
   ];
 };
 
+// Add the new chart data for the Risk Insights section
+const emptyControlEffectivenessData = [{ name: 'No Data', value: 100 }];
+const populatedControlEffectivenessData = [
+  { name: 'Fully Effective', value: 45 },
+  { name: 'Partially Effective', value: 35 },
+  { name: 'Needs Improvement', value: 20 }
+];
+
+const emptyRiskTrendData = Array(6).fill(0).map((_, idx) => ({ 
+  month: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'][idx], 
+  current: 0, 
+  previous: 0 
+}));
+
+const populatedRiskTrendData = [
+  { month: 'Jan', current: 65, previous: 70 },
+  { month: 'Feb', current: 58, previous: 62 },
+  { month: 'Mar', current: 70, previous: 65 },
+  { month: 'Apr', current: 84, previous: 75 },
+  { month: 'May', current: 72, previous: 80 },
+  { month: 'Jun', current: 76, previous: 72 }
+];
+
+const emptyRiskMaturityData = [{ category: 'No Data', score: 0 }];
+const populatedRiskMaturityData = [
+  { category: 'Policy', score: 85 },
+  { category: 'Process', score: 72 },
+  { category: 'Technology', score: 68 },
+  { category: 'People', score: 76 },
+  { category: 'Governance', score: 82 }
+];
+
+const emptyRiskTreatmentData = [{ status: 'No Data', value: 100 }];
+const populatedRiskTreatmentData = [
+  { status: 'Completed', value: 45 },
+  { status: 'In Progress', value: 35 },
+  { status: 'Not Started', value: 20 }
+];
+
 const Index = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -212,6 +251,10 @@ const Index = () => {
   const [predictiveRiskData, setPredictiveRiskData] = useState(emptyPredictiveRiskData);
   const [infoWidgetData, setInfoWidgetData] = useState(createEmptyInfoWidgetData());
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [controlEffectivenessData, setControlEffectivenessData] = useState(emptyControlEffectivenessData);
+  const [riskTrendData, setRiskTrendData] = useState(emptyRiskTrendData);
+  const [riskMaturityData, setRiskMaturityData] = useState(emptyRiskMaturityData);
+  const [riskTreatmentData, setRiskTreatmentData] = useState(emptyRiskTreatmentData);
   
   useEffect(() => {
     const handleProcessDataUpdated = () => {
@@ -223,6 +266,10 @@ const Index = () => {
       setOutlierAnalysisData(populatedOutlierAnalysisData);
       setPredictiveRiskData(populatedPredictiveRiskData);
       setInfoWidgetData(createPopulatedInfoWidgetData());
+      setControlEffectivenessData(populatedControlEffectivenessData);
+      setRiskTrendData(populatedRiskTrendData);
+      setRiskMaturityData(populatedRiskMaturityData);
+      setRiskTreatmentData(populatedRiskTreatmentData);
       setDataLoaded(true);
       
       toast.success("Dashboard updated with process mining insights");
@@ -409,9 +456,67 @@ const Index = () => {
           <AIRiskSummary />
         </div>
         
-        <Separator className="my-8 animate-fade-in" style={{ animationDelay: '800ms' }} />
-        
+        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '800ms' }}>
+          Risk Summary
+        </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '900ms' }}>
+          <Chart 
+            title="Control Effectiveness"
+            description="Distribution of control effectiveness ratings"
+            data={controlEffectivenessData}
+            series={[{ name: 'Controls', dataKey: 'value', color: '#10b981' }]}
+            type="pie"
+            showPercentages={true}
+            height={300}
+            tooltip="Status of control mechanisms across risk categories"
+            onClick={(data) => handleNavigate('controls-testing', { status: String(data.name).toLowerCase() })}
+          />
+          
+          <Chart 
+            title="Risk Trend Analysis"
+            description="Current vs Previous Period"
+            data={riskTrendData}
+            series={[
+              { name: 'Current Period', dataKey: 'current', color: '#8b5cf6' },
+              { name: 'Previous Period', dataKey: 'previous', color: '#94a3b8' }
+            ]}
+            type="line"
+            xAxisKey="month"
+            height={300}
+            tooltip="Comparison of risk metrics between current and previous periods"
+            onClick={(data) => handleNavigate('fmea-analysis', { month: data.month })}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '1000ms' }}>
+          <Chart 
+            title="Risk Maturity Assessment"
+            description="Organizational risk maturity by category"
+            data={riskMaturityData}
+            series={[{ name: 'Maturity Score', dataKey: 'score', color: '#f59e0b' }]}
+            type="bar"
+            xAxisKey="category"
+            height={300}
+            tooltip="Maturity level of risk management capabilities across organization"
+            onClick={(data) => handleNavigate('fmea-analysis', { category: data.category })}
+          />
+          
+          <Chart 
+            title="Risk Treatment Progress"
+            description="Status of risk treatment actions"
+            data={riskTreatmentData}
+            series={[{ name: 'Actions', dataKey: 'value', color: '#6366f1' }]}
+            type="pie"
+            showPercentages={true}
+            height={300}
+            tooltip="Progress on implementing risk treatments and mitigation actions"
+            onClick={(data) => handleNavigate('fmea-analysis', { status: String(data.status).toLowerCase() })}
+          />
+        </div>
+        
+        <Separator className="my-8 animate-fade-in" style={{ animationDelay: '1100ms' }} />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '1200ms' }}>
           <Chart 
             title="Controls Health"
             data={controlsHealthData}
@@ -439,7 +544,7 @@ const Index = () => {
           />
         </div>
         
-        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
+        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '1300ms' }}>
           Digital Twin Overview
         </h2>
         <div className="grid grid-cols-1 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '1300ms' }}>
