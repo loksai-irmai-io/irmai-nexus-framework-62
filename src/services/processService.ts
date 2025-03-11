@@ -4,7 +4,7 @@ import { ProcessData } from '@/components/process-discovery/types';
 
 export interface EventLogResponse {
   message: string;
-  status_code: string;
+  status_code: 'success' | 'failed';
   data?: ProcessData;
 }
 
@@ -25,8 +25,8 @@ export const processService = {
     } catch (error) {
       console.error('Error uploading event log:', error);
       return {
+        status_code: 'failed',
         message: 'Failed uploading file: Could not connect to the server. Please try again later.',
-        status_code: 'failed'
       };
     }
   },
@@ -41,8 +41,8 @@ export const processService = {
     } catch (error) {
       console.error('Error fetching example data:', error);
       return {
+        status_code: 'failed',
         message: 'Failed to connect to the server. Please try again later.',
-        status_code: 'failed'
       };
     }
   }

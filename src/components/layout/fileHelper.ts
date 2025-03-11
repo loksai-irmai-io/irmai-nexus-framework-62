@@ -17,7 +17,7 @@ export const handleFileUpload = async (file: File): Promise<EventLogResponse> =>
     console.error('Error handling file upload:', error);
     const errorResponse: EventLogResponse = {
       status_code: 'failed',
-      message: 'Failed to upload and process the file. Please try again.'
+      message: 'Failed uploading file: Could not connect to the server. Please try again later.'
     };
     toast.error(errorResponse.message);
     return errorResponse;
