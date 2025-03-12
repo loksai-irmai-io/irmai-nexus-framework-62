@@ -70,13 +70,13 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = fals
 
   return (
     <Card 
-      className="hover:shadow-md transition-shadow cursor-pointer" 
+      className="hover:shadow-md transition-shadow cursor-pointer w-full h-full flex flex-col" 
       onClick={onClick}
     >
-      <CardContent className="p-6">
-        <div className="space-y-6">
+      <CardContent className="p-6 flex-grow flex flex-col">
+        <div className="flex flex-col h-full">
           {/* Title and Badge Section */}
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between mb-6">
             <div className="space-y-1.5">
               <div className="flex items-center">
                 <span className="flex-shrink-0">{data.icon}</span>
@@ -97,7 +97,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = fals
           </div>
 
           {/* Metrics Grid */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 mb-6">
             {data.metrics.map((metric, index) => (
               <WidgetMetric
                 key={`${data.id}-metric-${index}`}
@@ -110,24 +110,26 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = fals
             ))}
           </div>
 
-          {/* Chart Section */}
+          {/* Chart Section with proper sizing */}
           {data.chartData.length > 0 && (
-            <div className="h-[200px] w-full">
-              <Chart
-                title=""
-                type={data.chartType}
-                data={data.chartData}
-                series={data.chartSeries}
-                xAxisKey="name"
-                height={data.chartHeight || 200}
-                showLegend={false}
-              />
+            <div className="w-full flex-grow flex items-center justify-center">
+              <div className="w-full h-[200px]">
+                <Chart
+                  title=""
+                  type={data.chartType}
+                  data={data.chartData}
+                  series={data.chartSeries}
+                  xAxisKey="name"
+                  height={data.chartHeight || 200}
+                  showLegend={false}
+                />
+              </div>
             </div>
           )}
 
           {/* Insights Section */}
           {data.insights.length > 0 && (
-            <div className="space-y-1">
+            <div className="space-y-1 mt-4">
               {data.insights.map((insight, index) => (
                 <p 
                   key={`${data.id}-insight-${index}`}
