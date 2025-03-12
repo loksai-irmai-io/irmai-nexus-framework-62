@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -824,7 +823,7 @@ const Index = () => {
             value={dataLoaded ? "5" : "0"}
             description="Critical risk items"
             icon={<AlertTriangle className="h-8 w-8 text-red-500" />}
-            trend={dataLoaded ? { type: "down", value: "2" } : undefined}
+            trend={dataLoaded ? -2 : undefined}
             onClick={() => handleMetricClick("High-Severity Risks")}
           />
           <MetricCard 
@@ -832,7 +831,7 @@ const Index = () => {
             value={dataLoaded ? "85%" : "0%"}
             description="Overall compliance"
             icon={<CheckCheck className="h-8 w-8 text-green-500" />}
-            trend={dataLoaded ? { type: "up", value: "5%" } : undefined}
+            trend={dataLoaded ? 5 : undefined}
             onClick={() => handleMetricClick("Compliance Score")}
           />
           <MetricCard 
@@ -840,13 +839,17 @@ const Index = () => {
             value={dataLoaded ? "158" : "0"}
             description="Critical process steps"
             icon={<GitBranch className="h-8 w-8 text-blue-500" />}
-            trend={dataLoaded ? { type: "up", value: "12" } : undefined}
+            trend={dataLoaded ? 12 : undefined}
             onClick={() => handleMetricClick("Critical Process Steps")}
           />
         </div>
         
         <div className="mb-8">
-          <RibbonNav />
+          <RibbonNav>
+            <div className="p-4 border rounded">Sample Content 1</div>
+            <div className="p-4 border rounded">Sample Content 2</div>
+            <div className="p-4 border rounded">Sample Content 3</div>
+          </RibbonNav>
         </div>
         
         {dataLoaded && announcements.length > 0 && (
@@ -938,16 +941,12 @@ const Index = () => {
                 <Chart 
                   type="pie"
                   data={dataLoaded ? riskDistributionData : emptyRiskDistributionData}
-                  dataKeys={['value']}
-                  colors={dataLoaded 
-                    ? riskDistributionData.map(item => item.color)
-                    : ['#f97316', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b']
+                  series={dataLoaded 
+                    ? riskDistributionData.map(item => ({ name: item.name, dataKey: 'value', color: item.color }))
+                    : [{ name: 'Value', dataKey: 'value', color: '#f97316' }]
                   }
-                  tooltipFormatter={(value, name, props) => {
-                    if (!dataLoaded) return ['No data', ''];
-                    return [`${value}% (${props.payload.count} items)`, name];
-                  }}
-                  nameKey="name"
+                  xAxisKey="name"
+                  tooltip={`Distribution of risks across different categories`}
                 />
               </div>
             </CardContent>
@@ -962,10 +961,9 @@ const Index = () => {
                 <Chart 
                   type="bar"
                   data={dataLoaded ? lossEventsData : emptyLossEventsData}
-                  dataKeys={['value']}
-                  colors={['#8b5cf6']}
-                  onBarClick={handleLossEventClick}
-                  nameKey="name"
+                  series={[{ name: 'Value', dataKey: 'value', color: '#8b5cf6' }]}
+                  xAxisKey="name"
+                  onClick={handleLossEventClick}
                 />
               </div>
             </CardContent>
@@ -980,9 +978,8 @@ const Index = () => {
                 <Chart 
                   type="bar"
                   data={dataLoaded ? incidentSeverityData : emptyIncidentSeverityData}
-                  dataKeys={['value']}
-                  colors={['#ef4444']}
-                  nameKey="name"
+                  series={[{ name: 'Value', dataKey: 'value', color: '#ef4444' }]}
+                  xAxisKey="name"
                 />
               </div>
             </CardContent>
@@ -997,9 +994,8 @@ const Index = () => {
                 <Chart 
                   type="pie"
                   data={dataLoaded ? controlsHealthData : emptyControlsHealthData}
-                  dataKeys={['value']}
-                  colors={dataLoaded ? ['#10b981', '#ef4444'] : ['#94a3b8']}
-                  nameKey="name"
+                  series={[{ name: 'Value', dataKey: 'value', color: dataLoaded ? '#10b981' : '#94a3b8' }]}
+                  xAxisKey="name"
                 />
               </div>
             </CardContent>
@@ -1012,7 +1008,7 @@ const Index = () => {
               <InfoWidget 
                 key={widget.id}
                 data={widget}
-                onAction={() => handleNavigate(widget.id)}
+                onClick={() => handleNavigate(widget.id)}
               />
             ))}
           </div>
@@ -1021,7 +1017,7 @@ const Index = () => {
               <InfoWidget 
                 key={widget.id}
                 data={widget}
-                onAction={() => handleNavigate(widget.id)}
+                onClick={() => handleNavigate(widget.id)}
               />
             ))}
           </div>
