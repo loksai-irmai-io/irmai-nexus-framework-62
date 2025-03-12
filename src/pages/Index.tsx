@@ -333,10 +333,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
           tooltip: 'Number of low severity risks'
         }
       ],
-      insights: [
-        'Payment fraud risk increased by 12% this month',
-        'Data privacy risks require immediate attention'
-      ],
+      
       chartData: [
         { name: 'Fraud', probability: 0.3, impact: 85, size: 25 },
         { name: 'Data Breach', probability: 0.4, impact: 95, size: 38 },
@@ -388,10 +385,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
           tooltip: 'Number of resource outliers'
         }
       ],
-      insights: [
-        '5 new anomalies detected in the payment process',
-        'Loan approval has unusual timestamp patterns'
-      ],
+      
       chartData: populatedOutlierAnalysisData,
       chartSeries: [
         { name: 'Anomaly Count', dataKey: 'count', color: '#f97316' },
@@ -436,10 +430,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
           tooltip: 'Number of compliance frameworks'
         }
       ],
-      insights: [
-        'GDPR compliance score improved by 5% this quarter',
-        'PCI-DSS has 2 new gaps requiring immediate action'
-      ],
+      
       chartData: [
         { name: 'PCI-DSS', current: 75, target: 100 },
         { name: 'GDPR', current: 85, target: 100 },
@@ -489,10 +480,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
           tooltip: 'Total number of cases'
         }
       ],
-      insights: [
-        'Payment processing has 3 bottlenecks identified',
-        'Customer onboarding has 2 automation opportunities'
-      ],
+      
       chartData: populatedProcessDiscoveryData,
       chartSeries: [
         { name: 'Process Steps', dataKey: 'value', color: '#10b981' }
@@ -536,10 +524,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
           trend: { direction: 'down', value: 3 }
         }
       ],
-      insights: [
-        'No new controls tested this week (awaiting scheduling)',
-        'Evidence collection automation in progress'
-      ],
+     
       chartData: populatedControlsHealthData,
       chartSeries: [
         { name: 'Controls', dataKey: 'value', color: '#10b981' }
@@ -583,10 +568,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
           trend: { direction: 'up', value: 1 }
         }
       ],
-      insights: [
-        'Financial loss peaked in March 2025 ($260K)',
-        'Major data breach incident resolved last week'
-      ],
+     
       chartData: populatedLossEventsData,
       chartSeries: [
         { name: 'Incident Count', dataKey: 'events', color: '#a855f7' },
@@ -630,10 +612,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
           tooltip: 'Average loss per scenario'
         }
       ],
-      insights: [
-        'Disaster recovery scenario indicates 20% potential revenue impact',
-        '3 new simulations pending for Q1 2026'
-      ],
+     
       chartData: [
         { name: 'Data Breach', probability: 0.8, impact: 85, size: 68 },
         { name: 'System Failure', probability: 0.6, impact: 65, size: 39 },
