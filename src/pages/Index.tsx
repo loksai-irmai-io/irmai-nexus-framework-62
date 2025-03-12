@@ -138,7 +138,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
         'Upload a file to see risk insights'
       ],
       chartData: [],
-      chartSeries: [],
+      chartSeries: [{ name: 'Value', dataKey: 'value', color: '#8b5cf6' }],
       chartType: 'composed',
       status: 'info',
       actionText: 'View Risk Analytics',
@@ -161,7 +161,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
         'Upload a file to see compliance insights'
       ],
       chartData: [],
-      chartSeries: [],
+      chartSeries: [{ name: 'Compliance', dataKey: 'value', color: '#10b981' }],
       chartType: 'bar',
       status: 'info',
       actionText: 'View Compliance Dashboard',
@@ -184,7 +184,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
         'Upload a file to see process insights'
       ],
       chartData: [],
-      chartSeries: [],
+      chartSeries: [{ name: 'Value', dataKey: 'value', color: '#0ea5e9' }],
       chartType: 'pie',
       status: 'info',
       actionText: 'View Process Maps',
@@ -207,7 +207,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
         'Upload a file to see anomaly insights'
       ],
       chartData: [],
-      chartSeries: [],
+      chartSeries: [{ name: 'Anomalies', dataKey: 'value', color: '#f43f5e' }],
       chartType: 'line',
       status: 'info',
       actionText: 'View Outlier Analysis',
@@ -230,7 +230,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
         'Upload a file to see control insights'
       ],
       chartData: [],
-      chartSeries: [],
+      chartSeries: [{ name: 'Controls', dataKey: 'value', color: '#0ea5e9' }],
       chartType: 'pie',
       status: 'info',
       actionText: 'View Controls Testing',
@@ -253,7 +253,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
         'Upload a file to see scenario insights'
       ],
       chartData: [],
-      chartSeries: [],
+      chartSeries: [{ name: 'Scenarios', dataKey: 'value', color: '#f97316' }],
       chartType: 'composed',
       status: 'info',
       actionText: 'View Scenario Analysis',
@@ -276,7 +276,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
         'Upload a file to see impact insights'
       ],
       chartData: [],
-      chartSeries: [],
+      chartSeries: [{ name: 'Impact', dataKey: 'value', color: '#f43f5e' }],
       chartType: 'bar',
       status: 'info',
       actionText: 'View Impact Analysis',
