@@ -9,7 +9,7 @@ export const processFileUpload = async (file: File): Promise<EventLogResponse> =
     if (response.status_code === 'success') {
       toast.success(response.message);
       
-      // Dispatch event to update dashboard
+      // Dispatch event to update dashboard and all risk insight widgets
       const event = new CustomEvent('processDataUpdated', {
         detail: { processData: response.data }
       });

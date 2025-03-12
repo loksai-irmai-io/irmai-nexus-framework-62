@@ -17,7 +17,14 @@ import {
   TestTube, 
   Presentation,
   Gauge,
-  BarChart4
+  BarChart4,
+  FileText,
+  Building,
+  Users,
+  Zap,
+  Target,
+  Briefcase,
+  Database
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
@@ -138,6 +145,144 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       actionHref: '/fmea-analysis',
       chartHeight: 200,
     },
+    {
+      id: 'compliance-monitoring',
+      title: 'Compliance Monitoring',
+      subtitle: 'Regulatory Framework Status',
+      icon: <FileText className="h-5 w-5 text-primary" />,
+      metrics: [
+        { label: 'Overall Score', value: '0%', icon: 'activity' },
+        { label: 'Frameworks', value: '0', icon: 'layers' },
+        { label: 'Open Issues', value: '0', icon: 'alert-triangle' },
+        { label: 'Tests Passing', value: '0%', icon: 'check-circle' },
+      ],
+      insights: [
+        'No compliance data available yet',
+        'Upload a file to see compliance insights'
+      ],
+      chartData: [],
+      chartSeries: [],
+      chartType: 'bar',
+      status: 'info',
+      actionText: 'View Compliance Dashboard',
+      actionHref: '/compliance-monitoring',
+      chartHeight: 200,
+    },
+    {
+      id: 'process-discovery',
+      title: 'Process Mining',
+      subtitle: 'Process Flow Analysis',
+      icon: <GitBranch className="h-5 w-5 text-primary" />,
+      metrics: [
+        { label: 'Processes', value: '0', icon: 'git-branch' },
+        { label: 'Activities', value: '0', icon: 'box' },
+        { label: 'Variations', value: '0', icon: 'git-merge' },
+        { label: 'Bottlenecks', value: '0', icon: 'alert-triangle' },
+      ],
+      insights: [
+        'No process data available yet',
+        'Upload a file to see process insights'
+      ],
+      chartData: [],
+      chartSeries: [],
+      chartType: 'pie',
+      status: 'info',
+      actionText: 'View Process Maps',
+      actionHref: '/process-discovery',
+      chartHeight: 200,
+    },
+    {
+      id: 'outlier-analysis',
+      title: 'Anomaly Detection',
+      subtitle: 'Outlier Transaction Analysis',
+      icon: <SearchX className="h-5 w-5 text-primary" />,
+      metrics: [
+        { label: 'Outliers', value: '0', icon: 'search' },
+        { label: 'False Positives', value: '0', icon: 'x-circle' },
+        { label: 'Patterns', value: '0', icon: 'grid' },
+        { label: 'Alert Rate', value: '0%', icon: 'bell' },
+      ],
+      insights: [
+        'No outlier data available yet',
+        'Upload a file to see anomaly insights'
+      ],
+      chartData: [],
+      chartSeries: [],
+      chartType: 'line',
+      status: 'info',
+      actionText: 'View Outlier Analysis',
+      actionHref: '/outlier-analysis',
+      chartHeight: 200,
+    },
+    {
+      id: 'controls-testing',
+      title: 'Controls Monitoring',
+      subtitle: 'Control Testing Results',
+      icon: <TestTube className="h-5 w-5 text-primary" />,
+      metrics: [
+        { label: 'Controls', value: '0', icon: 'shield' },
+        { label: 'Failing', value: '0', icon: 'x-circle' },
+        { label: 'Passing', value: '0', icon: 'check-circle' },
+        { label: 'Untested', value: '0', icon: 'help-circle' },
+      ],
+      insights: [
+        'No control data available yet',
+        'Upload a file to see control insights'
+      ],
+      chartData: [],
+      chartSeries: [],
+      chartType: 'pie',
+      status: 'info',
+      actionText: 'View Controls Testing',
+      actionHref: '/controls-testing',
+      chartHeight: 200,
+    },
+    {
+      id: 'scenario-analysis',
+      title: 'Scenario Modeling',
+      subtitle: 'Risk Simulation Analysis',
+      icon: <Presentation className="h-5 w-5 text-primary" />,
+      metrics: [
+        { label: 'Scenarios', value: '0', icon: 'copy' },
+        { label: 'Avg. Loss', value: '$0', icon: 'dollar-sign' },
+        { label: 'Worst Case', value: '$0', icon: 'trending-up' },
+        { label: 'VaR', value: '$0', icon: 'bar-chart' },
+      ],
+      insights: [
+        'No scenario data available yet',
+        'Upload a file to see scenario insights'
+      ],
+      chartData: [],
+      chartSeries: [],
+      chartType: 'composed',
+      status: 'info',
+      actionText: 'View Scenario Analysis',
+      actionHref: '/scenario-analysis',
+      chartHeight: 200,
+    },
+    {
+      id: 'impact-analysis',
+      title: 'Impact Analysis',
+      subtitle: 'Business Impact Assessment',
+      icon: <Target className="h-5 w-5 text-primary" />,
+      metrics: [
+        { label: 'Total Impact', value: '$0', icon: 'dollar-sign' },
+        { label: 'Risk Areas', value: '0', icon: 'layers' },
+        { label: 'Critical', value: '0', icon: 'alert-triangle' },
+        { label: 'Acceptable', value: '0', icon: 'check' },
+      ],
+      insights: [
+        'No impact data available yet',
+        'Upload a file to see impact insights'
+      ],
+      chartData: [],
+      chartSeries: [],
+      chartType: 'bar',
+      status: 'info',
+      actionText: 'View Impact Analysis',
+      actionHref: '/impact-analysis',
+      chartHeight: 200,
+    },
   ];
 };
 
@@ -196,6 +341,317 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       actionHref: '/fmea-analysis',
       chartHeight: 200,
     },
+    {
+      id: 'compliance-monitoring',
+      title: 'Compliance Monitoring',
+      subtitle: 'Regulatory Framework Status',
+      icon: <FileText className="h-5 w-5 text-primary" />,
+      metrics: [
+        { 
+          label: 'Overall Score', 
+          value: '85%', 
+          icon: 'activity',
+          tooltip: 'Overall compliance score across frameworks',
+          trend: { direction: 'up', value: 3 }
+        },
+        { 
+          label: 'Frameworks', 
+          value: '6', 
+          icon: 'layers',
+          tooltip: 'Active compliance frameworks'
+        },
+        { 
+          label: 'Open Issues', 
+          value: '12', 
+          icon: 'alert-triangle',
+          tooltip: 'Compliance issues requiring attention',
+          trend: { direction: 'down', value: 5 }
+        },
+        { 
+          label: 'Tests Passing', 
+          value: '92%', 
+          icon: 'check-circle',
+          tooltip: 'Percentage of controls passing tests',
+          trend: { direction: 'up', value: 4 }
+        },
+      ],
+      insights: [
+        'GDPR compliance improved 8% through data handling changes',
+        'SOC2 control gaps identified in vendor management'
+      ],
+      chartData: [
+        { name: 'GDPR', value: 94 },
+        { name: 'SOX', value: 88 },
+        { name: 'PCI-DSS', value: 76 },
+        { name: 'HIPAA', value: 82 },
+        { name: 'SOC2', value: 79 }
+      ],
+      chartSeries: [
+        { name: 'Compliance Score', dataKey: 'value', color: '#10b981' }
+      ],
+      chartType: 'bar',
+      xAxisKey: 'name',
+      status: 'warning',
+      actionText: 'View Compliance Dashboard',
+      actionHref: '/compliance-monitoring',
+      chartHeight: 200,
+    },
+    {
+      id: 'process-discovery',
+      title: 'Process Mining',
+      subtitle: 'Process Flow Analysis',
+      icon: <GitBranch className="h-5 w-5 text-primary" />,
+      metrics: [
+        { 
+          label: 'Processes', 
+          value: '24', 
+          icon: 'git-branch',
+          tooltip: 'Number of processes analyzed'
+        },
+        { 
+          label: 'Activities', 
+          value: '186', 
+          icon: 'box',
+          tooltip: 'Total activities across all processes'
+        },
+        { 
+          label: 'Variations', 
+          value: '43', 
+          icon: 'git-merge',
+          tooltip: 'Process variations identified',
+          trend: { direction: 'up', value: 12 }
+        },
+        { 
+          label: 'Bottlenecks', 
+          value: '7', 
+          icon: 'alert-triangle',
+          tooltip: 'Process bottlenecks identified',
+          trend: { direction: 'down', value: 2 }
+        },
+      ],
+      insights: [
+        'Customer onboarding process has 3 key bottlenecks',
+        'Payment approval has 67% more variations than last quarter'
+      ],
+      chartData: populatedProcessDiscoveryData,
+      chartSeries: [
+        { name: 'Process Steps', dataKey: 'value', color: '#0ea5e9' }
+      ],
+      chartType: 'pie',
+      status: 'warning',
+      actionText: 'View Process Maps',
+      actionHref: '/process-discovery',
+      chartHeight: 200,
+    },
+    {
+      id: 'outlier-analysis',
+      title: 'Anomaly Detection',
+      subtitle: 'Outlier Transaction Analysis',
+      icon: <SearchX className="h-5 w-5 text-primary" />,
+      metrics: [
+        { 
+          label: 'Outliers', 
+          value: '57', 
+          icon: 'search',
+          tooltip: 'Anomalous transactions detected',
+          trend: { direction: 'up', value: 8 }
+        },
+        { 
+          label: 'False Positives', 
+          value: '14', 
+          icon: 'x-circle',
+          tooltip: 'Incorrectly flagged transactions',
+          trend: { direction: 'down', value: 3 }
+        },
+        { 
+          label: 'Patterns', 
+          value: '6', 
+          icon: 'grid',
+          tooltip: 'Distinct anomaly patterns identified'
+        },
+        { 
+          label: 'Alert Rate', 
+          value: '2.1%', 
+          icon: 'bell',
+          tooltip: 'Percentage of transactions flagged'
+        },
+      ],
+      insights: [
+        'User authentication outliers increased 24% this month',
+        'New anomaly pattern detected in payment authorizations'
+      ],
+      chartData: populatedOutlierAnalysisData,
+      chartSeries: [
+        { name: 'Anomaly Count', dataKey: 'count', color: '#f43f5e' },
+        { name: 'Alert Rate (%)', dataKey: 'rate', color: '#8b5cf6' }
+      ],
+      chartType: 'line',
+      xAxisKey: 'name',
+      status: 'error',
+      actionText: 'View Outlier Analysis',
+      actionHref: '/outlier-analysis',
+      chartHeight: 200,
+    },
+    {
+      id: 'controls-testing',
+      title: 'Controls Monitoring',
+      subtitle: 'Control Testing Results',
+      icon: <TestTube className="h-5 w-5 text-primary" />,
+      metrics: [
+        { 
+          label: 'Controls', 
+          value: '124', 
+          icon: 'shield',
+          tooltip: 'Total number of controls monitored'
+        },
+        { 
+          label: 'Failing', 
+          value: '19', 
+          icon: 'x-circle',
+          tooltip: 'Controls failing tests',
+          trend: { direction: 'down', value: 4 }
+        },
+        { 
+          label: 'Passing', 
+          value: '98', 
+          icon: 'check-circle',
+          tooltip: 'Controls passing tests',
+          trend: { direction: 'up', value: 3 }
+        },
+        { 
+          label: 'Untested', 
+          value: '7', 
+          icon: 'help-circle',
+          tooltip: 'Controls awaiting testing'
+        },
+      ],
+      insights: [
+        'Access control failures decreased by 15% after IAM updates',
+        'Data validation controls need review in customer database'
+      ],
+      chartData: [
+        { name: 'Passing', value: 98 },
+        { name: 'Failing', value: 19 },
+        { name: 'Untested', value: 7 }
+      ],
+      chartSeries: [
+        { name: 'Controls', dataKey: 'value', color: '#0ea5e9' }
+      ],
+      chartType: 'pie',
+      status: 'warning',
+      actionText: 'View Controls Testing',
+      actionHref: '/controls-testing',
+      chartHeight: 200,
+    },
+    {
+      id: 'scenario-analysis',
+      title: 'Scenario Modeling',
+      subtitle: 'Risk Simulation Analysis',
+      icon: <Presentation className="h-5 w-5 text-primary" />,
+      metrics: [
+        { 
+          label: 'Scenarios', 
+          value: '14', 
+          icon: 'copy',
+          tooltip: 'Number of risk scenarios modeled'
+        },
+        { 
+          label: 'Avg. Loss', 
+          value: '$650K', 
+          icon: 'dollar-sign',
+          tooltip: 'Average loss per scenario',
+          trend: { direction: 'up', value: 50 }
+        },
+        { 
+          label: 'Worst Case', 
+          value: '$3.2M', 
+          icon: 'trending-up',
+          tooltip: 'Worst-case loss estimation',
+          trend: { direction: 'up', value: 400 }
+        },
+        { 
+          label: 'VaR', 
+          value: '$975K', 
+          icon: 'bar-chart',
+          tooltip: 'Value at Risk (95% confidence)',
+          trend: { direction: 'up', value: 120 }
+        },
+      ],
+      insights: [
+        'Data breach scenario shows 22% higher impact than last quarter',
+        'Supply chain disruption is now the highest financial risk'
+      ],
+      chartData: [
+        { name: 'Data Breach', expected: 850000, worst: 3200000, likelihood: 0.3 },
+        { name: 'Fraud', expected: 420000, worst: 1500000, likelihood: 0.5 },
+        { name: 'System Outage', expected: 680000, worst: 2100000, likelihood: 0.2 },
+        { name: 'Supply Chain', expected: 950000, worst: 2800000, likelihood: 0.4 },
+        { name: 'Regulatory', expected: 750000, worst: 2500000, likelihood: 0.25 }
+      ],
+      chartSeries: [
+        { name: 'Expected Loss', dataKey: 'expected', color: '#f97316' },
+        { name: 'Worst Case', dataKey: 'worst', color: '#ef4444' }
+      ],
+      chartType: 'composed',
+      xAxisKey: 'name',
+      status: 'error',
+      actionText: 'View Scenario Analysis',
+      actionHref: '/scenario-analysis',
+      chartHeight: 200,
+    },
+    {
+      id: 'impact-analysis',
+      title: 'Impact Analysis',
+      subtitle: 'Business Impact Assessment',
+      icon: <Target className="h-5 w-5 text-primary" />,
+      metrics: [
+        { 
+          label: 'Total Impact', 
+          value: '$1.8M', 
+          icon: 'dollar-sign',
+          tooltip: 'Total estimated financial impact',
+          trend: { direction: 'up', value: 200 }
+        },
+        { 
+          label: 'Risk Areas', 
+          value: '8', 
+          icon: 'layers',
+          tooltip: 'Business areas affected by risks'
+        },
+        { 
+          label: 'Critical', 
+          value: '3', 
+          icon: 'alert-triangle',
+          tooltip: 'Number of critical impact items',
+          trend: { direction: 'down', value: 1 }
+        },
+        { 
+          label: 'Acceptable', 
+          value: '5', 
+          icon: 'check',
+          tooltip: 'Number of acceptable impact items'
+        },
+      ],
+      insights: [
+        'Financial operations show highest potential impact at $780K',
+        'Customer data systems upgraded, reducing critical impacts by 1'
+      ],
+      chartData: [
+        { name: 'Financial', value: 780000 },
+        { name: 'Operations', value: 450000 },
+        { name: 'Customer Data', value: 320000 },
+        { name: 'Reputation', value: 250000 }
+      ],
+      chartSeries: [
+        { name: 'Impact ($K)', dataKey: 'value', color: '#f43f5e' }
+      ],
+      chartType: 'bar',
+      xAxisKey: 'name',
+      status: 'warning',
+      actionText: 'View Impact Analysis',
+      actionHref: '/impact-analysis',
+      chartHeight: 200,
+    },
   ];
 };
 
@@ -210,8 +666,9 @@ const Index = () => {
   const [processDiscoveryData, setProcessDiscoveryData] = useState(emptyProcessDiscoveryData);
   const [outlierAnalysisData, setOutlierAnalysisData] = useState(emptyOutlierAnalysisData);
   const [predictiveRiskData, setPredictiveRiskData] = useState(emptyPredictiveRiskData);
-  const [infoWidgetData, setInfoWidgetData] = useState(createEmptyInfoWidgetData());
   const [dataLoaded, setDataLoaded] = useState(false);
+  
+  const [infoWidgetData, setInfoWidgetData] = useState(createEmptyInfoWidgetData());
   
   useEffect(() => {
     const handleProcessDataUpdated = () => {
@@ -360,125 +817,3 @@ const Index = () => {
             tooltip="Estimated financial impact of all identified risks"
             trend={dataLoaded ? 12 : undefined}
             isLoading={loading}
-            onClick={() => handleMetricClick("Potential Loss")}
-          />
-          <MetricCard
-            title="Control Failures"
-            value={dataLoaded ? "15%" : "0%"}
-            severity="medium"
-            icon={<Gauge className="h-5 w-5" />}
-            tooltip="Percentage of control models that have failed testing"
-            trend={dataLoaded ? -3 : undefined}
-            isLoading={loading}
-            onClick={() => handleMetricClick("Control Failures")}
-          />
-          <MetricCard
-            title="Scenario Analysis"
-            value={dataLoaded ? "3.2M" : "0"}
-            prefix="$"
-            severity="high"
-            icon={<BarChart4 className="h-5 w-5" />}
-            tooltip="Projected loss based on current scenario analysis"
-            trend={dataLoaded ? 8 : undefined}
-            isLoading={loading}
-            onClick={() => handleMetricClick("Scenario Analysis")}
-          />
-        </RibbonNav>
-        
-        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '600ms' }}>
-          Risk Insights
-        </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '700ms' }}>
-          {infoWidgetData.slice(0, 7).map(module => (
-            <InfoWidget 
-              key={module.id} 
-              data={module} 
-              isLoading={loading}
-              onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
-            />
-          ))}
-          
-          {infoWidgetData.slice(7, 8).map(module => (
-            <InfoWidget 
-              key={module.id} 
-              data={module} 
-              isLoading={loading}
-              onClick={() => handleNavigate(module.actionHref.replace('/', ''))} 
-            />
-          ))}
-          <AIRiskSummary />
-        </div>
-        
-        <Separator className="my-8 animate-fade-in" style={{ animationDelay: '800ms' }} />
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '900ms' }}>
-          <Chart 
-            title="Controls Health"
-            data={controlsHealthData}
-            series={[{ name: 'Percentage', dataKey: 'value', color: '#4ade80' }]}
-            type="pie"
-            showPercentages={true}
-            height={300}
-            tooltip="Current health status of control mechanisms"
-            onClick={(data) => handleNavigate('controls-testing', { status: String(data.name).toLowerCase() })}
-          />
-          
-          <Chart 
-            title="Loss Events Over Time"
-            description="Trend of financial impact and event count by month"
-            data={lossEventsData}
-            series={[
-              { name: 'Financial Loss ($K)', dataKey: 'amount', color: '#ef4444' },
-              { name: 'Event Count', dataKey: 'events', color: '#8b5cf6' }
-            ]}
-            type="composed"
-            xAxisKey="name"
-            height={300}
-            tooltip="Click on any month to see detailed incident reports for that period"
-            onClick={handleLossEventClick}
-          />
-        </div>
-        
-        <h2 className="text-2xl font-semibold tracking-tight mb-4 mt-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
-          Digital Twin Overview
-        </h2>
-        <div className="grid grid-cols-1 gap-6 mb-6 animate-fade-in" style={{ animationDelay: '1300ms' }}>
-          <div className="w-full">
-            <div className="p-1 border border-primary/20 rounded-lg bg-primary/5">
-              <div className="relative w-full aspect-video sm:aspect-[16/9] xl:aspect-[21/9] overflow-hidden rounded-lg">
-                <KnowledgeGraph className="w-full h-full" />
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground mt-2 italic">
-              <span>This is your central data hub – all insights and interdependencies are sourced here.</span>
-            </p>
-          </div>
-        </div>
-        
-        <div className="mb-8 animate-fade-in" style={{ animationDelay: '1100ms' }}>
-          <h2 className="text-2xl font-semibold tracking-tight mb-4 animate-fade-in">
-            Announcements & Tips
-          </h2>
-          <div className="bg-card rounded-lg border shadow-sm p-4">
-            <div className="space-y-3 text-sm">
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark:border-blue-800">
-                <p className="font-medium text-blue-800 dark:text-blue-300 mb-1">New Feature</p>
-                <p className="text-blue-700 dark:text-blue-400">Knowledge Graph now supports interactive drilling through relationships between risks and controls.</p>
-              </div>
-              <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md border border-yellow-200 dark:border-yellow-800">
-                <p className="font-medium text-yellow-800 dark:text-yellow-300 mb-1">Tip</p>
-                <p className="text-yellow-700 dark:text-yellow-400">Use the Risk Catalog to drill into detailed risk descriptions and mitigations.</p>
-              </div>
-              <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-md border border-purple-200 dark:border-purple-800">
-                <p className="font-medium text-purple-800 dark:text-purple-300 mb-1">Training</p>
-                <p className="text-purple-700 dark:text-purple-400">New training session on FMEA Analysis scheduled for next Friday.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Layout>
-  );
-};
-
-export default Index;
