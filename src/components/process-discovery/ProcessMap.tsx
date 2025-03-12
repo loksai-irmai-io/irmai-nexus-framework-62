@@ -282,10 +282,10 @@ const ProcessMap: React.FC<ProcessMapProps> = ({
       );
     }
 
-    // Updated image paths to correctly reference uploaded images
+    // Define the correct image paths for each view type
     let imageSrc = '';
     if (viewType === 'bpmn') {
-      imageSrc = '/lovable-uploads/69e74ee4-1d9d-4dd8-8d7a-337f98ec4ebf.png';
+      imageSrc = '/lovable-uploads/2a99db55-215b-49b5-89e3-c992061b6c12.png';
     } else if (viewType === 'petri') {
       imageSrc = '/lovable-uploads/33fefa45-61b2-4fbd-ac25-94d1a0d4754c.png';
     } else if (viewType === 'tree') {
