@@ -38,7 +38,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
   
   useEffect(() => {
     if (animate) {
-      // Generate sample graph data
       const nodes = [
         { id: 'payment-process', name: 'Payment Process', group: 1, size: 15 },
         { id: 'customer-onboarding', name: 'Customer Onboarding', group: 1, size: 12 },
