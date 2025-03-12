@@ -18,7 +18,7 @@ import {
   Presentation,
   Gauge,
   BarChart4,
-  FileText,
+  FileText as FileTextIcon,
   Building,
   Users,
   Zap,
@@ -178,7 +178,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       id: 'compliance-monitoring',
       title: 'Compliance Monitoring',
       subtitle: 'Regulatory Industry & Internal Policy Gaps',
-      icon: <FileText className="h-5 w-5 text-primary" />,
+      icon: <FileTextIcon className="h-5 w-5 text-primary" />,
       metrics: [
         { label: 'Compliance Score', value: '0%', icon: 'activity' },
         { label: 'Critical Gaps', value: '0', icon: 'layers' },
@@ -355,8 +355,8 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
         }
       ],
       insights: [
-        'Payment fraud risk increased by 12% this month',
-        'Data privacy risks require immediate attention'
+        'No sensitive data available',
+        'Data access restricted'
       ],
       chartData: [
         { name: 'Fraud', probability: 0.3, impact: 85, size: 25 },
@@ -410,8 +410,8 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
         }
       ],
       insights: [
-        '5 new anomalies detected in the payment process',
-        'Loan approval has unusual timestamp patterns'
+        'No sensitive data available',
+        'Data access restricted'
       ],
       chartData: populatedOutlierAnalysisData,
       chartSeries: [
@@ -428,7 +428,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       id: 'compliance-monitoring',
       title: 'Compliance Monitoring',
       subtitle: 'Regulatory Industry & Internal Policy Gaps',
-      icon: <FileText className="h-5 w-5 text-primary" />,
+      icon: <FileTextIcon className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Compliance Score', 
@@ -458,8 +458,8 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
         }
       ],
       insights: [
-        'GDPR compliance score improved by 5% this quarter',
-        'PCI-DSS has 2 new gaps requiring immediate action'
+        'No sensitive data available',
+        'Data access restricted'
       ],
       chartData: [
         { name: 'PCI-DSS', current: 75, target: 100 },
@@ -511,8 +511,8 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
         }
       ],
       insights: [
-        'Payment processing has 3 bottlenecks identified',
-        'Customer onboarding has 2 automation opportunities'
+        'No sensitive data available',
+        'Data access restricted'
       ],
       chartData: populatedProcessDiscoveryData,
       chartSeries: [
@@ -558,8 +558,8 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
         }
       ],
       insights: [
-        'No new controls tested this week (awaiting scheduling)',
-        'Evidence collection automation in progress'
+        'No sensitive data available',
+        'Data access restricted'
       ],
       chartData: populatedControlsHealthData,
       chartSeries: [
@@ -605,8 +605,8 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
         }
       ],
       insights: [
-        'Financial loss peaked in March 2025 ($260K)',
-        'Major data breach incident resolved last week'
+        'No sensitive data available',
+        'Data access restricted'
       ],
       chartData: populatedLossEventsData,
       chartSeries: [
@@ -652,8 +652,8 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
         }
       ],
       insights: [
-        'Disaster recovery scenario indicates 20% potential revenue impact',
-        '3 new simulations pending for Q1 2026'
+        'No sensitive data available',
+        'Data access restricted'
       ],
       chartData: [
         { name: 'Data Breach', probability: 0.8, impact: 85, size: 68 },
@@ -811,203 +811,3 @@ const Index = () => {
       month: month,
       events: data.events,
       amount: data.amount
-    });
-  };
-  
-  const handleRiskCategoryClick = (data: any) => {
-    toast.info(`Navigating to Risk Analysis filtered by ${data.name} risks (${data.count} items)`);
-    
-    handleNavigate('fmea-analysis', { 
-      category: data.name,
-      count: data.count 
-    });
-  };
-  
-  return (
-    <Layout>
-      <div className="container py-6 animate-fade-in">
-        <h1 className="text-3xl font-bold tracking-tight mb-1">Dashboard</h1>
-        <p className="text-muted-foreground mb-6">
-          Real-time insights and analytics for operational risk management
-        </p>
-        
-        <RibbonNav className="mb-6 animate-fade-in" style={{ animationDelay: '100ms' }}>
-          <MetricCard
-            title="Severity Risks"
-            value={dataLoaded ? "5" : "0"}
-            severity="critical"
-            icon={<Shield className="h-5 w-5" />}
-            tooltip="Risks with critical or high severity ratings"
-            trend={dataLoaded ? -2 : undefined}
-            isLoading={loading}
-            onClick={() => handleMetricClick("High-Severity Risks")}
-          />
-          <MetricCard
-            title="Open Risks"
-            value={dataLoaded ? "46" : "0"}
-            severity="medium"
-            icon={<AlertTriangle className="h-5 w-5" />}
-            tooltip="Total number of open risk items across all categories"
-            trend={dataLoaded ? 8 : undefined}
-            isLoading={loading}
-            onClick={() => handleMetricClick("Open Risks")}
-          />
-          <MetricCard
-            title="Compliance Score"
-            value={dataLoaded ? "85%" : "0%"}
-            severity="low"
-            icon={<CheckCheck className="h-5 w-5" />}
-            tooltip="Overall compliance score across all regulatory frameworks"
-            trend={dataLoaded ? 5 : undefined}
-            isLoading={loading}
-            onClick={() => handleMetricClick("Compliance Score")}
-          />
-          <MetricCard
-            title="Critical Process Steps"
-            value={dataLoaded ? "24" : "0"}
-            severity="medium"
-            icon={<GitBranch className="h-5 w-5" />}
-            tooltip="Active processes being monitored in the system"
-            trend={dataLoaded ? 3 : undefined}
-            isLoading={loading}
-            onClick={() => handleMetricClick("Critical Process Steps")}
-          />
-          <MetricCard
-            title="Total Potential Loss"
-            value={dataLoaded ? "963K" : "0"}
-            prefix="$"
-            severity="high"
-            icon={<DollarSign className="h-5 w-5" />}
-            tooltip="Estimated financial impact of identified risks"
-            trend={dataLoaded ? 15 : undefined}
-            isLoading={loading}
-            onClick={() => handleMetricClick("Total Potential Loss")}
-          />
-          <MetricCard
-            title="Control Failures"
-            value={dataLoaded ? "15%" : "0%"}
-            severity="medium"
-            icon={<TestTube className="h-5 w-5" />}
-            tooltip="Percentage of control tests that failed"
-            trend={dataLoaded ? -4 : undefined}
-            isLoading={loading}
-            onClick={() => handleMetricClick("Control Failures")}
-          />
-          <MetricCard
-            title="Scenario Analysis"
-            value={dataLoaded ? "14" : "0"}
-            severity="low"
-            icon={<Presentation className="h-5 w-5" />}
-            tooltip="Number of risk scenarios modeled"
-            trend={dataLoaded ? 6 : undefined}
-            isLoading={loading}
-            onClick={() => handleMetricClick("Scenario Analysis")}
-          />
-        </RibbonNav>
-        
-        <h2 className="text-xl font-semibold mb-4">Risk Insights</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          {infoWidgetData.map((widget) => (
-            <InfoWidget 
-              key={widget.id}
-              data={widget}
-              onClick={() => handleNavigate(widget.actionHref.replace('/', ''))}
-              isLoading={loading}
-            />
-          ))}
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-3">
-            {dataLoaded ? (
-              <AIRiskSummary isLoading={loading} />
-            ) : null}
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 mb-6">
-          <div className="bg-white dark:bg-gray-950 border rounded-lg p-6">
-            <h3 className="font-medium mb-4">Process Knowledge Graph</h3>
-            <KnowledgeGraph animate={dataLoaded} />
-          </div>
-        </div>
-        
-        <div className="mb-6">
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Bell className="h-5 w-5 text-primary mr-2" />
-                  <CardTitle>Announcements</CardTitle>
-                </div>
-                <Badge variant="outline" className="font-normal">
-                  <Calendar className="h-3.5 w-3.5 mr-1" />
-                  Updated: {new Date().toLocaleDateString()}
-                </Badge>
-              </div>
-              <CardDescription>Important updates and notices</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {dataLoaded ? (
-                <div className="space-y-4">
-                  {announcements.length > 0 ? (
-                    announcements.map((announcement) => (
-                      <div 
-                        key={announcement.id} 
-                        className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <div className="flex items-center mb-1">
-                              <h4 className="font-medium">{announcement.title}</h4>
-                              <Badge 
-                                variant="outline" 
-                                className={`ml-2 text-xs ${
-                                  announcement.priority === 'high' ? 'bg-red-100 text-red-800 border-red-300' :
-                                  announcement.priority === 'medium' ? 'bg-amber-100 text-amber-800 border-amber-300' :
-                                  'bg-blue-100 text-blue-800 border-blue-300'
-                                }`}
-                              >
-                                {announcement.priority}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-2">{announcement.description}</p>
-                            <div className="flex items-center text-xs text-muted-foreground">
-                              <Calendar className="h-3 w-3 mr-1" />
-                              {new Date(announcement.date).toLocaleDateString()}
-                            </div>
-                          </div>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="text-xs h-8"
-                            onClick={() => navigate(announcement.link)}
-                          >
-                            View Details
-                            <ExternalLink className="h-3 w-3 ml-1" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex items-center justify-center p-8 text-muted-foreground">
-                      <p>No announcements at this time.</p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-20 bg-muted/20 rounded-lg animate-pulse"></div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </Layout>
-  );
-};
-
-export default Index;
