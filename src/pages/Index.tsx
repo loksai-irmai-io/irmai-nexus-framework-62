@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -811,3 +812,223 @@ const Index = () => {
       month: month,
       events: data.events,
       amount: data.amount
+    });
+  };
+  
+  return (
+    <Layout>
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <MetricCard 
+            title="High-Severity Risks"
+            value={dataLoaded ? "5" : "0"}
+            description="Critical risk items"
+            icon={<AlertTriangle className="h-8 w-8 text-red-500" />}
+            trend={dataLoaded ? { type: "down", value: "2" } : undefined}
+            onClick={() => handleMetricClick("High-Severity Risks")}
+          />
+          <MetricCard 
+            title="Compliance Score"
+            value={dataLoaded ? "85%" : "0%"}
+            description="Overall compliance"
+            icon={<CheckCheck className="h-8 w-8 text-green-500" />}
+            trend={dataLoaded ? { type: "up", value: "5%" } : undefined}
+            onClick={() => handleMetricClick("Compliance Score")}
+          />
+          <MetricCard 
+            title="Process Steps"
+            value={dataLoaded ? "158" : "0"}
+            description="Critical process steps"
+            icon={<GitBranch className="h-8 w-8 text-blue-500" />}
+            trend={dataLoaded ? { type: "up", value: "12" } : undefined}
+            onClick={() => handleMetricClick("Critical Process Steps")}
+          />
+        </div>
+        
+        <div className="mb-8">
+          <RibbonNav />
+        </div>
+        
+        {dataLoaded && announcements.length > 0 && (
+          <div className="mb-8">
+            <Card>
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-lg font-medium">
+                    <div className="flex items-center">
+                      <Bell className="mr-2 h-5 w-5" />
+                      Recent Announcements
+                    </div>
+                  </CardTitle>
+                  <Button variant="ghost" size="sm" className="text-xs">
+                    View All <ExternalLink className="ml-1 h-3 w-3" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {announcements.slice(0, 3).map((announcement) => (
+                    <div key={announcement.id} className="flex items-start space-x-4 pb-3 border-b last:border-0">
+                      <div className="flex-1">
+                        <div className="flex items-center mb-1">
+                          <h4 className="text-sm font-medium">{announcement.title}</h4>
+                          <Badge 
+                            variant={
+                              announcement.priority === 'high' ? 'destructive' : 
+                              announcement.priority === 'medium' ? 'default' : 
+                              'outline'
+                            } 
+                            className="ml-2 text-xs py-0"
+                          >
+                            {announcement.priority}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-1">{announcement.description}</p>
+                        <div className="flex items-center text-xs text-muted-foreground">
+                          <Calendar className="h-3 w-3 mr-1" />
+                          {new Date(announcement.date).toLocaleDateString()}
+                          {announcement.link !== '#' && (
+                            <Button 
+                              variant="link" 
+                              size="sm" 
+                              className="text-xs h-auto p-0 ml-2" 
+                              onClick={() => navigate(announcement.link)}
+                            >
+                              View Details
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+          <div className="lg:col-span-8">
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>Intelligent Risk Knowledge Graph</CardTitle>
+                <CardDescription>
+                  Visualizing interconnected risks and processes
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <div className="h-[400px] w-full">
+                  <KnowledgeGraph />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="lg:col-span-4">
+            <AIRiskSummary />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-md font-medium">Risk Distribution</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[200px]">
+                <Chart 
+                  type="pie"
+                  data={dataLoaded ? riskDistributionData : emptyRiskDistributionData}
+                  dataKeys={['value']}
+                  colors={dataLoaded 
+                    ? riskDistributionData.map(item => item.color)
+                    : ['#f97316', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b']
+                  }
+                  tooltipFormatter={(value, name, props) => {
+                    if (!dataLoaded) return ['No data', ''];
+                    return [`${value}% (${props.payload.count} items)`, name];
+                  }}
+                  nameKey="name"
+                />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-md font-medium">Loss Events</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[200px]">
+                <Chart 
+                  type="bar"
+                  data={dataLoaded ? lossEventsData : emptyLossEventsData}
+                  dataKeys={['value']}
+                  colors={['#8b5cf6']}
+                  onBarClick={handleLossEventClick}
+                  nameKey="name"
+                />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-md font-medium">Incident Severity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[200px]">
+                <Chart 
+                  type="bar"
+                  data={dataLoaded ? incidentSeverityData : emptyIncidentSeverityData}
+                  dataKeys={['value']}
+                  colors={['#ef4444']}
+                  nameKey="name"
+                />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-md font-medium">Controls Health</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[200px]">
+                <Chart 
+                  type="pie"
+                  data={dataLoaded ? controlsHealthData : emptyControlsHealthData}
+                  dataKeys={['value']}
+                  colors={dataLoaded ? ['#10b981', '#ef4444'] : ['#94a3b8']}
+                  nameKey="name"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 gap-6">
+            {infoWidgetData.slice(0, 4).map((widget) => (
+              <InfoWidget 
+                key={widget.id}
+                data={widget}
+                onAction={() => handleNavigate(widget.id)}
+              />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 gap-6">
+            {infoWidgetData.slice(4, 8).map((widget) => (
+              <InfoWidget 
+                key={widget.id}
+                data={widget}
+                onAction={() => handleNavigate(widget.id)}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default Index;
