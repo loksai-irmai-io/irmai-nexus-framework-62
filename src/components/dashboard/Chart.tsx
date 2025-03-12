@@ -15,9 +15,9 @@ export type ChartDataSeries = {
   color: string;
   dataKey: string;
   yAxisId?: string;
+  type?: string;
 };
 
-// Define the types for click event handlers
 type CurveProps = {
   payload?: ChartData;
   name?: string;
@@ -316,20 +316,7 @@ const Chart: React.FC<ChartProps> = ({
               <RechartsTooltip content={<CustomTooltip />} />
               {showLegend && <Legend wrapperStyle={{ fontSize: '12px', marginTop: '10px' }} />}
               {series.map((item, index) => {
-                if (item.name.includes('Bar')) {
-                  return (
-                    <Bar 
-                      key={index}
-                      dataKey={item.dataKey}
-                      name={item.name}
-                      fill={item.color || COLORS[index % COLORS.length]}
-                      radius={[4, 4, 0, 0]}
-                      stackId={stacked ? "stack" : undefined}
-                      onClick={onClick ? handleDataClick : undefined}
-                      cursor={onClick ? "pointer" : undefined}
-                    />
-                  );
-                } else {
+                if (item.type === 'line') {
                   return (
                     <Line 
                       type="monotone"
@@ -340,6 +327,19 @@ const Chart: React.FC<ChartProps> = ({
                       strokeWidth={2}
                       dot={{ r: 3 }}
                       activeDot={{ r: 5 }}
+                      onClick={onClick ? handleDataClick : undefined}
+                      cursor={onClick ? "pointer" : undefined}
+                    />
+                  );
+                } else {
+                  return (
+                    <Bar 
+                      key={index}
+                      dataKey={item.dataKey}
+                      name={item.name}
+                      fill={item.color || COLORS[index % COLORS.length]}
+                      radius={[4, 4, 0, 0]}
+                      stackId={stacked ? "stack" : undefined}
                       onClick={onClick ? handleDataClick : undefined}
                       cursor={onClick ? "pointer" : undefined}
                     />

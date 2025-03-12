@@ -249,20 +249,45 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       subtitle: 'Incident Tracking & Response',
       icon: <AlertTriangle className="h-5 w-5 text-primary" />,
       metrics: [
-        { label: 'Open Incidents', value: '0', icon: 'alert-triangle' },
-        { label: 'Critical', value: '0', icon: 'alert-circle' },
-        { label: 'Avg Response', value: '0h', icon: 'clock' },
-        { label: 'Resolved', value: '0', icon: 'check-circle' },
+        { 
+          label: 'Open Incidents', 
+          value: '10', 
+          icon: 'alert-triangle',
+          tooltip: 'Number of open incidents',
+          trend: { direction: 'down', value: 2 }
+        },
+        { 
+          label: 'Resolved', 
+          value: '5', 
+          icon: 'check-circle',
+          tooltip: 'Number of resolved incidents'
+        },
+        { 
+          label: 'Avg. Resolution', 
+          value: '3.2 days', 
+          icon: 'clock',
+          tooltip: 'Average incident resolution time'
+        },
+        { 
+          label: 'Critical Incidents', 
+          value: '2', 
+          icon: 'alert-circle',
+          tooltip: 'Number of critical incidents',
+          trend: { direction: 'up', value: 1 }
+        }
       ],
       insights: [
-        'No incident data available yet',
-        'Upload a file to see incident insights'
+        'Financial loss peaked in March 2025 ($260K)',
+        'Major data breach incident resolved last week'
       ],
-      chartData: [],
-      chartSeries: [{ name: 'Incidents', dataKey: 'value', color: '#f97316' }],
-      chartType: 'bar',
-      status: 'info',
-      actionText: 'View Incident Dashboard',
+      chartData: populatedLossEventsData,
+      chartSeries: [
+        { name: 'Incident Count', dataKey: 'events', color: '#a855f7' },
+        { name: 'Financial Loss ($K)', dataKey: 'amount', color: '#ef4444', type: 'line' }
+      ],
+      chartType: 'composed',
+      status: 'warning',
+      actionText: 'View Incident Management',
       actionHref: '/incident-management',
       chartHeight: 200,
     },
@@ -272,10 +297,14 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       subtitle: 'Risk Simulation Analysis',
       icon: <Presentation className="h-5 w-5 text-primary" />,
       metrics: [
-        { label: 'Scenarios', value: '0', icon: 'copy' },
-        { label: 'Avg. Loss', value: '$0', icon: 'dollar-sign' },
-        { label: 'Worst Case', value: '$0', icon: 'trending-up' },
-        { label: 'VaR', value: '$0', icon: 'bar-chart' },
+        { 
+          label: 'Scenarios', value: '0', icon: 'copy' },
+        { 
+          label: 'Avg. Loss', value: '$0', icon: 'dollar-sign' },
+        { 
+          label: 'Worst Case', value: '$0', icon: 'trending-up' },
+        { 
+          label: 'VaR', value: '$0', icon: 'bar-chart' },
       ],
       insights: [
         'No scenario data available yet',
@@ -982,4 +1011,3 @@ const Index = () => {
 };
 
 export default Index;
-

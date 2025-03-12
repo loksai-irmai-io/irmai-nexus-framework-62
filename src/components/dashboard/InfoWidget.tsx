@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ export interface InfoWidgetData {
     name: string;
     dataKey: string;
     color: string;
+    type?: string;
   }>;
   chartType: 'line' | 'bar' | 'area' | 'pie' | 'composed';
   xAxisKey?: string;
@@ -77,7 +79,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = fals
   const chartProps = hasChartData ? {
     title: data.title || "Data Chart",
     data: data.chartData,
-    series: data.chartSeries,
+    series: data.chartSeries.map(({ name, dataKey, color }) => ({ name, dataKey, color })),
     type: data.chartType,
     xAxisKey: data.xAxisKey || 'name',
     height: data.chartHeight || 200,
