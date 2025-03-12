@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -88,13 +89,18 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
     } else {
       setGraphData({
         nodes: [
-          { id: 'process', name: 'Process', group: 1, size: 10 },
-          { id: 'risk', name: 'Risk', group: 2, size: 10 },
-          { id: 'control', name: 'Control', group: 3, size: 10 },
+          { id: 'irmai-bank', name: 'IRMAI Bank', group: 1, size: 15 },
+          { id: 'risk', name: 'Risk', group: 2, size: 12 },
+          { id: 'process', name: 'Process', group: 3, size: 12 },
+          { id: 'control', name: 'Controls', group: 4, size: 12 },
         ],
         links: [
-          { source: 'process', target: 'risk', value: 3 },
-          { source: 'risk', target: 'control', value: 3 },
+          { source: 'irmai-bank', target: 'risk', value: 4 },
+          { source: 'irmai-bank', target: 'process', value: 4 },
+          { source: 'irmai-bank', target: 'control', value: 4 },
+          { source: 'risk', target: 'process', value: 3 },
+          { source: 'process', target: 'control', value: 3 },
+          { source: 'control', target: 'risk', value: 3 },
         ]
       });
     }
