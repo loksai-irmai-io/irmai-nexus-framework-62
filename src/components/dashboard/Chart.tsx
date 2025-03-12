@@ -118,7 +118,16 @@ const Chart: React.FC<ChartProps> = ({
     }
   };
   
+  const getChartHeight = (): number => {
+    if (typeof height === 'number') {
+      return height;
+    }
+    return 300;
+  };
+  
   const renderChart = () => {
+    const actualHeight = getChartHeight();
+    
     if (isLoading) {
       return (
         <div className="w-full h-full flex items-center justify-center">
@@ -130,7 +139,7 @@ const Chart: React.FC<ChartProps> = ({
     switch (type) {
       case 'bar':
         return (
-          <ResponsiveContainer width="100%" height={height}>
+          <ResponsiveContainer width="100%" height={actualHeight}>
             <BarChart data={activeData}>
               {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#eee" />}
               <XAxis 
@@ -165,7 +174,7 @@ const Chart: React.FC<ChartProps> = ({
         
       case 'line':
         return (
-          <ResponsiveContainer width="100%" height={height}>
+          <ResponsiveContainer width="100%" height={actualHeight}>
             <LineChart data={activeData}>
               {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#eee" />}
               <XAxis 
@@ -201,7 +210,7 @@ const Chart: React.FC<ChartProps> = ({
         );
         
       case 'pie':
-        const pieHeight = height >= 300 ? height : Math.max(300, height + 50);
+        const pieHeight = actualHeight >= 300 ? actualHeight : Math.max(300, actualHeight + 50);
         
         return (
           <ResponsiveContainer width="100%" height={pieHeight}>
@@ -261,7 +270,7 @@ const Chart: React.FC<ChartProps> = ({
         
       case 'area':
         return (
-          <ResponsiveContainer width="100%" height={height}>
+          <ResponsiveContainer width="100%" height={actualHeight}>
             <AreaChart data={activeData}>
               {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#eee" />}
               <XAxis 
@@ -298,7 +307,7 @@ const Chart: React.FC<ChartProps> = ({
         
       case 'composed':
         return (
-          <ResponsiveContainer width="100%" height={height}>
+          <ResponsiveContainer width="100%" height={actualHeight}>
             <ComposedChart data={activeData}>
               {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#eee" />}
               <XAxis 

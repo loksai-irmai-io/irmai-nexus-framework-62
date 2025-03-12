@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -111,15 +112,15 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = fals
 
           {/* Chart Section with fixed height and proper containment */}
           {data.chartData.length > 0 && (
-            <div className="flex-1 min-h-0 w-full">
-              <div className="h-full w-full" style={{ minHeight: '180px', maxHeight: '200px' }}>
+            <div className="flex-1 min-h-0 w-full flex-grow">
+              <div className="h-[180px] w-full overflow-hidden">
                 <Chart
                   title=""
                   type={data.chartType}
                   data={data.chartData}
                   series={data.chartSeries}
                   xAxisKey="name"
-                  height={data.chartHeight || "100%"}
+                  height={data.chartHeight || 180}
                   showLegend={false}
                 />
               </div>
