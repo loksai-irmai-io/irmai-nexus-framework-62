@@ -14,6 +14,7 @@ export type ChartDataSeries = {
   name: string;
   color: string;
   dataKey: string;
+  yAxisId?: string;
 };
 
 // Define the types for click event handlers
@@ -23,12 +24,12 @@ type CurveProps = {
   value?: number;
 };
 
-type ChartProps = {
+export interface ChartProps {
   title: string;
   description?: string;
   data: ChartData[];
   series: ChartDataSeries[];
-  type: 'bar' | 'line' | 'pie' | 'area' | 'composed';
+  type?: 'bar' | 'line' | 'pie' | 'area' | 'composed';
   xAxisKey?: string;
   stacked?: boolean;
   showLegend?: boolean;
@@ -43,7 +44,8 @@ type ChartProps = {
   onClick?: (datapoint: ChartData) => void;
   onMouseMove?: (data: any) => void;
   onMouseLeave?: () => void;
-};
+  emptyText?: string;
+}
 
 const COLORS = [
   '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A4DE6C',
@@ -73,7 +75,7 @@ const Chart: React.FC<ChartProps> = ({
   description,
   data,
   series,
-  type,
+  type = 'bar',
   xAxisKey = 'name',
   stacked = false,
   showLegend = true,
@@ -87,7 +89,8 @@ const Chart: React.FC<ChartProps> = ({
   isLoading = false,
   onClick,
   onMouseMove,
-  onMouseLeave
+  onMouseLeave,
+  emptyText = "No data available"
 }) => {
   const [activeTab, setActiveTab] = useState(tabs ? tabs[0].title : null);
   const [activePeriodIndex, setActivePeriodIndex] = useState(periods ? 0 : null);
@@ -106,11 +109,9 @@ const Chart: React.FC<ChartProps> = ({
     }
   };
   
-  // Safely handle click events by extracting the correct data
   const handleDataClick = (data: any) => {
     if (!onClick) return;
     
-    // Extract the payload data which contains the actual chart data point
     const payload = data.payload || data;
     if (payload && typeof payload === 'object') {
       onClick(payload as ChartData);
@@ -200,7 +201,6 @@ const Chart: React.FC<ChartProps> = ({
         );
         
       case 'pie':
-        // For pie charts, increase the height and adjust margins
         const pieHeight = height >= 300 ? height : Math.max(300, height + 50);
         
         return (

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,12 +20,13 @@ interface RiskInsight {
   confidence: number;
 }
 
-interface AIRiskSummaryProps {
+export interface AIRiskSummaryProps {
   className?: string;
   isLoading?: boolean;
+  dataLoaded?: boolean;
 }
 
-const AIRiskSummary: React.FC<AIRiskSummaryProps> = ({ className, isLoading = false }) => {
+const AIRiskSummary: React.FC<AIRiskSummaryProps> = ({ className, isLoading = false, dataLoaded = true }) => {
   const insights: RiskInsight[] = [
     {
       title: "Payment Fraud Risk",

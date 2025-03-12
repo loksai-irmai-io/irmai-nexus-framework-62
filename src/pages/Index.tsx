@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -147,8 +146,8 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       chartHeight: 200,
     },
     {
-      id: 'risk-analytics',
-      title: 'Predictive Risk Analytics',
+      id: 'outlier-analysis',
+      title: 'Outlier Analysis',
       subtitle: 'Risk Prediction & Forecasting',
       icon: <AlertTriangle className="h-5 w-5 text-primary" />,
       metrics: [
@@ -343,8 +342,8 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       chartHeight: 200,
     },
     {
-      id: 'risk-analytics',
-      title: 'Predictive Risk Analytics',
+      id: 'outlier-analysis',
+      title: 'Outlier Analysis',
       subtitle: 'Risk Prediction & Forecasting',
       icon: <AlertTriangle className="h-5 w-5 text-primary" />,
       metrics: [
@@ -796,8 +795,9 @@ const Index = () => {
           />
         </RibbonNav>
         
+        <h2 className="text-xl font-semibold mb-4">Risk Insights</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          {infoWidgetData.slice(0, 4).map((widget) => (
+          {infoWidgetData.map((widget) => (
             <InfoWidget 
               key={widget.id}
               data={widget}
@@ -814,53 +814,28 @@ const Index = () => {
               description="Financial impact and number of events"
               data={lossEventsData}
               series={[
-                { name: 'Loss Events', dataKey: 'value', type: 'bar', color: '#f43f5e' },
-                { name: 'Amount', dataKey: 'amount', type: 'line', color: '#8b5cf6', yAxisId: 'right' }
+                { name: 'Loss Events', dataKey: 'value', color: '#f43f5e' },
+                { name: 'Amount', dataKey: 'amount', color: '#8b5cf6' }
               ]}
+              type="composed"
               xAxisKey="name"
               height={300}
               showGrid={true}
               showLegend={true}
-              onClickItem={handleLossEventClick}
+              onClick={handleLossEventClick}
               isLoading={loading}
-              emptyText="No loss event data available"
             />
           </div>
           <div>
-            <Chart 
-              title="Risk Distribution"
-              description="By category"
-              data={riskDistributionData}
-              series={[{ name: 'Risks', dataKey: 'value', color: '#10b981' }]}
-              type="pie"
-              height={300}
-              showLegend={true}
-              onClickItem={handleRiskCategoryClick}
-              isLoading={loading}
-              emptyText="No risk distribution data available"
-            />
+            <AIRiskSummary isLoading={loading} />
           </div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-2 bg-white dark:bg-gray-950 border rounded-lg p-6">
+        <div className="grid grid-cols-1 mb-6">
+          <div className="bg-white dark:bg-gray-950 border rounded-lg p-6">
             <h3 className="font-medium mb-4">Process Knowledge Graph</h3>
-            <KnowledgeGraph isLoading={loading} animate={dataLoaded} />
+            <KnowledgeGraph animate={dataLoaded} />
           </div>
-          <div>
-            <AIRiskSummary isLoading={loading} dataLoaded={dataLoaded} />
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {infoWidgetData.slice(4).map((widget) => (
-            <InfoWidget 
-              key={widget.id}
-              data={widget}
-              onClick={() => handleNavigate(widget.actionHref.replace('/', ''))}
-              isLoading={loading}
-            />
-          ))}
         </div>
       </div>
     </Layout>
