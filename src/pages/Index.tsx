@@ -307,50 +307,38 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       icon: <Shield className="h-5 w-5 text-primary" />,
       metrics: [
         { 
-          label: 'Open Risks', 
-          value: '46', 
-          icon: 'alert-triangle',
-          tooltip: 'Total number of open risk items',
-          trend: { direction: 'up', value: 5 }
+          label: 'Current Score', 
+          value: '**', 
+          icon: 'shield',
+          tooltip: 'Risk score data hidden for privacy'
         },
         { 
-          label: 'High Severity', 
-          value: '5', 
+          label: 'Critical Risks', 
+          value: '**', 
           icon: 'alert-triangle',
-          tooltip: 'Number of high severity risks',
-          trend: { direction: 'down', value: 2 }
+          tooltip: 'Number of critical risks hidden for privacy'
         },
         { 
-          label: 'Medium Severity', 
-          value: '18', 
+          label: 'High Risks', 
+          value: '**', 
           icon: 'trending-up',
-          tooltip: 'Number of medium severity risks'
+          tooltip: 'Number of high risks hidden for privacy'
         },
         { 
-          label: 'Low Severity', 
-          value: '23', 
-          icon: 'trending-down',
-          tooltip: 'Number of low severity risks'
+          label: 'Q3 Prediction', 
+          value: '**', 
+          icon: 'sparkles',
+          tooltip: 'Prediction data hidden for privacy'
         }
       ],
-      
-      chartData: [
-        { name: 'Fraud', probability: 0.3, impact: 85, size: 25 },
-        { name: 'Data Breach', probability: 0.4, impact: 95, size: 38 },
-        { name: 'System Failure', probability: 0.3, impact: 80, size: 24 },
-        { name: 'Compliance', probability: 0.2, impact: 70, size: 14 },
-        { name: 'Operations', probability: 0.1, impact: 60, size: 6 }
-      ],
-      chartSeries: [
-        { name: 'Probability', dataKey: 'probability', color: '#8b5cf6' },
-        { name: 'Impact', dataKey: 'impact', color: '#ef4444' },
-        { name: 'Size', dataKey: 'size', color: '#d946ef' }
-      ],
+      insights: [],
+      chartData: [],
+      chartSeries: [{ name: 'Risk', dataKey: 'value', color: '#8b5cf6' }],
       chartType: 'line',
-      status: 'error',
+      status: 'info',
       actionText: 'View Risk Analytics',
       actionHref: '/fmea-analysis',
-      chartHeight: 200,
+      icon: <Shield className="h-5 w-5 text-primary" />
     },
     {
       id: 'outlier-analysis',
@@ -360,42 +348,37 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       metrics: [
         { 
           label: 'Sequence Fails', 
-          value: '18', 
+          value: '**', 
           icon: 'activity',
-          tooltip: 'Number of sequence failures',
-          trend: { direction: 'up', value: 12 }
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Timing Fails', 
-          value: '3', 
+          value: '**', 
           icon: 'clock',
-          tooltip: 'Number of timing failures'
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Rework Fails', 
-          value: '94%', 
+          value: '**', 
           icon: 'repeat',
-          tooltip: 'Percentage of rework failures',
-          trend: { direction: 'up', value: 3 }
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Resource Outliers', 
-          value: '5,120', 
+          value: '**', 
           icon: 'users',
-          tooltip: 'Number of resource outliers'
+          tooltip: 'Data hidden for privacy'
         }
       ],
-      
-      chartData: populatedOutlierAnalysisData,
-      chartSeries: [
-        { name: 'Anomaly Count', dataKey: 'count', color: '#f97316' },
-        { name: 'Anomaly Rate (%)', dataKey: 'rate', color: '#3b82f6' }
-      ],
+      insights: [],
+      chartData: [],
+      chartSeries: [],
       chartType: 'line',
-      status: 'warning',
+      status: 'info',
       actionText: 'View Outlier Analysis',
       actionHref: '/outlier-analysis',
-      chartHeight: 200,
+      icon: <SearchX className="h-5 w-5 text-primary" />
     },
     {
       id: 'compliance-monitoring',
@@ -405,135 +388,117 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       metrics: [
         { 
           label: 'Compliance Score', 
-          value: '85%', 
+          value: '**', 
           icon: 'activity',
-          tooltip: 'Overall compliance score',
-          trend: { direction: 'up', value: 5 }
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Critical Gaps', 
-          value: '3', 
-          icon: 'alert-triangle',
-          tooltip: 'Number of critical gaps',
-          trend: { direction: 'down', value: 2 }
+          value: '**', 
+          icon: 'layers',
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Controls', 
-          value: '124', 
-          icon: 'shield',
-          tooltip: 'Total number of controls'
+          value: '**', 
+          icon: 'alert-triangle',
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Frameworks', 
-          value: '8', 
-          icon: 'layers',
-          tooltip: 'Number of compliance frameworks'
+          value: '**', 
+          icon: 'check-circle',
+          tooltip: 'Data hidden for privacy'
         }
       ],
-      
-      chartData: [
-        { name: 'PCI-DSS', current: 75, target: 100 },
-        { name: 'GDPR', current: 85, target: 100 },
-        { name: 'SOX', current: 90, target: 100 },
-        { name: 'ISO 27001', current: 65, target: 100 },
-        { name: 'Basel III', current: 70, target: 100 }
-      ],
-      chartSeries: [
-        { name: 'Current Compliance', dataKey: 'current', color: '#0ea5e9' },
-        { name: 'Target', dataKey: 'target', color: '#64748b' }
-      ],
+      insights: [],
+      chartData: [],
+      chartSeries: [],
       chartType: 'bar',
-      status: 'warning',
-      actionText: 'View Compliance Monitoring',
+      status: 'info',
+      actionText: 'View Compliance Dashboard',
       actionHref: '/compliance-monitoring',
-      chartHeight: 200,
+      icon: <FileText className="h-5 w-5 text-primary" />
     },
     {
       id: 'process-discovery',
-      title: 'Process Discovery',
+      title: 'Process Mining',
       subtitle: 'End-End Process Insights',
       icon: <GitBranch className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Events', 
-          value: '24', 
+          value: '**', 
           icon: 'git-branch',
-          tooltip: 'Total number of events',
-          trend: { direction: 'up', value: 8 }
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Critical Activities', 
-          value: '158', 
-          icon: 'activity',
-          tooltip: 'Number of critical activities'
+          value: '**', 
+          icon: 'box',
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Objects', 
-          value: '42', 
-          icon: 'box',
-          tooltip: 'Number of process objects'
+          value: '**', 
+          icon: 'git-merge',
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Cases', 
-          value: '2,453', 
-          icon: 'folder',
-          tooltip: 'Total number of cases'
+          value: '**', 
+          icon: 'alert-triangle',
+          tooltip: 'Data hidden for privacy'
         }
       ],
-      
-      chartData: populatedProcessDiscoveryData,
-      chartSeries: [
-        { name: 'Process Steps', dataKey: 'value', color: '#10b981' }
-      ],
+      insights: [],
+      chartData: [],
+      chartSeries: [],
       chartType: 'pie',
-      status: 'warning',
-      actionText: 'View Process Discovery',
+      status: 'info',
+      actionText: 'View Process Maps',
       actionHref: '/process-discovery',
-      chartHeight: 200,
+      icon: <GitBranch className="h-5 w-5 text-primary" />
     },
     {
       id: 'controls-testing',
-      title: 'Controls Testing',
+      title: 'Controls Monitoring',
       subtitle: 'Automated Controls Testing and Validation',
       icon: <TestTube className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Total Controls', 
-          value: '124', 
+          value: '**', 
           icon: 'shield',
-          tooltip: 'Total number of controls'
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Tested', 
-          value: '80', 
-          icon: 'check-circle',
-          tooltip: 'Number of tested controls'
+          value: '**', 
+          icon: 'x-circle',
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Pass Rate', 
-          value: '85%', 
-          icon: 'trending-up',
-          tooltip: 'Control test pass rate',
-          trend: { direction: 'up', value: 3 }
+          value: '**', 
+          icon: 'check-circle',
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Fail Rate', 
-          value: '15%', 
-          icon: 'trending-down',
-          tooltip: 'Control test fail rate',
-          trend: { direction: 'down', value: 3 }
+          value: '**', 
+          icon: 'help-circle',
+          tooltip: 'Data hidden for privacy'
         }
       ],
-     
-      chartData: populatedControlsHealthData,
-      chartSeries: [
-        { name: 'Controls', dataKey: 'value', color: '#10b981' }
-      ],
+      insights: [],
+      chartData: [],
+      chartSeries: [],
       chartType: 'pie',
-      status: 'warning',
+      status: 'info',
       actionText: 'View Controls Testing',
       actionHref: '/controls-testing',
-      chartHeight: 200,
+      icon: <TestTube className="h-5 w-5 text-primary" />
     },
     {
       id: 'incident-management',
@@ -543,93 +508,77 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       metrics: [
         { 
           label: 'Open Incidents', 
-          value: '10', 
+          value: '**', 
           icon: 'alert-triangle',
-          tooltip: 'Number of open incidents',
-          trend: { direction: 'down', value: 2 }
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Resolved', 
-          value: '5', 
+          value: '**', 
           icon: 'check-circle',
-          tooltip: 'Number of resolved incidents'
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Avg. Resolution', 
-          value: '3.2 days', 
+          value: '**', 
           icon: 'clock',
-          tooltip: 'Average incident resolution time'
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Critical Incidents', 
-          value: '2', 
+          value: '**', 
           icon: 'alert-circle',
-          tooltip: 'Number of critical incidents',
-          trend: { direction: 'up', value: 1 }
+          tooltip: 'Data hidden for privacy'
         }
       ],
-     
-      chartData: populatedLossEventsData,
-      chartSeries: [
-        { name: 'Incident Count', dataKey: 'events', color: '#a855f7' },
-        { name: 'Financial Loss ($K)', dataKey: 'amount', color: '#ef4444', type: 'line' }
-      ],
+      insights: [],
+      chartData: [],
+      chartSeries: [],
       chartType: 'composed',
-      status: 'warning',
+      status: 'info',
       actionText: 'View Incident Management',
       actionHref: '/incident-management',
-      chartHeight: 200,
+      icon: <AlertTriangle className="h-5 w-5 text-primary" />
     },
     {
       id: 'scenario-analysis',
-      title: 'Scenario Analysis',
+      title: 'Scenario Modeling',
       subtitle: 'Risk Scenario Modeling and Simulation',
       icon: <Presentation className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Scenarios', 
-          value: '5', 
+          value: '**', 
           icon: 'copy',
-          tooltip: 'Number of risk scenarios'
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Simulations Run', 
-          value: '12', 
+          value: '**', 
           icon: 'refresh-cw',
-          tooltip: 'Number of simulations run'
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Coverage', 
-          value: '60%', 
+          value: '**', 
           icon: 'pie-chart',
-          tooltip: 'Scenario coverage',
-          trend: { direction: 'up', value: 10 }
+          tooltip: 'Data hidden for privacy'
         },
         { 
           label: 'Avg. Loss', 
-          value: '$75K', 
+          value: '**', 
           icon: 'dollar-sign',
-          tooltip: 'Average loss per scenario'
+          tooltip: 'Data hidden for privacy'
         }
       ],
-     
-      chartData: [
-        { name: 'Data Breach', probability: 0.8, impact: 85, size: 68 },
-        { name: 'System Failure', probability: 0.6, impact: 65, size: 39 },
-        { name: 'Compliance', probability: 0.4, impact: 75, size: 30 },
-        { name: 'Disaster Recovery', probability: 0.2, impact: 95, size: 19 },
-        { name: 'Fraud', probability: 0.5, impact: 55, size: 27.5 }
-      ],
-      chartSeries: [
-        { name: 'Probability', dataKey: 'probability', color: '#0ea5e9' },
-        { name: 'Impact', dataKey: 'impact', color: '#f97316' },
-        { name: 'Size', dataKey: 'size', color: '#8b5cf6' }
-      ],
-      chartType: 'line',
-      status: 'error',
+      insights: [],
+      chartData: [],
+      chartSeries: [],
+      chartType: 'composed',
+      status: 'info',
       actionText: 'View Scenario Analysis',
       actionHref: '/scenario-analysis',
-      chartHeight: 200,
+      icon: <Presentation className="h-5 w-5 text-primary" />
     }
   ];
 };
@@ -896,76 +845,4 @@ const Index = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <Bell className="h-5 w-5 text-primary mr-2" />
-                  <CardTitle>Announcements</CardTitle>
-                </div>
-                <Badge variant="outline" className="font-normal">
-                  <Calendar className="h-3.5 w-3.5 mr-1" />
-                  Updated: {new Date().toLocaleDateString()}
-                </Badge>
-              </div>
-              <CardDescription>Important updates and notices</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {dataLoaded ? (
-                <div className="space-y-4">
-                  {announcements.length > 0 ? (
-                    announcements.map((announcement) => (
-                      <div 
-                        key={announcement.id} 
-                        className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <div className="flex items-center mb-1">
-                              <h4 className="font-medium">{announcement.title}</h4>
-                              <Badge 
-                                variant="outline" 
-                                className={`ml-2 text-xs ${
-                                  announcement.priority === 'high' ? 'bg-red-100 text-red-800 border-red-300' :
-                                  announcement.priority === 'medium' ? 'bg-amber-100 text-amber-800 border-amber-300' :
-                                  'bg-blue-100 text-blue-800 border-blue-300'
-                                }`}
-                              >
-                                {announcement.priority}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-2">{announcement.description}</p>
-                            <div className="flex items-center text-xs text-muted-foreground">
-                              <Calendar className="h-3 w-3 mr-1" />
-                              {new Date(announcement.date).toLocaleDateString()}
-                            </div>
-                          </div>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="text-xs h-8"
-                            onClick={() => navigate(announcement.link)}
-                          >
-                            View Details
-                            <ExternalLink className="h-3 w-3 ml-1" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex items-center justify-center p-8 text-muted-foreground">
-                      <p>No announcements at this time.</p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-20 bg-muted/20 rounded-lg animate-pulse"></div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </Layout>
-  );
-};
-
-export default Index;
+                  <CardTitle>Announcements</
