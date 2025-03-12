@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Tooltip, 
@@ -281,6 +282,7 @@ const ProcessMap: React.FC<ProcessMapProps> = ({
       );
     }
 
+    // Updated image paths to correctly reference uploaded images
     let imageSrc = '';
     if (viewType === 'bpmn') {
       imageSrc = '/lovable-uploads/69e74ee4-1d9d-4dd8-8d7a-337f98ec4ebf.png';
@@ -291,13 +293,19 @@ const ProcessMap: React.FC<ProcessMapProps> = ({
     }
 
     return (
-      <div className="w-full h-[500px] overflow-auto">
-        <img 
-          src={imageSrc} 
-          alt={`${viewType.toUpperCase()} Process Visualization`}
-          className="w-full h-full object-contain"
-          style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'center', transition: 'transform 0.2s ease-out' }}
-        />
+      <div className="w-full h-[500px] overflow-auto bg-white dark:bg-gray-900 flex items-center justify-center">
+        {imageSrc ? (
+          <img 
+            src={imageSrc} 
+            alt={`${viewType.toUpperCase()} Process Visualization`}
+            className="max-w-full max-h-full object-contain"
+            style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'center', transition: 'transform 0.2s ease-out' }}
+          />
+        ) : (
+          <div className="text-center text-muted-foreground p-8">
+            No visualization available for the selected view type
+          </div>
+        )}
       </div>
     );
   };
