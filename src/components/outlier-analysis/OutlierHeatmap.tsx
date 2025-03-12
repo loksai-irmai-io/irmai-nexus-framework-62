@@ -7,7 +7,7 @@ interface OutlierHeatmapProps {
   height?: number;
 }
 
-const OutlierHeatmap: React.FC<OutlierHeatmapProps> = ({ height = 300 }) => {
+const OutlierHeatmap: React.FC<OutlierHeatmapProps> = ({ height = 250 }) => {
   // Get unique activities and resources for the heatmap
   const activities = Array.from(new Set(mockHeatmapData.map(item => item.activity)));
   const resources = Array.from(new Set(mockHeatmapData.map(item => item.resource)));
@@ -22,12 +22,12 @@ const OutlierHeatmap: React.FC<OutlierHeatmapProps> = ({ height = 300 }) => {
   };
   
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden h-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-base font-medium">Process Anomaly Heatmap</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
+      <CardContent className="flex flex-col p-2">
+        <div className="overflow-x-auto flex-1">
           <div style={{ height: `${height}px`, width: '100%', minWidth: `${resources.length * 80}px` }}>
             {/* Y-axis labels (Activities) */}
             <div className="grid grid-cols-[120px_1fr] h-full">
@@ -90,7 +90,7 @@ const OutlierHeatmap: React.FC<OutlierHeatmapProps> = ({ height = 300 }) => {
             </div>
           </div>
         </div>
-        <div className="mt-3 flex items-center justify-center">
+        <div className="mt-2 flex items-center justify-center">
           <div className="w-full h-2 max-w-xs bg-gradient-to-r from-white to-red-600 rounded"></div>
           <div className="flex justify-between w-full max-w-xs text-xs mt-1">
             <span>Low</span>
