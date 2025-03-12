@@ -12,7 +12,7 @@ interface OutlierDistributionProps {
   height?: number;
 }
 
-const OutlierDistribution: React.FC<OutlierDistributionProps> = ({ type, height = 250 }) => {
+const OutlierDistribution: React.FC<OutlierDistributionProps> = ({ type, height = 300 }) => {
   const distributionData = type === 'activity' ? mockActivityDistribution : mockResourceDistribution;
   const [hoveredItem, setHoveredItem] = useState<ChartData | null>(null);
   
@@ -50,7 +50,7 @@ const OutlierDistribution: React.FC<OutlierDistributionProps> = ({ type, height 
   };
 
   return (
-    <Card className="shadow-sm h-full">
+    <Card className="shadow-sm">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center justify-between">
           {type === 'activity' ? 'Activity Distribution' : 'Resource Distribution'}
@@ -73,23 +73,21 @@ const OutlierDistribution: React.FC<OutlierDistributionProps> = ({ type, height 
           </TooltipProvider>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col">
-        <div className="flex-1 h-[220px]">
-          <Chart
-            title=""
-            description=""
-            type="bar"
-            data={chartData}
-            series={series}
-            xAxisKey="name"
-            height={220}
-            showLegend={true}
-            onClick={handleDataClick}
-            onMouseMove={handleDataHover}
-            onMouseLeave={() => setHoveredItem(null)}
-            tooltip={`This chart shows the distribution of events and their deviation percentages across ${type === 'activity' ? 'different activities' : 'resource types'}. Click on any bar for more details.`}
-          />
-        </div>
+      <CardContent>
+        <Chart
+          title=""
+          description=""
+          type="bar"
+          data={chartData}
+          series={series}
+          xAxisKey="name"
+          height={height}
+          showLegend={true}
+          onClick={handleDataClick}
+          onMouseMove={handleDataHover}
+          onMouseLeave={() => setHoveredItem(null)}
+          tooltip={`This chart shows the distribution of events and their deviation percentages across ${type === 'activity' ? 'different activities' : 'resource types'}. Click on any bar for more details.`}
+        />
         
         {hoveredItem && (
           <div className="mt-2 p-2 border border-border rounded-md bg-muted/30 text-sm animate-fade-in">
