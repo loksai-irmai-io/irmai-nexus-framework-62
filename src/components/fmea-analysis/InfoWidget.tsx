@@ -94,17 +94,19 @@ export const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onMetricClick }) =
           ))}
         </div>
         
-        <div className="mt-4 h-[200px]">
-          <Chart 
-            title=""
-            data={data.chartData}
-            series={data.chartSeries}
-            type={data.chartType}
-            xAxisKey="name"
-            height={180}
-            showPercentages={data.chartType === 'pie'}
-          />
-        </div>
+        {data.chartData.length > 0 && (
+          <div className="mt-4 h-[200px]">
+            <Chart 
+              title=""
+              data={data.chartData}
+              series={data.chartSeries}
+              type={data.chartType}
+              xAxisKey="name"
+              height={180}
+              showPercentages={data.chartType === 'pie'}
+            />
+          </div>
+        )}
         
         {data.insights && data.insights.length > 0 && (
           <div className="mt-4 pt-3 border-t">

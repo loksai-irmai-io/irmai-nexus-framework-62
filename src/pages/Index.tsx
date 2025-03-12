@@ -139,10 +139,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
         { label: 'Medium Severity', value: '0', icon: 'trending-up' },
         { label: 'Low Severity', value: '0', icon: 'trending-down' },
       ],
-      insights: [
-        'No risk data available yet',
-        'Upload a file to see risk insights'
-      ],
+      insights: [],
       chartData: [],
       chartSeries: [{ name: 'Value', dataKey: 'value', color: '#8b5cf6' }],
       chartType: 'composed',
@@ -162,10 +159,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
         { label: 'Rework Fails', value: '0', icon: 'trending-up' },
         { label: 'Resource Outliers', value: '0', icon: 'shield' },
       ],
-      insights: [
-        'No risk analytics data available yet',
-        'Upload a file to see risk predictions'
-      ],
+      insights: [],
       chartData: [],
       chartSeries: [{ name: 'Value', dataKey: 'value', color: '#f43f5e' }],
       chartType: 'line',
@@ -185,10 +179,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
         { label: 'Controls', value: '0', icon: 'alert-triangle' },
         { label: 'Frameworks', value: '0%', icon: 'check-circle' },
       ],
-      insights: [
-        'No compliance data available yet',
-        'Upload a file to see compliance insights'
-      ],
+      insights: [],
       chartData: [],
       chartSeries: [{ name: 'Compliance', dataKey: 'value', color: '#10b981' }],
       chartType: 'bar',
@@ -208,10 +199,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
         { label: 'Objects', value: '0', icon: 'git-merge' },
         { label: 'Cases', value: '0', icon: 'alert-triangle' },
       ],
-      insights: [
-        'No process data available yet',
-        'Upload a file to see process insights'
-      ],
+      insights: [],
       chartData: [],
       chartSeries: [{ name: 'Value', dataKey: 'value', color: '#0ea5e9' }],
       chartType: 'pie',
@@ -231,10 +219,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
         { label: 'Pass Rate', value: '0', icon: 'check-circle' },
         { label: 'Fail Rate', value: '0', icon: 'help-circle' },
       ],
-      insights: [
-        'No control data available yet',
-        'Upload a file to see control insights'
-      ],
+      insights: [],
       chartData: [],
       chartSeries: [{ name: 'Controls', dataKey: 'value', color: '#0ea5e9' }],
       chartType: 'pie',
@@ -274,10 +259,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
           tooltip: 'Number of critical incidents'
         }
       ],
-      insights: [
-        'No incident data available yet',
-        'Upload a file to see incident insights'
-      ],
+      insights: [],
       chartData: [],
       chartSeries: [
         { name: 'Incident Count', dataKey: 'events', color: '#a855f7' },
@@ -304,10 +286,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
         { 
           label: 'Avg. Loss', value: '$0', icon: 'dollar-sign' },
       ],
-      insights: [
-        'No scenario data available yet',
-        'Upload a file to see scenario insights'
-      ],
+      insights: [],
       chartData: [],
       chartSeries: [{ name: 'Scenarios', dataKey: 'value', color: '#f97316' }],
       chartType: 'composed',
