@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -767,4 +768,103 @@ const Index = () => {
             value={dataLoaded ? "963K" : "0"}
             prefix="$"
             severity="high"
-            icon={<DollarSign className="
+            icon={<DollarSign className="h-5 w-5" />}
+            tooltip="Estimated financial impact of identified risks"
+            trend={dataLoaded ? 15 : undefined}
+            isLoading={loading}
+            onClick={() => handleMetricClick("Total Potential Loss")}
+          />
+          <MetricCard
+            title="Control Failures"
+            value={dataLoaded ? "15%" : "0%"}
+            severity="medium"
+            icon={<TestTube className="h-5 w-5" />}
+            tooltip="Percentage of control tests that failed"
+            trend={dataLoaded ? -4 : undefined}
+            isLoading={loading}
+            onClick={() => handleMetricClick("Control Failures")}
+          />
+          <MetricCard
+            title="Scenario Analysis"
+            value={dataLoaded ? "14" : "0"}
+            severity="low"
+            icon={<Presentation className="h-5 w-5" />}
+            tooltip="Number of risk scenarios modeled"
+            trend={dataLoaded ? 6 : undefined}
+            isLoading={loading}
+            onClick={() => handleMetricClick("Scenario Analysis")}
+          />
+        </RibbonNav>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          {infoWidgetData.slice(0, 4).map((widget) => (
+            <InfoWidget 
+              key={widget.id}
+              data={widget}
+              onClick={() => handleNavigate(widget.actionHref.replace('/', ''))}
+              isLoading={loading}
+            />
+          ))}
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="lg:col-span-2">
+            <Chart 
+              title="Loss Events by Month"
+              description="Financial impact and number of events"
+              data={lossEventsData}
+              series={[
+                { name: 'Loss Events', dataKey: 'value', type: 'bar', color: '#f43f5e' },
+                { name: 'Amount', dataKey: 'amount', type: 'line', color: '#8b5cf6', yAxisId: 'right' }
+              ]}
+              xAxisKey="name"
+              height={300}
+              showGrid={true}
+              showLegend={true}
+              onClickItem={handleLossEventClick}
+              isLoading={loading}
+              emptyText="No loss event data available"
+            />
+          </div>
+          <div>
+            <Chart 
+              title="Risk Distribution"
+              description="By category"
+              data={riskDistributionData}
+              series={[{ name: 'Risks', dataKey: 'value', color: '#10b981' }]}
+              type="pie"
+              height={300}
+              showLegend={true}
+              onClickItem={handleRiskCategoryClick}
+              isLoading={loading}
+              emptyText="No risk distribution data available"
+            />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="lg:col-span-2 bg-white dark:bg-gray-950 border rounded-lg p-6">
+            <h3 className="font-medium mb-4">Process Knowledge Graph</h3>
+            <KnowledgeGraph isLoading={loading} animate={dataLoaded} />
+          </div>
+          <div>
+            <AIRiskSummary isLoading={loading} dataLoaded={dataLoaded} />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {infoWidgetData.slice(4).map((widget) => (
+            <InfoWidget 
+              key={widget.id}
+              data={widget}
+              onClick={() => handleNavigate(widget.actionHref.replace('/', ''))}
+              isLoading={loading}
+            />
+          ))}
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default Index;
