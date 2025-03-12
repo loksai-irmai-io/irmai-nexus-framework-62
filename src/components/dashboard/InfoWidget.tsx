@@ -1,32 +1,39 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 import Chart from './Chart';
+import { Badge } from '@/components/ui/badge';
 import WidgetMetric from './WidgetMetric';
-
-export interface InfoWidgetMetric {
-  label: string;
-  value: string;
-  icon: string;
-  tooltip?: string;
-  trend?: {
-    direction: 'up' | 'down' | 'neutral';
-    value: number;
-  };
-}
+import { Skeleton } from '@/components/ui/skeleton';
 
 export interface InfoWidgetData {
   id: string;
   title: string;
   subtitle: string;
   icon: React.ReactNode;
-  metrics: InfoWidgetMetric[];
+  metrics: Array<{
+    label: string;
+    value: string;
+    icon: string;
+    tooltip?: string;
+    trend?: {
+      direction: 'up' | 'down' | 'neutral';
+      value: number;
+    };
+  }>;
   insights: string[];
   chartData: any[];
-  chartSeries: { name: string; dataKey: string; color: string; type?: 'line' | 'bar' | 'area' }[];
-  chartType: 'line' | 'bar' | 'pie' | 'composed';
+  chartSeries: Array<{
+    name: string;
+    dataKey: string;
+    color: string;
+    type?: string;
+  }>;
+  chartType: 'line' | 'bar' | 'area' | 'pie' | 'composed';
+  xAxisKey?: string;
   status: 'success' | 'warning' | 'error' | 'info';
   actionText: string;
   actionHref: string;
@@ -40,106 +47,112 @@ interface InfoWidgetProps {
 }
 
 const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = false }) => {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'success': return 'bg-green-50 text-green-700 border-green-200';
-      case 'warning': return 'bg-amber-50 text-amber-700 border-amber-200';
-      case 'error': return 'bg-red-50 text-red-700 border-red-200';
-      default: return 'bg-blue-50 text-blue-700 border-blue-200';
-    }
-  };
-
   if (isLoading) {
     return (
-      <Card className="hover:shadow-md transition-shadow">
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            <Skeleton className="h-6 w-3/4" />
-            <div className="grid grid-cols-2 gap-4">
-              <Skeleton className="h-12" />
-              <Skeleton className="h-12" />
-              <Skeleton className="h-12" />
-              <Skeleton className="h-12" />
-            </div>
-            <Skeleton className="h-[200px]" />
+      <Card className="overflow-hidden hover:shadow-md transition-shadow">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-4 w-2/3" />
+            <Skeleton className="h-8 w-8 rounded-full" />
           </div>
+          <Skeleton className="h-3 w-1/2 mt-1" />
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-2 gap-2 mb-6">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="flex flex-col">
+                <Skeleton className="h-3 w-16 mb-1" />
+                <Skeleton className="h-5 w-12" />
+              </div>
+            ))}
+          </div>
+          <Skeleton className="h-[180px] w-full rounded" />
         </CardContent>
+        <CardFooter className="pt-0 pb-3">
+          <Skeleton className="h-9 w-full rounded" />
+        </CardFooter>
       </Card>
     );
   }
 
-  return (
-    <Card 
-      className="hover:shadow-md transition-shadow cursor-pointer" 
-      onClick={onClick}
-    >
-      <CardContent className="p-6">
-        <div className="space-y-6">
-          {/* Title and Badge Section */}
-          <div className="flex items-start justify-between">
-            <div className="space-y-1.5">
-              <div className="flex items-center">
-                <span className="flex-shrink-0">{data.icon}</span>
-                <h3 className="text-base font-medium ml-2">
-                  {data.title}
-                </h3>
-              </div>
-              <p className="text-sm text-muted-foreground pl-7">
-                {data.subtitle}
-              </p>
-            </div>
-            <Badge 
-              variant="outline" 
-              className={`font-normal ${getStatusColor(data.status)}`}
-            >
-              {data.status.charAt(0).toUpperCase() + data.status.slice(1)}
-            </Badge>
-          </div>
+  const hasChartData = data.chartData && data.chartData.length > 0 && data.chartSeries && data.chartSeries.length > 0;
+  const chartProps = hasChartData ? {
+    title: data.title || "Data Chart",
+    data: data.chartData,
+    series: data.chartSeries.map(({ name, dataKey, color }) => ({ name, dataKey, color })),
+    type: data.chartType,
+    xAxisKey: data.xAxisKey || 'name',
+    height: data.chartHeight || 200,
+    showGrid: false,
+    showLegend: false
+  } : null;
 
-          {/* Metrics Grid */}
-          <div className="grid grid-cols-2 gap-4">
-            {data.metrics.map((metric, index) => (
-              <WidgetMetric
-                key={`${data.id}-metric-${index}`}
-                label={metric.label}
-                value={metric.value}
-                iconName={metric.icon}
-                tooltip={metric.tooltip}
-                trend={metric.trend}
-              />
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'success': return 'bg-green-500/10 text-green-700 border-green-200 dark:bg-green-500/20 dark:text-green-300 dark:border-green-800';
+      case 'warning': return 'bg-yellow-500/10 text-yellow-700 border-yellow-200 dark:bg-yellow-500/20 dark:text-yellow-300 dark:border-yellow-800';
+      case 'error': return 'bg-red-500/10 text-red-700 border-red-200 dark:bg-red-500/20 dark:text-red-300 dark:border-red-800';
+      case 'info': 
+      default: return 'bg-blue-500/10 text-blue-700 border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-800';
+    }
+  };
+
+  return (
+    <Card className="overflow-hidden h-full flex flex-col hover:shadow-md transition-shadow">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            {data.icon}
+            <h3 className="font-medium">{data.title}</h3>
+          </div>
+          <Badge variant="outline" className={cn("text-xs font-normal", getStatusColor(data.status))}>
+            {data.status === 'success' ? 'Healthy' : 
+             data.status === 'warning' ? 'Attention' : 
+             data.status === 'error' ? 'Critical' : 'Info'}
+          </Badge>
+        </div>
+        <p className="text-sm text-muted-foreground">{data.subtitle}</p>
+      </CardHeader>
+      
+      <CardContent className="pb-2 flex-1">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-4">
+          {data.metrics.map((metric, idx) => (
+            <WidgetMetric
+              key={idx}
+              label={metric.label}
+              value={metric.value}
+              iconName={metric.icon}
+              tooltip={metric.tooltip}
+              trend={metric.trend}
+            />
+          ))}
+        </div>
+        
+        {hasChartData && chartProps && (
+          <div className="mb-4">
+            <Chart {...chartProps} />
+          </div>
+        )}
+        
+        {data.insights && data.insights.length > 0 && (
+          <div className="space-y-1">
+            {data.insights.map((insight, idx) => (
+              <p key={idx} className="text-xs text-muted-foreground">{insight}</p>
             ))}
           </div>
-
-          {/* Chart Section */}
-          {data.chartData.length > 0 && (
-            <div className="h-[200px] w-full">
-              <Chart
-                title=""
-                type={data.chartType}
-                data={data.chartData}
-                series={data.chartSeries}
-                xAxisKey="name"
-                height={data.chartHeight || 200}
-                showLegend={false}
-              />
-            </div>
-          )}
-
-          {/* Insights Section */}
-          {data.insights.length > 0 && (
-            <div className="space-y-1">
-              {data.insights.map((insight, index) => (
-                <p 
-                  key={`${data.id}-insight-${index}`}
-                  className="text-sm text-muted-foreground"
-                >
-                  {insight}
-                </p>
-              ))}
-            </div>
-          )}
-        </div>
+        )}
       </CardContent>
+      
+      <CardFooter className="pt-0 mt-auto">
+        <Button 
+          variant="ghost" 
+          className="w-full justify-between hover:bg-muted/50"
+          onClick={onClick}
+        >
+          {data.actionText}
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </CardFooter>
     </Card>
   );
 };
