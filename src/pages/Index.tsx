@@ -154,13 +154,13 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
     {
       id: 'outlier-analysis',
       title: 'Outlier Analysis',
-      subtitle: 'Risk Prediction & Forecasting',
-      icon: <AlertTriangle className="h-5 w-5 text-primary" />,
+      subtitle: 'Predictive Risk Analytics',
+      icon: <SearchX className="h-5 w-5 text-primary" />,
       metrics: [
-        { label: 'Risk Score', value: '0', icon: 'gauge' },
-        { label: 'Critical Risks', value: '0', icon: 'alert-triangle' },
-        { label: 'High Impacts', value: '0', icon: 'trending-up' },
-        { label: 'Mitigations', value: '0', icon: 'shield' },
+        { label: 'Sequence Fails', value: '0', icon: 'activity' },
+        { label: 'Timing Fails', value: '0', icon: 'alert-triangle' },
+        { label: 'Rework Fails', value: '0', icon: 'trending-up' },
+        { label: 'Resource Outliers', value: '0', icon: 'shield' },
       ],
       insights: [
         'No risk analytics data available yet',
@@ -177,13 +177,13 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
     {
       id: 'compliance-monitoring',
       title: 'Compliance Monitoring',
-      subtitle: 'Regulatory Framework Status',
+      subtitle: 'Regulatory Industry & Internal Policy Gaps',
       icon: <FileText className="h-5 w-5 text-primary" />,
       metrics: [
-        { label: 'Overall Score', value: '0%', icon: 'activity' },
-        { label: 'Frameworks', value: '0', icon: 'layers' },
-        { label: 'Open Issues', value: '0', icon: 'alert-triangle' },
-        { label: 'Tests Passing', value: '0%', icon: 'check-circle' },
+        { label: 'Compliance Score', value: '0%', icon: 'activity' },
+        { label: 'Critical Gaps', value: '0', icon: 'layers' },
+        { label: 'Controls', value: '0', icon: 'alert-triangle' },
+        { label: 'Frameworks', value: '0%', icon: 'check-circle' },
       ],
       insights: [
         'No compliance data available yet',
@@ -200,13 +200,13 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
     {
       id: 'process-discovery',
       title: 'Process Mining',
-      subtitle: 'Process Flow Analysis',
+      subtitle: 'End-End Process Insights',
       icon: <GitBranch className="h-5 w-5 text-primary" />,
       metrics: [
-        { label: 'Processes', value: '0', icon: 'git-branch' },
-        { label: 'Activities', value: '0', icon: 'box' },
-        { label: 'Variations', value: '0', icon: 'git-merge' },
-        { label: 'Bottlenecks', value: '0', icon: 'alert-triangle' },
+        { label: 'Events', value: '0', icon: 'git-branch' },
+        { label: 'Critical Activities', value: '0', icon: 'box' },
+        { label: 'Objects', value: '0', icon: 'git-merge' },
+        { label: 'Cases', value: '0', icon: 'alert-triangle' },
       ],
       insights: [
         'No process data available yet',
@@ -223,13 +223,13 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
     {
       id: 'controls-testing',
       title: 'Controls Monitoring',
-      subtitle: 'Control Testing Results',
+      subtitle: 'Automated Controls Testing and Validation',
       icon: <TestTube className="h-5 w-5 text-primary" />,
       metrics: [
-        { label: 'Controls', value: '0', icon: 'shield' },
-        { label: 'Failing', value: '0', icon: 'x-circle' },
-        { label: 'Passing', value: '0', icon: 'check-circle' },
-        { label: 'Untested', value: '0', icon: 'help-circle' },
+        { label: 'Total Controls', value: '0', icon: 'shield' },
+        { label: 'Tested', value: '0', icon: 'x-circle' },
+        { label: 'Pass Rate', value: '0', icon: 'check-circle' },
+        { label: 'Fail Rate', value: '0', icon: 'help-circle' },
       ],
       insights: [
         'No control data available yet',
@@ -246,47 +246,45 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
     {
       id: 'incident-management',
       title: 'Incident Management',
-      subtitle: 'Incident Tracking & Response',
+      subtitle: 'Loss Events and Issue Tracking',
       icon: <AlertTriangle className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Open Incidents', 
-          value: '10', 
+          value: '0', 
           icon: 'alert-triangle',
-          tooltip: 'Number of open incidents',
-          trend: { direction: 'down', value: 2 }
+          tooltip: 'Number of open incidents'
         },
         { 
           label: 'Resolved', 
-          value: '5', 
+          value: '0', 
           icon: 'check-circle',
           tooltip: 'Number of resolved incidents'
         },
         { 
           label: 'Avg. Resolution', 
-          value: '3.2 days', 
+          value: '0 days', 
           icon: 'clock',
           tooltip: 'Average incident resolution time'
         },
         { 
           label: 'Critical Incidents', 
-          value: '2', 
+          value: '0', 
           icon: 'alert-circle',
-          tooltip: 'Number of critical incidents',
-          trend: { direction: 'up', value: 1 }
+          tooltip: 'Number of critical incidents'
         }
       ],
       insights: [
-        'Financial loss peaked in March 2025 ($260K)',
-        'Major data breach incident resolved last week'
+        'No incident data available yet',
+        'Upload a file to see incident insights'
       ],
-      chartData: populatedLossEventsData,
+      chartData: [],
       chartSeries: [
         { name: 'Incident Count', dataKey: 'events', color: '#a855f7' },
         { name: 'Financial Loss ($K)', dataKey: 'amount', color: '#ef4444', type: 'line' }
       ],
       chartType: 'composed',
-      status: 'warning',
+      status: 'info',
       actionText: 'View Incident Management',
       actionHref: '/incident-management',
       chartHeight: 200,
@@ -294,17 +292,17 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
     {
       id: 'scenario-analysis',
       title: 'Scenario Modeling',
-      subtitle: 'Risk Simulation Analysis',
+      subtitle: 'Risk Scenario Modeling and Simulation',
       icon: <Presentation className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Scenarios', value: '0', icon: 'copy' },
         { 
+          label: 'Simulations Run', value: '0', icon: 'refresh-cw' },
+        { 
+          label: 'Coverage', value: '0%', icon: 'pie-chart' },
+        { 
           label: 'Avg. Loss', value: '$0', icon: 'dollar-sign' },
-        { 
-          label: 'Worst Case', value: '$0', icon: 'trending-up' },
-        { 
-          label: 'VaR', value: '$0', icon: 'bar-chart' },
       ],
       insights: [
         'No scenario data available yet',
@@ -381,7 +379,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
     {
       id: 'outlier-analysis',
       title: 'Outlier Analysis',
-      subtitle: 'Anomaly Detection and Unusual Patterns',
+      subtitle: 'Predictive Risk Analytics',
       icon: <SearchX className="h-5 w-5 text-primary" />,
       metrics: [
         { 
@@ -429,7 +427,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
     {
       id: 'compliance-monitoring',
       title: 'Compliance Monitoring',
-      subtitle: 'Regulatory, Industry & Internal Policy Gaps',
+      subtitle: 'Regulatory Industry & Internal Policy Gaps',
       icon: <FileText className="h-5 w-5 text-primary" />,
       metrics: [
         { 
@@ -487,10 +485,10 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       icon: <GitBranch className="h-5 w-5 text-primary" />,
       metrics: [
         { 
-          label: 'Processes', 
+          label: 'Events', 
           value: '24', 
           icon: 'git-branch',
-          tooltip: 'Total number of processes',
+          tooltip: 'Total number of events',
           trend: { direction: 'up', value: 8 }
         },
         { 

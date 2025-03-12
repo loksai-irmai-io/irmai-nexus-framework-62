@@ -13,7 +13,20 @@ import {
   DollarSign,
   FileText,
   AlertCircle,
-  Users
+  Users,
+  AlertTriangle,
+  Shield,
+  RefreshCw,
+  PieChart,
+  Copy,
+  Repeat,
+  Box,
+  GitMerge,
+  GitBranch,
+  Folder,
+  Layers,
+  HelpCircle,
+  XCircle
 } from 'lucide-react';
 import { 
   Tooltip, 
@@ -45,6 +58,7 @@ const WidgetMetric: React.FC<WidgetMetricProps> = ({
     const iconMap: Record<string, React.ReactNode> = {
       'activity': <Activity className="h-4 w-4 text-gray-500" />,
       'bar-chart': <BarChart3 className="h-4 w-4 text-gray-500" />,
+      'chart-bar': <BarChart3 className="h-4 w-4 text-gray-500" />,
       'line-chart': <LineChart className="h-4 w-4 text-gray-500" />,
       'check-circle': <CheckCircle className="h-4 w-4 text-gray-500" />,
       'credit-card': <CreditCard className="h-4 w-4 text-gray-500" />,
@@ -53,7 +67,22 @@ const WidgetMetric: React.FC<WidgetMetricProps> = ({
       'dollar-sign': <DollarSign className="h-4 w-4 text-gray-500" />,
       'file-text': <FileText className="h-4 w-4 text-gray-500" />,
       'alert-circle': <AlertCircle className="h-4 w-4 text-gray-500" />,
-      'users': <Users className="h-4 w-4 text-gray-500" />
+      'alert-triangle': <AlertTriangle className="h-4 w-4 text-gray-500" />,
+      'users': <Users className="h-4 w-4 text-gray-500" />,
+      'shield': <Shield className="h-4 w-4 text-gray-500" />,
+      'refresh-cw': <RefreshCw className="h-4 w-4 text-gray-500" />,
+      'pie-chart': <PieChart className="h-4 w-4 text-gray-500" />,
+      'copy': <Copy className="h-4 w-4 text-gray-500" />,
+      'repeat': <Repeat className="h-4 w-4 text-gray-500" />,
+      'box': <Box className="h-4 w-4 text-gray-500" />,
+      'git-merge': <GitMerge className="h-4 w-4 text-gray-500" />,
+      'git-branch': <GitBranch className="h-4 w-4 text-gray-500" />,
+      'folder': <Folder className="h-4 w-4 text-gray-500" />,
+      'layers': <Layers className="h-4 w-4 text-gray-500" />,
+      'help-circle': <HelpCircle className="h-4 w-4 text-gray-500" />,
+      'x-circle': <XCircle className="h-4 w-4 text-gray-500" />,
+      'trending-up': <ArrowUp className="h-4 w-4 text-gray-500" />,
+      'trending-down': <ArrowDown className="h-4 w-4 text-gray-500" />
     };
     
     return iconMap[iconName] || <Activity className="h-4 w-4 text-gray-500" />;
