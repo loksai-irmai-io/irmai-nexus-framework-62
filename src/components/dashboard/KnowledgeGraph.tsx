@@ -52,16 +52,22 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
         { id: 'customer-onboarding', name: 'Customer Onboarding', group: 2, size: 12 },
         { id: 'payment-process', name: 'Payment Process', group: 2, size: 12 },
         { id: 'kyc', name: 'KYC', group: 2, size: 10 },
+        { id: 'loan-approval', name: 'Loan Approval', group: 2, size: 11 },
+        { id: 'account-opening', name: 'Account Opening', group: 2, size: 11 },
         
         // Risk subcategories
         { id: 'fraud', name: 'Fraud', group: 3, size: 10 },
         { id: 'compliance', name: 'Compliance', group: 3, size: 12 },
         { id: 'operational', name: 'Operational', group: 3, size: 11 },
+        { id: 'credit', name: 'Credit', group: 3, size: 10 },
+        { id: 'market', name: 'Market', group: 3, size: 9 },
         
         // Control subcategories
         { id: 'audit', name: 'Audit', group: 4, size: 10 },
         { id: 'transaction-monitoring', name: 'Transaction Monitoring', group: 4, size: 12 },
         { id: 'control-validation', name: 'Control Validation', group: 4, size: 9 },
+        { id: 'access-management', name: 'Access Management', group: 4, size: 11 },
+        { id: 'data-quality', name: 'Data Quality', group: 4, size: 10 },
       ];
       
       const links = [
@@ -74,24 +80,35 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
         { source: 'processes', target: 'customer-onboarding', value: 4 },
         { source: 'processes', target: 'payment-process', value: 4 },
         { source: 'processes', target: 'kyc', value: 3 },
+        { source: 'processes', target: 'loan-approval', value: 3 },
+        { source: 'processes', target: 'account-opening', value: 3 },
         
         // Connect Risks to subcategories
         { source: 'risks', target: 'fraud', value: 3 },
         { source: 'risks', target: 'compliance', value: 4 },
         { source: 'risks', target: 'operational', value: 3 },
+        { source: 'risks', target: 'credit', value: 3 },
+        { source: 'risks', target: 'market', value: 2 },
         
         // Connect Controls to subcategories
         { source: 'controls', target: 'audit', value: 3 },
         { source: 'controls', target: 'transaction-monitoring', value: 4 },
         { source: 'controls', target: 'control-validation', value: 3 },
+        { source: 'controls', target: 'access-management', value: 3 },
+        { source: 'controls', target: 'data-quality', value: 3 },
         
         // Cross-connections between categories
         { source: 'payment-process', target: 'fraud', value: 2 },
         { source: 'customer-onboarding', target: 'compliance', value: 2 },
         { source: 'kyc', target: 'compliance', value: 2 },
+        { source: 'loan-approval', target: 'credit', value: 2 },
+        { source: 'account-opening', target: 'operational', value: 2 },
+        
         { source: 'fraud', target: 'transaction-monitoring', value: 2 },
         { source: 'compliance', target: 'audit', value: 2 },
         { source: 'operational', target: 'control-validation', value: 2 },
+        { source: 'credit', target: 'data-quality', value: 2 },
+        { source: 'market', target: 'access-management', value: 2 },
       ];
       
       setGraphData({ nodes, links });
@@ -99,17 +116,17 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
       setGraphData({
         nodes: [
           { id: 'irmai-bank', name: 'IRMAI Bank', group: 1, size: 15 },
-          { id: 'risk', name: 'Risk', group: 2, size: 12 },
-          { id: 'process', name: 'Process', group: 3, size: 12 },
-          { id: 'control', name: 'Controls', group: 4, size: 12 },
+          { id: 'risks', name: 'Risks', group: 2, size: 12 },
+          { id: 'processes', name: 'Processes', group: 3, size: 12 },
+          { id: 'controls', name: 'Controls', group: 4, size: 12 },
         ],
         links: [
-          { source: 'irmai-bank', target: 'risk', value: 4 },
-          { source: 'irmai-bank', target: 'process', value: 4 },
-          { source: 'irmai-bank', target: 'control', value: 4 },
-          { source: 'risk', target: 'process', value: 3 },
-          { source: 'process', target: 'control', value: 3 },
-          { source: 'control', target: 'risk', value: 3 },
+          { source: 'irmai-bank', target: 'risks', value: 4 },
+          { source: 'irmai-bank', target: 'processes', value: 4 },
+          { source: 'irmai-bank', target: 'controls', value: 4 },
+          { source: 'risks', target: 'processes', value: 3 },
+          { source: 'processes', target: 'controls', value: 3 },
+          { source: 'controls', target: 'risks', value: 3 },
         ]
       });
     }
@@ -117,10 +134,10 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
   
   const getNodeColor = (node: any) => {
     const groupColors = [
-      '#3b82f6', // blue
-      '#10b981', // green
-      '#ef4444', // red
-      '#8b5cf6', // purple
+      '#3b82f6', // blue - IRMAI Bank
+      '#10b981', // green - Processes 
+      '#ef4444', // red - Risks
+      '#8b5cf6', // purple - Controls
       '#f59e0b', // amber
       '#ec4899', // pink
       '#06b6d4', // cyan

@@ -57,6 +57,11 @@ export const processService = {
     
     // Simulate successful response 95% of the time
     if (Math.random() > 0.05) {
+      // Trigger the event to update the dashboard components
+      window.dispatchEvent(new CustomEvent('processDataUpdated', {
+        detail: { processData: MOCK_PROCESS_DATA }
+      }));
+      
       return {
         status_code: 'success',
         message: `File "${file.name}" uploaded successfully`,
@@ -73,6 +78,11 @@ export const processService = {
   getExampleData: async (): Promise<EventLogResponse> => {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Trigger the event to update the dashboard components
+    window.dispatchEvent(new CustomEvent('processDataUpdated', {
+      detail: { processData: MOCK_PROCESS_DATA }
+    }));
     
     return {
       status_code: 'success',
