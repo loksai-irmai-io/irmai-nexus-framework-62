@@ -310,7 +310,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
         { 
           label: 'High Severity', 
           value: '5', 
-          icon: 'trending-up',
+          icon: 'alert-triangle',
           tooltip: 'Number of high severity risks',
           trend: { direction: 'down', value: 2 }
         },
@@ -325,23 +325,25 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
           value: '23', 
           icon: 'trending-down',
           tooltip: 'Number of low severity risks'
-        },
+        }
       ],
       insights: [
         'Payment fraud risk increased by 12% this month',
         'Data privacy risks require immediate attention'
       ],
-      chartData: populatedPredictiveRiskData.map(item => ({
-        ...item,
-        size: Math.round(item.probability * item.impact)
-      })),
+      chartData: [
+        { name: 'Fraud', probability: 0.3, impact: 85, size: 25 },
+        { name: 'Data Breach', probability: 0.4, impact: 95, size: 38 },
+        { name: 'System Failure', probability: 0.3, impact: 80, size: 24 },
+        { name: 'Compliance', probability: 0.2, impact: 70, size: 14 },
+        { name: 'Operations', probability: 0.1, impact: 60, size: 6 }
+      ],
       chartSeries: [
         { name: 'Probability', dataKey: 'probability', color: '#8b5cf6' },
         { name: 'Impact', dataKey: 'impact', color: '#ef4444' },
         { name: 'Size', dataKey: 'size', color: '#d946ef' }
       ],
-      chartType: 'composed',
-      xAxisKey: 'name',
+      chartType: 'line',
       status: 'error',
       actionText: 'View Risk Analytics',
       actionHref: '/fmea-analysis',
@@ -350,177 +352,191 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
     {
       id: 'outlier-analysis',
       title: 'Outlier Analysis',
-      subtitle: 'Risk Prediction & Forecasting',
-      icon: <AlertTriangle className="h-5 w-5 text-primary" />,
+      subtitle: 'Anomaly Detection and Unusual Patterns',
+      icon: <SearchX className="h-5 w-5 text-primary" />,
       metrics: [
-        { label: 'Risk Score', value: '78', icon: 'gauge', tooltip: 'Overall risk score', trend: { direction: 'up', value: 3 } },
-        { label: 'Critical Risks', value: '3', icon: 'alert-triangle', tooltip: 'Number of critical risks', trend: { direction: 'down', value: 1 } },
-        { label: 'High Impacts', value: '15', icon: 'trending-up', tooltip: 'Number of high impact risks' },
-        { label: 'Mitigations', value: '22', icon: 'shield', tooltip: 'Number of active mitigations', trend: { direction: 'up', value: 4 } },
+        { 
+          label: 'Sequence Fails', 
+          value: '18', 
+          icon: 'activity',
+          tooltip: 'Number of sequence failures',
+          trend: { direction: 'up', value: 12 }
+        },
+        { 
+          label: 'Timing Fails', 
+          value: '3', 
+          icon: 'clock',
+          tooltip: 'Number of timing failures'
+        },
+        { 
+          label: 'Rework Fails', 
+          value: '94%', 
+          icon: 'repeat',
+          tooltip: 'Percentage of rework failures',
+          trend: { direction: 'up', value: 3 }
+        },
+        { 
+          label: 'Resource Outliers', 
+          value: '5,120', 
+          icon: 'users',
+          tooltip: 'Number of resource outliers'
+        }
       ],
       insights: [
-        'AI predicts a 15% increase in cyber risks next quarter',
-        'New mitigation strategies are reducing financial exposure'
+        '5 new anomalies detected in the payment process',
+        'Loan approval has unusual timestamp patterns'
       ],
-      chartData: [
-        { name: 'Fraud', value: 75 },
-        { name: 'Cyber', value: 88 },
-        { name: 'Operational', value: 62 },
-        { name: 'Compliance', value: 79 },
+      chartData: populatedOutlierAnalysisData,
+      chartSeries: [
+        { name: 'Anomaly Count', dataKey: 'count', color: '#f97316' },
+        { name: 'Anomaly Rate (%)', dataKey: 'rate', color: '#3b82f6' }
       ],
-      chartSeries: [{ name: 'Risk Score', dataKey: 'value', color: '#f43f5e' }],
       chartType: 'line',
       status: 'warning',
-      actionText: 'View Predictive Analytics',
-      actionHref: '/risk-analytics',
+      actionText: 'View Outlier Analysis',
+      actionHref: '/outlier-analysis',
       chartHeight: 200,
     },
     {
       id: 'compliance-monitoring',
       title: 'Compliance Monitoring',
-      subtitle: 'Regulatory Framework Status',
+      subtitle: 'Regulatory, Industry & Internal Policy Gaps',
       icon: <FileText className="h-5 w-5 text-primary" />,
       metrics: [
         { 
-          label: 'Overall Score', 
+          label: 'Compliance Score', 
           value: '85%', 
           icon: 'activity',
-          tooltip: 'Overall compliance score across frameworks',
-          trend: { direction: 'up', value: 3 }
+          tooltip: 'Overall compliance score',
+          trend: { direction: 'up', value: 5 }
+        },
+        { 
+          label: 'Critical Gaps', 
+          value: '3', 
+          icon: 'alert-triangle',
+          tooltip: 'Number of critical gaps',
+          trend: { direction: 'down', value: 2 }
+        },
+        { 
+          label: 'Controls', 
+          value: '124', 
+          icon: 'shield',
+          tooltip: 'Total number of controls'
         },
         { 
           label: 'Frameworks', 
-          value: '6', 
+          value: '8', 
           icon: 'layers',
-          tooltip: 'Active compliance frameworks'
-        },
-        { 
-          label: 'Open Issues', 
-          value: '12', 
-          icon: 'alert-triangle',
-          tooltip: 'Compliance issues requiring attention',
-          trend: { direction: 'down', value: 5 }
-        },
-        { 
-          label: 'Tests Passing', 
-          value: '92%', 
-          icon: 'check-circle',
-          tooltip: 'Percentage of controls passing tests',
-          trend: { direction: 'up', value: 4 }
-        },
+          tooltip: 'Number of compliance frameworks'
+        }
       ],
       insights: [
-        'GDPR compliance improved 8% through data handling changes',
-        'SOC2 control gaps identified in vendor management'
+        'GDPR compliance score improved by 5% this quarter',
+        'PCI-DSS has 2 new gaps requiring immediate action'
       ],
       chartData: [
-        { name: 'GDPR', value: 94 },
-        { name: 'SOX', value: 88 },
-        { name: 'PCI-DSS', value: 76 },
-        { name: 'HIPAA', value: 82 },
-        { name: 'SOC2', value: 79 }
+        { name: 'PCI-DSS', current: 75, target: 100 },
+        { name: 'GDPR', current: 85, target: 100 },
+        { name: 'SOX', current: 90, target: 100 },
+        { name: 'ISO 27001', current: 65, target: 100 },
+        { name: 'Basel III', current: 70, target: 100 }
       ],
       chartSeries: [
-        { name: 'Compliance Score', dataKey: 'value', color: '#10b981' }
+        { name: 'Current Compliance', dataKey: 'current', color: '#0ea5e9' },
+        { name: 'Target', dataKey: 'target', color: '#64748b' }
       ],
       chartType: 'bar',
-      xAxisKey: 'name',
       status: 'warning',
-      actionText: 'View Compliance Dashboard',
+      actionText: 'View Compliance Monitoring',
       actionHref: '/compliance-monitoring',
       chartHeight: 200,
     },
     {
       id: 'process-discovery',
-      title: 'Process Mining',
-      subtitle: 'Process Flow Analysis',
+      title: 'Process Discovery',
+      subtitle: 'End-End Process Insights',
       icon: <GitBranch className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Processes', 
           value: '24', 
           icon: 'git-branch',
-          tooltip: 'Number of processes analyzed'
+          tooltip: 'Total number of processes',
+          trend: { direction: 'up', value: 8 }
         },
         { 
-          label: 'Activities', 
-          value: '186', 
+          label: 'Critical Activities', 
+          value: '158', 
+          icon: 'activity',
+          tooltip: 'Number of critical activities'
+        },
+        { 
+          label: 'Objects', 
+          value: '42', 
           icon: 'box',
-          tooltip: 'Total activities across all processes'
+          tooltip: 'Number of process objects'
         },
         { 
-          label: 'Variations', 
-          value: '43', 
-          icon: 'git-merge',
-          tooltip: 'Process variations identified',
-          trend: { direction: 'up', value: 12 }
-        },
-        { 
-          label: 'Bottlenecks', 
-          value: '7', 
-          icon: 'alert-triangle',
-          tooltip: 'Process bottlenecks identified',
-          trend: { direction: 'down', value: 2 }
-        },
+          label: 'Cases', 
+          value: '2,453', 
+          icon: 'folder',
+          tooltip: 'Total number of cases'
+        }
       ],
       insights: [
-        'Customer onboarding process has 3 key bottlenecks',
-        'Payment approval has 67% more variations than last quarter'
+        'Payment processing has 3 bottlenecks identified',
+        'Customer onboarding has 2 automation opportunities'
       ],
       chartData: populatedProcessDiscoveryData,
       chartSeries: [
-        { name: 'Process Steps', dataKey: 'value', color: '#0ea5e9' }
+        { name: 'Process Steps', dataKey: 'value', color: '#10b981' }
       ],
       chartType: 'pie',
       status: 'warning',
-      actionText: 'View Process Maps',
+      actionText: 'View Process Discovery',
       actionHref: '/process-discovery',
       chartHeight: 200,
     },
     {
       id: 'controls-testing',
-      title: 'Controls Monitoring',
-      subtitle: 'Control Testing Results',
+      title: 'Controls Testing',
+      subtitle: 'Automated Controls Testing and Validation',
       icon: <TestTube className="h-5 w-5 text-primary" />,
       metrics: [
         { 
-          label: 'Controls', 
+          label: 'Total Controls', 
           value: '124', 
           icon: 'shield',
-          tooltip: 'Total number of controls monitored'
+          tooltip: 'Total number of controls'
         },
         { 
-          label: 'Failing', 
-          value: '19', 
-          icon: 'x-circle',
-          tooltip: 'Controls failing tests',
-          trend: { direction: 'down', value: 4 }
-        },
-        { 
-          label: 'Passing', 
-          value: '98', 
+          label: 'Tested', 
+          value: '80', 
           icon: 'check-circle',
-          tooltip: 'Controls passing tests',
+          tooltip: 'Number of tested controls'
+        },
+        { 
+          label: 'Pass Rate', 
+          value: '85%', 
+          icon: 'trending-up',
+          tooltip: 'Control test pass rate',
           trend: { direction: 'up', value: 3 }
         },
         { 
-          label: 'Untested', 
-          value: '7', 
-          icon: 'help-circle',
-          tooltip: 'Controls awaiting testing'
-        },
+          label: 'Fail Rate', 
+          value: '15%', 
+          icon: 'trending-down',
+          tooltip: 'Control test fail rate',
+          trend: { direction: 'down', value: 3 }
+        }
       ],
       insights: [
-        'Access control failures decreased by 15% after IAM updates',
-        'Data validation controls need review in customer database'
+        'No new controls tested this week (awaiting scheduling)',
+        'Evidence collection automation in progress'
       ],
-      chartData: [
-        { name: 'Passing', value: 98 },
-        { name: 'Failing', value: 19 },
-        { name: 'Untested', value: 7 }
-      ],
+      chartData: populatedControlsHealthData,
       chartSeries: [
-        { name: 'Controls', dataKey: 'value', color: '#0ea5e9' }
+        { name: 'Controls', dataKey: 'value', color: '#10b981' }
       ],
       chartType: 'pie',
       status: 'warning',
@@ -531,87 +547,105 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
     {
       id: 'incident-management',
       title: 'Incident Management',
-      subtitle: 'Incident Tracking & Response',
+      subtitle: 'Loss Events and Issue Tracking',
       icon: <AlertTriangle className="h-5 w-5 text-primary" />,
       metrics: [
-        { label: 'Open Incidents', value: '15', icon: 'alert-triangle', tooltip: 'Number of open incidents', trend: { direction: 'up', value: 2 } },
-        { label: 'Critical', value: '2', icon: 'alert-circle', tooltip: 'Number of critical incidents' },
-        { label: 'Avg Response', value: '2.5h', icon: 'clock', tooltip: 'Average response time' },
-        { label: 'Resolved', value: '12', icon: 'check-circle', tooltip: 'Number of resolved incidents', trend: { direction: 'up', value: 3 } },
+        { 
+          label: 'Open Incidents', 
+          value: '10', 
+          icon: 'alert-triangle',
+          tooltip: 'Number of open incidents',
+          trend: { direction: 'down', value: 2 }
+        },
+        { 
+          label: 'Resolved', 
+          value: '5', 
+          icon: 'check-circle',
+          tooltip: 'Number of resolved incidents'
+        },
+        { 
+          label: 'Avg. Resolution', 
+          value: '3.2 days', 
+          icon: 'clock',
+          tooltip: 'Average incident resolution time'
+        },
+        { 
+          label: 'Critical Incidents', 
+          value: '2', 
+          icon: 'alert-circle',
+          tooltip: 'Number of critical incidents',
+          trend: { direction: 'up', value: 1 }
+        }
       ],
       insights: [
-        'Phishing incidents increased by 20% this month',
-        'Average resolution time improved by 10%'
+        'Financial loss peaked in March 2025 ($260K)',
+        'Major data breach incident resolved last week'
       ],
-      chartData: [
-        { name: 'Phishing', value: 5 },
-        { name: 'Malware', value: 3 },
-        { name: 'Data Breach', value: 2 },
-        { name: 'System Failure', value: 5 },
+      chartData: populatedLossEventsData,
+      chartSeries: [
+        { name: 'Incident Count', dataKey: 'events', color: '#a855f7' },
+        { name: 'Financial Loss ($K)', dataKey: 'amount', color: '#ef4444', type: 'line' }
       ],
-      chartSeries: [{ name: 'Incidents', dataKey: 'value', color: '#f97316' }],
-      chartType: 'bar',
-      status: 'info',
-      actionText: 'View Incident Dashboard',
+      chartType: 'composed',
+      status: 'warning',
+      actionText: 'View Incident Management',
       actionHref: '/incident-management',
       chartHeight: 200,
     },
     {
       id: 'scenario-analysis',
-      title: 'Scenario Modeling',
-      subtitle: 'Risk Simulation Analysis',
+      title: 'Scenario Analysis',
+      subtitle: 'Risk Scenario Modeling and Simulation',
       icon: <Presentation className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Scenarios', 
-          value: '14', 
+          value: '5', 
           icon: 'copy',
-          tooltip: 'Number of risk scenarios modeled'
+          tooltip: 'Number of risk scenarios'
+        },
+        { 
+          label: 'Simulations Run', 
+          value: '12', 
+          icon: 'refresh-cw',
+          tooltip: 'Number of simulations run'
+        },
+        { 
+          label: 'Coverage', 
+          value: '60%', 
+          icon: 'pie-chart',
+          tooltip: 'Scenario coverage',
+          trend: { direction: 'up', value: 10 }
         },
         { 
           label: 'Avg. Loss', 
-          value: '$650K', 
+          value: '$75K', 
           icon: 'dollar-sign',
-          tooltip: 'Average loss per scenario',
-          trend: { direction: 'up', value: 50 }
-        },
-        { 
-          label: 'Worst Case', 
-          value: '$3.2M', 
-          icon: 'trending-up',
-          tooltip: 'Worst-case loss estimation',
-          trend: { direction: 'up', value: 400 }
-        },
-        { 
-          label: 'VaR', 
-          value: '$975K', 
-          icon: 'bar-chart',
-          tooltip: 'Value at Risk (95% confidence)',
-          trend: { direction: 'up', value: 120 }
-        },
+          tooltip: 'Average loss per scenario'
+        }
       ],
       insights: [
-        'Data breach scenario shows 22% higher impact than last quarter',
-        'Supply chain disruption is now the highest financial risk'
+        'Disaster recovery scenario indicates 20% potential revenue impact',
+        '3 new simulations pending for Q1 2026'
       ],
       chartData: [
-        { name: 'Data Breach', expected: 850000, worst: 3200000, likelihood: 0.3 },
-        { name: 'Fraud', expected: 420000, worst: 1500000, likelihood: 0.5 },
-        { name: 'System Outage', expected: 680000, worst: 2100000, likelihood: 0.2 },
-        { name: 'Supply Chain', expected: 950000, worst: 2800000, likelihood: 0.4 },
-        { name: 'Regulatory', expected: 750000, worst: 2500000, likelihood: 0.25 }
+        { name: 'Data Breach', probability: 0.8, impact: 85, size: 68 },
+        { name: 'System Failure', probability: 0.6, impact: 65, size: 39 },
+        { name: 'Compliance', probability: 0.4, impact: 75, size: 30 },
+        { name: 'Disaster Recovery', probability: 0.2, impact: 95, size: 19 },
+        { name: 'Fraud', probability: 0.5, impact: 55, size: 27.5 }
       ],
       chartSeries: [
-        { name: 'Expected Loss', dataKey: 'expected', color: '#f97316' },
-        { name: 'Worst Case', dataKey: 'worst', color: '#ef4444' }
+        { name: 'Probability', dataKey: 'probability', color: '#0ea5e9' },
+        { name: 'Impact', dataKey: 'impact', color: '#f97316' },
+        { name: 'Size', dataKey: 'size', color: '#8b5cf6' }
       ],
-      chartType: 'composed',
-      xAxisKey: 'name',
+      chartType: 'line',
       status: 'error',
       actionText: 'View Scenario Analysis',
       actionHref: '/scenario-analysis',
       chartHeight: 200,
-    },
+    }
   ];
 };
 
