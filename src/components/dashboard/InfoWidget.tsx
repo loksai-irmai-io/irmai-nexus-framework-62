@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -76,7 +75,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = fals
       <CardContent className="p-6 flex-grow flex flex-col">
         <div className="flex flex-col h-full">
           {/* Title and Badge Section */}
-          <div className="flex items-start justify-between mb-6">
+          <div className="flex items-start justify-between mb-4">
             <div className="space-y-1.5">
               <div className="flex items-center">
                 <span className="flex-shrink-0">{data.icon}</span>
@@ -97,7 +96,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = fals
           </div>
 
           {/* Metrics Grid */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-2 gap-4 mb-4">
             {data.metrics.map((metric, index) => (
               <WidgetMetric
                 key={`${data.id}-metric-${index}`}
@@ -110,17 +109,17 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = fals
             ))}
           </div>
 
-          {/* Chart Section with proper sizing */}
+          {/* Chart Section with fixed height and proper containment */}
           {data.chartData.length > 0 && (
-            <div className="w-full flex-grow flex items-center justify-center">
-              <div className="w-full h-[200px]">
+            <div className="flex-1 min-h-0 w-full">
+              <div className="h-full w-full" style={{ minHeight: '180px', maxHeight: '200px' }}>
                 <Chart
                   title=""
                   type={data.chartType}
                   data={data.chartData}
                   series={data.chartSeries}
                   xAxisKey="name"
-                  height={data.chartHeight || 200}
+                  height={data.chartHeight || "100%"}
                   showLegend={false}
                 />
               </div>
@@ -129,7 +128,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = fals
 
           {/* Insights Section */}
           {data.insights.length > 0 && (
-            <div className="space-y-1 mt-4">
+            <div className="space-y-1 mt-3">
               {data.insights.map((insight, index) => (
                 <p 
                   key={`${data.id}-insight-${index}`}
