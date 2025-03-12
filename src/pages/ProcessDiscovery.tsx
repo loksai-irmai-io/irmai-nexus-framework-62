@@ -120,7 +120,7 @@ const eventLogs = [
 ];
 
 const ProcessDiscovery = () => {
-  const [viewType, setViewType] = useState('bpmn');
+  const [viewType, setViewType] = useState<'bpmn' | 'petri' | 'tree'>('bpmn');
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [detailView, setDetailView] = useState(false);
   const [showRawEvents, setShowRawEvents] = useState(false);
@@ -132,6 +132,7 @@ const ProcessDiscovery = () => {
   const [apiResponse, setApiResponse] = useState<EventLogResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentProcessData, setCurrentProcessData] = useState<ProcessData>(processData);
+  const [fileUploaded, setFileUploaded] = useState(false);
   
   useEffect(() => {
     const handleProcessDataUpdate = (event: Event) => {
@@ -189,6 +190,7 @@ const ProcessDiscovery = () => {
         
         if (response.status_code === 'success' && response.data) {
           setCurrentProcessData(response.data);
+          setFileUploaded(true);
           toast.success(response.message);
         } else {
           toast.error(response.message);
@@ -362,7 +364,7 @@ const ProcessDiscovery = () => {
                 </CardHeader>
                 
                 <CardContent className="pt-0">
-                  <Tabs defaultValue="bpmn" value={viewType} onValueChange={setViewType}>
+                  <Tabs defaultValue="bpmn" value={viewType} onValueChange={(value) => setViewType(value as 'bpmn' | 'petri' | 'tree')}>
                     <TabsList className="mb-4">
                       <TabsTrigger value="bpmn">BPMN Diagram</TabsTrigger>
                       <TabsTrigger value="petri">Petri Net</TabsTrigger>
@@ -374,37 +376,29 @@ const ProcessDiscovery = () => {
                         processData={currentProcessData} 
                         selectedNode={selectedNode} 
                         onNodeClick={handleNodeClick} 
+                        viewType="bpmn"
+                        isLoaded={fileUploaded}
                       />
                     </TabsContent>
                     
                     <TabsContent value="petri">
-                      <div className="relative w-full h-[500px] border border-muted rounded-md p-4 overflow-auto bg-muted/20">
-                        <div className="flex items-center justify-center h-full">
-                          <div className="text-center">
-                            <Network className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                            <h3 className="text-lg font-medium">Petri Net View</h3>
-                            <p className="text-muted-foreground max-w-md">
-                              This view shows the process as a Petri net, with places (states) and transitions (activities).
-                              It's useful for analyzing concurrency and synchronization in processes.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                      <ProcessMap 
+                        processData={currentProcessData} 
+                        selectedNode={selectedNode} 
+                        onNodeClick={handleNodeClick} 
+                        viewType="petri"
+                        isLoaded={fileUploaded}
+                      />
                     </TabsContent>
                     
                     <TabsContent value="tree">
-                      <div className="relative w-full h-[500px] border border-muted rounded-md p-4 overflow-auto bg-muted/20">
-                        <div className="flex items-center justify-center h-full">
-                          <div className="text-center">
-                            <GitBranch className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                            <h3 className="text-lg font-medium">Process Tree View</h3>
-                            <p className="text-muted-foreground max-w-md">
-                              This hierarchical view represents the process as a tree, showing sequential, parallel, and choice constructs.
-                              It's useful for understanding the hierarchical structure of the process.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                      <ProcessMap 
+                        processData={currentProcessData} 
+                        selectedNode={selectedNode} 
+                        onNodeClick={handleNodeClick} 
+                        viewType="tree"
+                        isLoaded={fileUploaded}
+                      />
                     </TabsContent>
                   </Tabs>
                 </CardContent>
