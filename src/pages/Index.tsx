@@ -855,7 +855,7 @@ const Index = () => {
             description="Distribution by severity level"
             data={incidentSeverityData}
             type="pie"
-            series={[{ name: 'Value', dataKey: 'value' }]}
+            series={[{ name: 'Value', dataKey: 'value', color: '#f43f5e' }]}
             isLoading={loading}
             height={240}
           />
@@ -865,7 +865,7 @@ const Index = () => {
             description="Control effectiveness status"
             data={controlsHealthData}
             type="pie"
-            series={[{ name: 'Value', dataKey: 'value' }]}
+            series={[{ name: 'Value', dataKey: 'value', color: '#10b981' }]}
             isLoading={loading}
             height={240}
           />
