@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -82,7 +83,7 @@ const AIRiskSummary: React.FC<AIRiskSummaryProps> = ({ className, isLoading = fa
   
   if (isLoading) {
     return (
-      <Card className={cn("w-full", className)}>
+      <Card className={cn("w-full h-full", className)}>
         <CardHeader className="pb-2 animate-pulse">
           <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
           <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
@@ -106,7 +107,7 @@ const AIRiskSummary: React.FC<AIRiskSummaryProps> = ({ className, isLoading = fa
   }
   
   return (
-    <Card className={cn("w-full", className)}>
+    <Card className={cn("w-full h-full", className)}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl flex items-center">

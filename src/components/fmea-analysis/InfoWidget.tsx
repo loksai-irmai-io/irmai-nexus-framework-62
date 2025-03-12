@@ -94,14 +94,14 @@ export const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onMetricClick }) =
           ))}
         </div>
         
-        <div className="mt-4 h-[200px]">
+        <div className="mt-4 h-[250px]">
           <Chart 
             title=""
             data={data.chartData}
             series={data.chartSeries}
             type={data.chartType}
             xAxisKey="name"
-            height={180}
+            height={250}
             showPercentages={data.chartType === 'pie'}
           />
         </div>

@@ -74,7 +74,7 @@ const OutlierDistribution: React.FC<OutlierDistributionProps> = ({ type, height 
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col">
-        <div className="flex-1 h-[220px]">
+        <div className="flex-1 h-[300px]">
           <Chart
             title=""
             description=""
@@ -82,7 +82,7 @@ const OutlierDistribution: React.FC<OutlierDistributionProps> = ({ type, height 
             data={chartData}
             series={series}
             xAxisKey="name"
-            height={220}
+            height={300}
             showLegend={true}
             onClick={handleDataClick}
             onMouseMove={handleDataHover}
