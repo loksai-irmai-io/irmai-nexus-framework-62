@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -76,6 +75,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = fals
 
   const hasChartData = data.chartData && data.chartData.length > 0 && data.chartSeries && data.chartSeries.length > 0;
   const chartProps = hasChartData ? {
+    title: data.title || "Data Chart",
     data: data.chartData,
     series: data.chartSeries,
     type: data.chartType,
