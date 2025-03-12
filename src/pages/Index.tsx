@@ -24,10 +24,16 @@ import {
   Zap,
   Target,
   Briefcase,
-  Database
+  Database,
+  Bell,
+  Calendar,
+  ExternalLink
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 const emptyLossEventsData = [
   { name: 'Jan 2025', value: 0, amount: 0, events: 0 },
@@ -38,14 +44,6 @@ const emptyLossEventsData = [
   { name: 'Jun 2025', value: 0, amount: 0, events: 0 },
 ];
 
-const emptyRiskDistributionData = [
-  { name: 'Operational', value: 0, count: 0, color: '#f97316' },
-  { name: 'Credit', value: 0, count: 0, color: '#8b5cf6' },
-  { name: 'Market', value: 0, count: 0, color: '#06b6d4' },
-  { name: 'Compliance', value: 0, count: 0, color: '#10b981' },
-  { name: 'Strategic', value: 0, count: 0, color: '#f59e0b' },
-];
-
 const populatedLossEventsData = [
   { name: 'Jan 2025', value: 4, amount: 100000, events: 2 },
   { name: 'Feb 2025', value: 5, amount: 150000, events: 3 },
@@ -53,6 +51,14 @@ const populatedLossEventsData = [
   { name: 'Apr 2025', value: 6, amount: 180000, events: 4 },
   { name: 'May 2025', value: 4, amount: 120000, events: 2 },
   { name: 'Jun 2025', value: 3, amount: 80000, events: 1 },
+];
+
+const emptyRiskDistributionData = [
+  { name: 'Operational', value: 0, count: 0, color: '#f97316' },
+  { name: 'Credit', value: 0, count: 0, color: '#8b5cf6' },
+  { name: 'Market', value: 0, count: 0, color: '#06b6d4' },
+  { name: 'Compliance', value: 0, count: 0, color: '#10b981' },
+  { name: 'Strategic', value: 0, count: 0, color: '#f59e0b' },
 ];
 
 const populatedRiskDistributionData = [
@@ -609,6 +615,47 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
   ];
 };
 
+const emptyAnnouncementsData = [];
+
+const populatedAnnouncementsData = [
+  {
+    id: 'ann-1',
+    title: 'New Compliance Framework Released',
+    date: '2025-04-15',
+    priority: 'high',
+    category: 'compliance',
+    description: 'A new compliance framework for banking regulations has been published. All processes should be reviewed for compliance.',
+    link: '/compliance-monitoring'
+  },
+  {
+    id: 'ann-2',
+    title: 'Risk Assessment Schedule Update',
+    date: '2025-04-10',
+    priority: 'medium',
+    category: 'risk',
+    description: 'The quarterly risk assessment schedule has been updated. Please review the new deadlines.',
+    link: '/fmea-analysis'
+  },
+  {
+    id: 'ann-3',
+    title: 'System Maintenance Notice',
+    date: '2025-04-20',
+    priority: 'low',
+    category: 'system',
+    description: 'Scheduled system maintenance will occur on April 20, 2025. The system will be unavailable from 2:00 AM to 4:00 AM EST.',
+    link: '#'
+  },
+  {
+    id: 'ann-4',
+    title: 'New Controls Testing Procedure',
+    date: '2025-04-05',
+    priority: 'medium',
+    category: 'controls',
+    description: 'Updated testing procedures for operational controls have been published. Training sessions will be scheduled next week.',
+    link: '/controls-testing'
+  }
+];
+
 const Index = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -621,6 +668,7 @@ const Index = () => {
   const [outlierAnalysisData, setOutlierAnalysisData] = useState(emptyOutlierAnalysisData);
   const [predictiveRiskData, setPredictiveRiskData] = useState(emptyPredictiveRiskData);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [announcements, setAnnouncements] = useState(emptyAnnouncementsData);
   
   const [infoWidgetData, setInfoWidgetData] = useState(createEmptyInfoWidgetData());
   
@@ -634,6 +682,7 @@ const Index = () => {
       setOutlierAnalysisData(populatedOutlierAnalysisData);
       setPredictiveRiskData(populatedPredictiveRiskData);
       setInfoWidgetData(createPopulatedInfoWidgetData());
+      setAnnouncements(populatedAnnouncementsData);
       setDataLoaded(true);
       
       toast.success("Dashboard updated with process mining insights");
@@ -808,25 +857,7 @@ const Index = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-2">
-            <Chart 
-              title="Loss Events by Month"
-              description="Financial impact and number of events"
-              data={lossEventsData}
-              series={[
-                { name: 'Loss Events', dataKey: 'value', color: '#f43f5e' },
-                { name: 'Amount', dataKey: 'amount', color: '#8b5cf6' }
-              ]}
-              type="composed"
-              xAxisKey="name"
-              height={300}
-              showGrid={true}
-              showLegend={true}
-              onClick={handleLossEventClick}
-              isLoading={loading}
-            />
-          </div>
-          <div>
+          <div className="lg:col-span-3">
             <AIRiskSummary isLoading={loading} />
           </div>
         </div>
@@ -837,9 +868,84 @@ const Index = () => {
             <KnowledgeGraph animate={dataLoaded} />
           </div>
         </div>
+        
+        <div className="mb-6">
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Bell className="h-5 w-5 text-primary mr-2" />
+                  <CardTitle>Announcements</CardTitle>
+                </div>
+                <Badge variant="outline" className="font-normal">
+                  <Calendar className="h-3.5 w-3.5 mr-1" />
+                  Updated: {new Date().toLocaleDateString()}
+                </Badge>
+              </div>
+              <CardDescription>Important updates and notices</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {dataLoaded ? (
+                <div className="space-y-4">
+                  {announcements.length > 0 ? (
+                    announcements.map((announcement) => (
+                      <div 
+                        key={announcement.id} 
+                        className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <div className="flex items-center mb-1">
+                              <h4 className="font-medium">{announcement.title}</h4>
+                              <Badge 
+                                variant="outline" 
+                                className={`ml-2 text-xs ${
+                                  announcement.priority === 'high' ? 'bg-red-100 text-red-800 border-red-300' :
+                                  announcement.priority === 'medium' ? 'bg-amber-100 text-amber-800 border-amber-300' :
+                                  'bg-blue-100 text-blue-800 border-blue-300'
+                                }`}
+                              >
+                                {announcement.priority}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-2">{announcement.description}</p>
+                            <div className="flex items-center text-xs text-muted-foreground">
+                              <Calendar className="h-3 w-3 mr-1" />
+                              {new Date(announcement.date).toLocaleDateString()}
+                            </div>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-xs h-8"
+                            onClick={() => navigate(announcement.link)}
+                          >
+                            View Details
+                            <ExternalLink className="h-3 w-3 ml-1" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex items-center justify-center p-8 text-muted-foreground">
+                      <p>No announcements at this time.</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-20 bg-muted/20 rounded-lg animate-pulse"></div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </Layout>
   );
 };
 
 export default Index;
+
