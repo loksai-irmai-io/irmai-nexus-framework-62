@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -825,83 +824,55 @@ const Index = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <Chart
             title="Loss Events by Month"
-            subtitle="Financial impact and event count"
+            description="Financial impact and event count"
             data={lossEventsData}
-            type="combined"
+            type="composed"
             series={[
-              { name: 'Amount ($K)', dataKey: 'amount', type: 'bar', unit: '$', color: '#8b5cf6' },
-              { name: 'Events', dataKey: 'events', type: 'line', color: '#f43f5e' }
+              { name: 'Amount ($K)', dataKey: 'amount', color: '#8b5cf6' },
+              { name: 'Events', dataKey: 'events', color: '#f43f5e' }
             ]}
             xAxisKey="name"
             isLoading={loading}
             height={300}
-            onPointClick={handleLossEventClick}
-            emptyState={{
-              title: "No loss events",
-              description: "Upload data to see loss events",
-              icon: <DollarSign className="h-10 w-10 text-muted-foreground" />
-            }}
+            onClick={handleLossEventClick}
           />
           
           <Chart
             title="Risk Distribution"
-            subtitle="Risk categories by exposure"
+            description="Risk categories by exposure"
             data={riskDistributionData}
             type="pie"
-            series={[{ dataKey: 'value', nameKey: 'name', colorKey: 'color' }]}
+            series={[{ name: 'Value', dataKey: 'value', color: 'color' }]}
             isLoading={loading}
             height={300}
-            onPointClick={handleRiskCategoryClick}
-            emptyState={{
-              title: "No risk data",
-              description: "Upload data to see risk distribution",
-              icon: <AlertTriangle className="h-10 w-10 text-muted-foreground" />
-            }}
+            onClick={handleRiskCategoryClick}
           />
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           <Chart
             title="Incident Severity"
-            subtitle="Distribution by severity level"
+            description="Distribution by severity level"
             data={incidentSeverityData}
             type="pie"
-            series={[{ dataKey: 'value', nameKey: 'name' }]}
+            series={[{ name: 'Value', dataKey: 'value' }]}
             isLoading={loading}
             height={240}
-            emptyState={{
-              title: "No incident data",
-              description: "Upload data to see incidents",
-              icon: <AlertTriangle className="h-10 w-10 text-muted-foreground" />
-            }}
           />
           
           <Chart
             title="Controls Health"
-            subtitle="Control effectiveness status"
+            description="Control effectiveness status"
             data={controlsHealthData}
             type="pie"
-            series={[{ dataKey: 'value', nameKey: 'name' }]}
+            series={[{ name: 'Value', dataKey: 'value' }]}
             isLoading={loading}
             height={240}
-            emptyState={{
-              title: "No control data",
-              description: "Upload data to see control status",
-              icon: <Shield className="h-10 w-10 text-muted-foreground" />
-            }}
           />
           
           <AIRiskSummary 
-            isLoaded={dataLoaded}
-            insights={dataLoaded ? [
-              "High risk of data breaches detected in customer databases",
-              "Fraud risk increased by 15% in payment systems",
-              "3 compliance controls failing tests need immediate attention",
-              "System performance issues may impact SLA commitments"
-            ] : []}
+            className=""
             isLoading={loading}
-            riskScore={dataLoaded ? 68 : 0}
-            onViewDetails={() => handleNavigate('fmea-analysis')}
           />
         </div>
         
@@ -922,11 +893,7 @@ const Index = () => {
         <div className="mb-6">
           <h2 className="text-2xl font-bold tracking-tight mb-4">Process Knowledge Graph</h2>
           <KnowledgeGraph
-            isLoaded={dataLoaded}
-            onNodeClick={(node: any) => {
-              toast.info(`Navigating to details for ${node.name}`);
-              handleNavigate('process-discovery', { nodeName: node.name });
-            }}
+            className=""
             isLoading={loading}
           />
         </div>
