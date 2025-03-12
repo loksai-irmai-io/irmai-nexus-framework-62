@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -930,6 +931,156 @@ const Index = () => {
             <h3 className="font-medium mb-4">Process Knowledge Graph</h3>
             <KnowledgeGraph animate={dataLoaded} />
           </div>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Risk Distribution by Category</CardTitle>
+              <CardDescription>Breakdown of risks by category</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Chart
+                title="Risk Distribution"
+                type="pie"
+                data={dataLoaded ? riskDistributionData : emptyRiskDistributionData}
+                series={[{ name: 'Risks', dataKey: 'value', color: '#8b5cf6' }]}
+                xAxisKey="name"
+                tooltip="Value distribution by category"
+              />
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Loss Events Over Time</CardTitle>
+              <CardDescription>Financial impact and count of loss events</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Chart
+                title="Loss Events"
+                type="bar"
+                data={dataLoaded ? lossEventsData : emptyLossEventsData}
+                series={[
+                  { name: 'Incident Count', dataKey: 'events', color: '#a855f7' },
+                  { name: 'Financial Loss ($K)', dataKey: 'amount', color: '#ef4444' }
+                ]}
+                xAxisKey="name"
+                onClick={handleLossEventClick}
+              />
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Incident Severity Distribution</CardTitle>
+              <CardDescription>Distribution of incidents by severity level</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Chart
+                title="Incident Severity"
+                type="bar"
+                data={dataLoaded ? incidentSeverityData : emptyIncidentSeverityData}
+                series={[{ name: 'Incidents', dataKey: 'value', color: '#f97316' }]}
+                xAxisKey="name"
+              />
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Controls Health</CardTitle>
+              <CardDescription>Status of control testing and validation</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Chart
+                title="Controls Status"
+                type="pie"
+                data={dataLoaded ? controlsHealthData : emptyControlsHealthData}
+                series={[{ name: 'Controls', dataKey: 'value', color: '#10b981' }]}
+                xAxisKey="name"
+              />
+            </CardContent>
+          </Card>
+        </div>
+        
+        <h2 className="text-xl font-semibold mb-4">Active Modules</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          {/* FMEA Analysis */}
+          <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleNavigate('fmea-analysis')}>
+            <CardHeader className="space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                <div className="flex items-center">
+                  <Shield className="h-4 w-4 mr-2 text-primary" />
+                  Risk Management
+                </div>
+              </CardTitle>
+              <CardDescription>Predictive risk analytics</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {dataLoaded ? "46" : "0"}
+                <span className="text-xs font-normal ml-1 text-muted-foreground">open risks</span>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Process Discovery */}
+          <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleNavigate('process-discovery')}>
+            <CardHeader className="space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                <div className="flex items-center">
+                  <GitBranch className="h-4 w-4 mr-2 text-primary" />
+                  Process Mining
+                </div>
+              </CardTitle>
+              <CardDescription>End-to-end process insights</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {dataLoaded ? "24" : "0"}
+                <span className="text-xs font-normal ml-1 text-muted-foreground">processes</span>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Compliance Monitoring */}
+          <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleNavigate('compliance-monitoring')}>
+            <CardHeader className="space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                <div className="flex items-center">
+                  <FileText className="h-4 w-4 mr-2 text-primary" />
+                  Compliance
+                </div>
+              </CardTitle>
+              <CardDescription>Regulatory framework tracking</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {dataLoaded ? "85%" : "0%"}
+                <span className="text-xs font-normal ml-1 text-muted-foreground">compliance score</span>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Outlier Analysis */}
+          <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleNavigate('outlier-analysis')}>
+            <CardHeader className="space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                <div className="flex items-center">
+                  <SearchX className="h-4 w-4 mr-2 text-primary" />
+                  Anomaly Detection
+                </div>
+              </CardTitle>
+              <CardDescription>Outlier and pattern analysis</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {dataLoaded ? "57" : "0"}
+                <span className="text-xs font-normal ml-1 text-muted-foreground">anomalies</span>
+              </div>
+            </CardContent>
+          </Card>
         </div>
         
         <div className="mb-6">
