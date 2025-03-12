@@ -79,62 +79,21 @@ export const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onMetricClick }) =
       
       <CardContent className="p-4">
         <div className="grid grid-cols-2 gap-3 mb-4">
-          {data.metrics.map((metric, index) => (
-            <CompactMetric 
-              key={index}
-              label={metric.label}
-              value={metric.value}
-              icon={metric.icon as any}
-              tooltip={metric.tooltip}
-              trend={metric.trend}
-              variant="minimal"
-              drilldownHint={metric.drilldownHint}
-              onClick={metric.drilldownHint && onMetricClick ? () => onMetricClick(metric.label) : undefined}
-            />
-          ))}
+          {/* No metrics displayed for privacy reasons */}
         </div>
         
-        {data.chartData.length > 0 && (
-          <div className="mt-4 h-[200px]">
-            <Chart 
-              title=""
-              data={data.chartData}
-              series={data.chartSeries}
-              type={data.chartType}
-              xAxisKey="name"
-              height={180}
-              showPercentages={data.chartType === 'pie'}
-            />
-          </div>
-        )}
+        {/* Charts removed for data privacy */}
         
-        {data.insights && data.insights.length > 0 && (
-          <div className="mt-4 pt-3 border-t">
-            <div className="text-xs text-muted-foreground uppercase mb-2 flex items-center">
-              <span>Key Insights</span>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="h-3 w-3 ml-1 text-muted-foreground cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    <p className="text-xs">AI-generated insights based on your data</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            
-            <ul className="space-y-1 text-sm">
-              {data.insights.map((insight, index) => (
-                <li key={index} className="flex items-start group transition-colors hover:bg-muted/20 p-1 rounded cursor-pointer">
-                  <span className="mr-2 mt-0.5 text-primary">•</span>
-                  <span>{insight}</span>
-                  <ExternalLink className="h-3 w-3 ml-auto opacity-0 group-hover:opacity-100 text-blue-500" />
-                </li>
-              ))}
-            </ul>
+        <div className="mt-4 p-3 border rounded-md bg-blue-50 text-blue-800">
+          <div className="flex items-center mb-2">
+            <Info className="h-4 w-4 mr-2" />
+            <p className="text-sm font-medium">Data Privacy Notice</p>
           </div>
-        )}
+          <p className="text-xs">
+            Risk insights data is not displayed publicly for security and compliance reasons.
+            Please access this information through secure authorized channels.
+          </p>
+        </div>
         
         <button 
           className="w-full mt-4 flex items-center justify-between p-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm"
