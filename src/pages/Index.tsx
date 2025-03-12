@@ -146,6 +146,29 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       chartHeight: 200,
     },
     {
+      id: 'risk-analytics',
+      title: 'Predictive Risk Analytics',
+      subtitle: 'Risk Prediction & Forecasting',
+      icon: <AlertTriangle className="h-5 w-5 text-primary" />,
+      metrics: [
+        { label: 'Risk Score', value: '0', icon: 'gauge' },
+        { label: 'Critical Risks', value: '0', icon: 'alert-triangle' },
+        { label: 'High Impacts', value: '0', icon: 'trending-up' },
+        { label: 'Mitigations', value: '0', icon: 'shield' },
+      ],
+      insights: [
+        'No risk analytics data available yet',
+        'Upload a file to see risk predictions'
+      ],
+      chartData: [],
+      chartSeries: [{ name: 'Value', dataKey: 'value', color: '#f43f5e' }],
+      chartType: 'line',
+      status: 'info',
+      actionText: 'View Predictive Analytics',
+      actionHref: '/risk-analytics',
+      chartHeight: 200,
+    },
+    {
       id: 'compliance-monitoring',
       title: 'Compliance Monitoring',
       subtitle: 'Regulatory Framework Status',
@@ -192,29 +215,6 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       chartHeight: 200,
     },
     {
-      id: 'outlier-analysis',
-      title: 'Anomaly Detection',
-      subtitle: 'Outlier Transaction Analysis',
-      icon: <SearchX className="h-5 w-5 text-primary" />,
-      metrics: [
-        { label: 'Outliers', value: '0', icon: 'search' },
-        { label: 'False Positives', value: '0', icon: 'x-circle' },
-        { label: 'Patterns', value: '0', icon: 'grid' },
-        { label: 'Alert Rate', value: '0%', icon: 'bell' },
-      ],
-      insights: [
-        'No outlier data available yet',
-        'Upload a file to see anomaly insights'
-      ],
-      chartData: [],
-      chartSeries: [{ name: 'Anomalies', dataKey: 'value', color: '#f43f5e' }],
-      chartType: 'line',
-      status: 'info',
-      actionText: 'View Outlier Analysis',
-      actionHref: '/outlier-analysis',
-      chartHeight: 200,
-    },
-    {
       id: 'controls-testing',
       title: 'Controls Monitoring',
       subtitle: 'Control Testing Results',
@@ -238,6 +238,29 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       chartHeight: 200,
     },
     {
+      id: 'incident-management',
+      title: 'Incident Management',
+      subtitle: 'Incident Tracking & Response',
+      icon: <AlertTriangle className="h-5 w-5 text-primary" />,
+      metrics: [
+        { label: 'Open Incidents', value: '0', icon: 'alert-triangle' },
+        { label: 'Critical', value: '0', icon: 'alert-circle' },
+        { label: 'Avg Response', value: '0h', icon: 'clock' },
+        { label: 'Resolved', value: '0', icon: 'check-circle' },
+      ],
+      insights: [
+        'No incident data available yet',
+        'Upload a file to see incident insights'
+      ],
+      chartData: [],
+      chartSeries: [{ name: 'Incidents', dataKey: 'value', color: '#f97316' }],
+      chartType: 'bar',
+      status: 'info',
+      actionText: 'View Incident Dashboard',
+      actionHref: '/incident-management',
+      chartHeight: 200,
+    },
+    {
       id: 'scenario-analysis',
       title: 'Scenario Modeling',
       subtitle: 'Risk Simulation Analysis',
@@ -258,29 +281,6 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       status: 'info',
       actionText: 'View Scenario Analysis',
       actionHref: '/scenario-analysis',
-      chartHeight: 200,
-    },
-    {
-      id: 'impact-analysis',
-      title: 'Impact Analysis',
-      subtitle: 'Business Impact Assessment',
-      icon: <Target className="h-5 w-5 text-primary" />,
-      metrics: [
-        { label: 'Total Impact', value: '$0', icon: 'dollar-sign' },
-        { label: 'Risk Areas', value: '0', icon: 'layers' },
-        { label: 'Critical', value: '0', icon: 'alert-triangle' },
-        { label: 'Acceptable', value: '0', icon: 'check' },
-      ],
-      insights: [
-        'No impact data available yet',
-        'Upload a file to see impact insights'
-      ],
-      chartData: [],
-      chartSeries: [{ name: 'Impact', dataKey: 'value', color: '#f43f5e' }],
-      chartType: 'bar',
-      status: 'info',
-      actionText: 'View Impact Analysis',
-      actionHref: '/impact-analysis',
       chartHeight: 200,
     },
   ];
@@ -339,6 +339,34 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       status: 'error',
       actionText: 'View Risk Analytics',
       actionHref: '/fmea-analysis',
+      chartHeight: 200,
+    },
+    {
+      id: 'risk-analytics',
+      title: 'Predictive Risk Analytics',
+      subtitle: 'Risk Prediction & Forecasting',
+      icon: <AlertTriangle className="h-5 w-5 text-primary" />,
+      metrics: [
+        { label: 'Risk Score', value: '78', icon: 'gauge', tooltip: 'Overall risk score', trend: { direction: 'up', value: 3 } },
+        { label: 'Critical Risks', value: '3', icon: 'alert-triangle', tooltip: 'Number of critical risks', trend: { direction: 'down', value: 1 } },
+        { label: 'High Impacts', value: '15', icon: 'trending-up', tooltip: 'Number of high impact risks' },
+        { label: 'Mitigations', value: '22', icon: 'shield', tooltip: 'Number of active mitigations', trend: { direction: 'up', value: 4 } },
+      ],
+      insights: [
+        'AI predicts a 15% increase in cyber risks next quarter',
+        'New mitigation strategies are reducing financial exposure'
+      ],
+      chartData: [
+        { name: 'Fraud', value: 75 },
+        { name: 'Cyber', value: 88 },
+        { name: 'Operational', value: 62 },
+        { name: 'Compliance', value: 79 },
+      ],
+      chartSeries: [{ name: 'Risk Score', dataKey: 'value', color: '#f43f5e' }],
+      chartType: 'line',
+      status: 'warning',
+      actionText: 'View Predictive Analytics',
+      actionHref: '/risk-analytics',
       chartHeight: 200,
     },
     {
@@ -444,55 +472,6 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       chartHeight: 200,
     },
     {
-      id: 'outlier-analysis',
-      title: 'Anomaly Detection',
-      subtitle: 'Outlier Transaction Analysis',
-      icon: <SearchX className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Outliers', 
-          value: '57', 
-          icon: 'search',
-          tooltip: 'Anomalous transactions detected',
-          trend: { direction: 'up', value: 8 }
-        },
-        { 
-          label: 'False Positives', 
-          value: '14', 
-          icon: 'x-circle',
-          tooltip: 'Incorrectly flagged transactions',
-          trend: { direction: 'down', value: 3 }
-        },
-        { 
-          label: 'Patterns', 
-          value: '6', 
-          icon: 'grid',
-          tooltip: 'Distinct anomaly patterns identified'
-        },
-        { 
-          label: 'Alert Rate', 
-          value: '2.1%', 
-          icon: 'bell',
-          tooltip: 'Percentage of transactions flagged'
-        },
-      ],
-      insights: [
-        'User authentication outliers increased 24% this month',
-        'New anomaly pattern detected in payment authorizations'
-      ],
-      chartData: populatedOutlierAnalysisData,
-      chartSeries: [
-        { name: 'Anomaly Count', dataKey: 'count', color: '#f43f5e' },
-        { name: 'Alert Rate (%)', dataKey: 'rate', color: '#8b5cf6' }
-      ],
-      chartType: 'line',
-      xAxisKey: 'name',
-      status: 'error',
-      actionText: 'View Outlier Analysis',
-      actionHref: '/outlier-analysis',
-      chartHeight: 200,
-    },
-    {
       id: 'controls-testing',
       title: 'Controls Monitoring',
       subtitle: 'Control Testing Results',
@@ -541,6 +520,34 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       status: 'warning',
       actionText: 'View Controls Testing',
       actionHref: '/controls-testing',
+      chartHeight: 200,
+    },
+    {
+      id: 'incident-management',
+      title: 'Incident Management',
+      subtitle: 'Incident Tracking & Response',
+      icon: <AlertTriangle className="h-5 w-5 text-primary" />,
+      metrics: [
+        { label: 'Open Incidents', value: '15', icon: 'alert-triangle', tooltip: 'Number of open incidents', trend: { direction: 'up', value: 2 } },
+        { label: 'Critical', value: '2', icon: 'alert-circle', tooltip: 'Number of critical incidents' },
+        { label: 'Avg Response', value: '2.5h', icon: 'clock', tooltip: 'Average response time' },
+        { label: 'Resolved', value: '12', icon: 'check-circle', tooltip: 'Number of resolved incidents', trend: { direction: 'up', value: 3 } },
+      ],
+      insights: [
+        'Phishing incidents increased by 20% this month',
+        'Average resolution time improved by 10%'
+      ],
+      chartData: [
+        { name: 'Phishing', value: 5 },
+        { name: 'Malware', value: 3 },
+        { name: 'Data Breach', value: 2 },
+        { name: 'System Failure', value: 5 },
+      ],
+      chartSeries: [{ name: 'Incidents', dataKey: 'value', color: '#f97316' }],
+      chartType: 'bar',
+      status: 'info',
+      actionText: 'View Incident Dashboard',
+      actionHref: '/incident-management',
       chartHeight: 200,
     },
     {
@@ -597,59 +604,6 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       status: 'error',
       actionText: 'View Scenario Analysis',
       actionHref: '/scenario-analysis',
-      chartHeight: 200,
-    },
-    {
-      id: 'impact-analysis',
-      title: 'Impact Analysis',
-      subtitle: 'Business Impact Assessment',
-      icon: <Target className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Total Impact', 
-          value: '$1.8M', 
-          icon: 'dollar-sign',
-          tooltip: 'Total estimated financial impact',
-          trend: { direction: 'up', value: 200 }
-        },
-        { 
-          label: 'Risk Areas', 
-          value: '8', 
-          icon: 'layers',
-          tooltip: 'Business areas affected by risks'
-        },
-        { 
-          label: 'Critical', 
-          value: '3', 
-          icon: 'alert-triangle',
-          tooltip: 'Number of critical impact items',
-          trend: { direction: 'down', value: 1 }
-        },
-        { 
-          label: 'Acceptable', 
-          value: '5', 
-          icon: 'check',
-          tooltip: 'Number of acceptable impact items'
-        },
-      ],
-      insights: [
-        'Financial operations show highest potential impact at $780K',
-        'Customer data systems upgraded, reducing critical impacts by 1'
-      ],
-      chartData: [
-        { name: 'Financial', value: 780000 },
-        { name: 'Operations', value: 450000 },
-        { name: 'Customer Data', value: 320000 },
-        { name: 'Reputation', value: 250000 }
-      ],
-      chartSeries: [
-        { name: 'Impact ($K)', dataKey: 'value', color: '#f43f5e' }
-      ],
-      chartType: 'bar',
-      xAxisKey: 'name',
-      status: 'warning',
-      actionText: 'View Impact Analysis',
-      actionHref: '/impact-analysis',
       chartHeight: 200,
     },
   ];
@@ -769,7 +723,7 @@ const Index = () => {
         
         <RibbonNav className="mb-6 animate-fade-in" style={{ animationDelay: '100ms' }}>
           <MetricCard
-            title="High-Severity Risks"
+            title="Severity Risks"
             value={dataLoaded ? "5" : "0"}
             severity="critical"
             icon={<Shield className="h-5 w-5" />}
@@ -813,92 +767,4 @@ const Index = () => {
             value={dataLoaded ? "963K" : "0"}
             prefix="$"
             severity="high"
-            icon={<DollarSign className="h-5 w-5" />}
-            tooltip="Estimated financial impact of all identified risks"
-            trend={dataLoaded ? 12 : undefined}
-            isLoading={loading}
-            onClick={() => handleMetricClick("Total Potential Loss")}
-          />
-        </RibbonNav>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <Chart
-            title="Loss Events by Month"
-            description="Financial impact and event count"
-            data={lossEventsData}
-            type="composed"
-            series={[
-              { name: 'Amount ($K)', dataKey: 'amount', color: '#8b5cf6' },
-              { name: 'Events', dataKey: 'events', color: '#f43f5e' }
-            ]}
-            xAxisKey="name"
-            isLoading={loading}
-            height={300}
-            onClick={handleLossEventClick}
-          />
-          
-          <Chart
-            title="Risk Distribution"
-            description="Risk categories by exposure"
-            data={riskDistributionData}
-            type="pie"
-            series={[{ name: 'Value', dataKey: 'value', color: 'color' }]}
-            isLoading={loading}
-            height={300}
-            onClick={handleRiskCategoryClick}
-          />
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-          <Chart
-            title="Incident Severity"
-            description="Distribution by severity level"
-            data={incidentSeverityData}
-            type="pie"
-            series={[{ name: 'Value', dataKey: 'value', color: '#f43f5e' }]}
-            isLoading={loading}
-            height={240}
-          />
-          
-          <Chart
-            title="Controls Health"
-            description="Control effectiveness status"
-            data={controlsHealthData}
-            type="pie"
-            series={[{ name: 'Value', dataKey: 'value', color: '#10b981' }]}
-            isLoading={loading}
-            height={240}
-          />
-          
-          <AIRiskSummary 
-            className=""
-            isLoading={loading}
-          />
-        </div>
-        
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold tracking-tight mb-4">Risk Insights</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {infoWidgetData.map((widget) => (
-              <InfoWidget
-                key={widget.id}
-                data={widget}
-                isLoading={loading}
-                onClick={() => handleNavigate(widget.id.split('-').join('-'))}
-              />
-            ))}
-          </div>
-        </div>
-        
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold tracking-tight mb-4">Process Knowledge Graph</h2>
-          <KnowledgeGraph
-            className=""
-          />
-        </div>
-      </div>
-    </Layout>
-  );
-};
-
-export default Index;
+            icon={<DollarSign className="
