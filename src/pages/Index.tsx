@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -817,3 +818,121 @@ const Index = () => {
             tooltip="Estimated financial impact of all identified risks"
             trend={dataLoaded ? 12 : undefined}
             isLoading={loading}
+            onClick={() => handleMetricClick("Total Potential Loss")}
+          />
+        </RibbonNav>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <Chart
+            title="Loss Events by Month"
+            subtitle="Financial impact and event count"
+            data={lossEventsData}
+            type="combined"
+            series={[
+              { name: 'Amount ($K)', dataKey: 'amount', type: 'bar', unit: '$', color: '#8b5cf6' },
+              { name: 'Events', dataKey: 'events', type: 'line', color: '#f43f5e' }
+            ]}
+            xAxisKey="name"
+            isLoading={loading}
+            height={300}
+            onPointClick={handleLossEventClick}
+            emptyState={{
+              title: "No loss events",
+              description: "Upload data to see loss events",
+              icon: <DollarSign className="h-10 w-10 text-muted-foreground" />
+            }}
+          />
+          
+          <Chart
+            title="Risk Distribution"
+            subtitle="Risk categories by exposure"
+            data={riskDistributionData}
+            type="pie"
+            series={[{ dataKey: 'value', nameKey: 'name', colorKey: 'color' }]}
+            isLoading={loading}
+            height={300}
+            onPointClick={handleRiskCategoryClick}
+            emptyState={{
+              title: "No risk data",
+              description: "Upload data to see risk distribution",
+              icon: <AlertTriangle className="h-10 w-10 text-muted-foreground" />
+            }}
+          />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          <Chart
+            title="Incident Severity"
+            subtitle="Distribution by severity level"
+            data={incidentSeverityData}
+            type="pie"
+            series={[{ dataKey: 'value', nameKey: 'name' }]}
+            isLoading={loading}
+            height={240}
+            emptyState={{
+              title: "No incident data",
+              description: "Upload data to see incidents",
+              icon: <AlertTriangle className="h-10 w-10 text-muted-foreground" />
+            }}
+          />
+          
+          <Chart
+            title="Controls Health"
+            subtitle="Control effectiveness status"
+            data={controlsHealthData}
+            type="pie"
+            series={[{ dataKey: 'value', nameKey: 'name' }]}
+            isLoading={loading}
+            height={240}
+            emptyState={{
+              title: "No control data",
+              description: "Upload data to see control status",
+              icon: <Shield className="h-10 w-10 text-muted-foreground" />
+            }}
+          />
+          
+          <AIRiskSummary 
+            isLoaded={dataLoaded}
+            insights={dataLoaded ? [
+              "High risk of data breaches detected in customer databases",
+              "Fraud risk increased by 15% in payment systems",
+              "3 compliance controls failing tests need immediate attention",
+              "System performance issues may impact SLA commitments"
+            ] : []}
+            isLoading={loading}
+            riskScore={dataLoaded ? 68 : 0}
+            onViewDetails={() => handleNavigate('fmea-analysis')}
+          />
+        </div>
+        
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold tracking-tight mb-4">Risk Insights</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {infoWidgetData.map((widget) => (
+              <InfoWidget
+                key={widget.id}
+                data={widget}
+                isLoading={loading}
+                onClick={() => handleNavigate(widget.id.split('-').join('-'))}
+              />
+            ))}
+          </div>
+        </div>
+        
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold tracking-tight mb-4">Process Knowledge Graph</h2>
+          <KnowledgeGraph
+            isLoaded={dataLoaded}
+            onNodeClick={(node: any) => {
+              toast.info(`Navigating to details for ${node.name}`);
+              handleNavigate('process-discovery', { nodeName: node.name });
+            }}
+            isLoading={loading}
+          />
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default Index;
