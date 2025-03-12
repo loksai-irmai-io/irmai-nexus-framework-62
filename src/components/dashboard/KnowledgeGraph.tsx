@@ -39,50 +39,59 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
   
   useEffect(() => {
     if (animate) {
+      // Detailed graph with multiple layers based on the image
       const nodes = [
-        { id: 'payment-process', name: 'Payment Process', group: 1, size: 15 },
-        { id: 'customer-onboarding', name: 'Customer Onboarding', group: 1, size: 12 },
-        { id: 'fraud-detection', name: 'Fraud Detection', group: 2, size: 10 },
-        { id: 'kyc-verification', name: 'KYC Verification', group: 2, size: 8 },
-        { id: 'transaction-monitoring', name: 'Transaction Monitoring', group: 2, size: 10 },
-        { id: 'risk-assessment', name: 'Risk Assessment', group: 3, size: 12 },
-        { id: 'compliance-check', name: 'Compliance Check', group: 3, size: 10 },
-        { id: 'data-privacy', name: 'Data Privacy', group: 4, size: 8 },
-        { id: 'audit-trail', name: 'Audit Trail', group: 4, size: 6 },
-        { id: 'reporting', name: 'Reporting', group: 5, size: 8 },
-        { id: 'approval-workflow', name: 'Approval Workflow', group: 5, size: 7 },
-        { id: 'exception-handling', name: 'Exception Handling', group: 6, size: 9 },
-        { id: 'customer-data', name: 'Customer Data', group: 7, size: 11 },
-        { id: 'transaction-data', name: 'Transaction Data', group: 7, size: 10 },
-        { id: 'regulatory-requirements', name: 'Regulatory Requirements', group: 8, size: 9 },
+        { id: 'irmai-bank', name: 'IRMAI Bank', group: 1, size: 18 },
+        
+        // Main categories
+        { id: 'processes', name: 'Processes', group: 2, size: 14 },
+        { id: 'risks', name: 'Risks', group: 3, size: 14 },
+        { id: 'controls', name: 'Controls', group: 4, size: 14 },
+        
+        // Process subcategories
+        { id: 'customer-onboarding', name: 'Customer Onboarding', group: 2, size: 12 },
+        { id: 'payment-process', name: 'Payment Process', group: 2, size: 12 },
+        { id: 'kyc', name: 'KYC', group: 2, size: 10 },
+        
+        // Risk subcategories
+        { id: 'fraud', name: 'Fraud', group: 3, size: 10 },
+        { id: 'compliance', name: 'Compliance', group: 3, size: 12 },
+        { id: 'operational', name: 'Operational', group: 3, size: 11 },
+        
+        // Control subcategories
+        { id: 'audit', name: 'Audit', group: 4, size: 10 },
+        { id: 'transaction-monitoring', name: 'Transaction Monitoring', group: 4, size: 12 },
+        { id: 'control-validation', name: 'Control Validation', group: 4, size: 9 },
       ];
       
       const links = [
-        { source: 'payment-process', target: 'fraud-detection', value: 5 },
-        { source: 'payment-process', target: 'transaction-monitoring', value: 5 },
-        { source: 'payment-process', target: 'approval-workflow', value: 3 },
-        { source: 'payment-process', target: 'transaction-data', value: 4 },
-        { source: 'customer-onboarding', target: 'kyc-verification', value: 5 },
-        { source: 'customer-onboarding', target: 'risk-assessment', value: 4 },
-        { source: 'customer-onboarding', target: 'compliance-check', value: 4 },
-        { source: 'customer-onboarding', target: 'customer-data', value: 5 },
-        { source: 'fraud-detection', target: 'transaction-monitoring', value: 4 },
-        { source: 'fraud-detection', target: 'risk-assessment', value: 3 },
-        { source: 'fraud-detection', target: 'exception-handling', value: 3 },
-        { source: 'kyc-verification', target: 'compliance-check', value: 4 },
-        { source: 'kyc-verification', target: 'data-privacy', value: 3 },
-        { source: 'kyc-verification', target: 'regulatory-requirements', value: 4 },
-        { source: 'transaction-monitoring', target: 'audit-trail', value: 3 },
-        { source: 'transaction-monitoring', target: 'reporting', value: 3 },
-        { source: 'risk-assessment', target: 'compliance-check', value: 4 },
-        { source: 'risk-assessment', target: 'reporting', value: 3 },
-        { source: 'compliance-check', target: 'regulatory-requirements', value: 5 },
-        { source: 'compliance-check', target: 'audit-trail', value: 3 },
-        { source: 'data-privacy', target: 'customer-data', value: 4 },
-        { source: 'data-privacy', target: 'regulatory-requirements', value: 4 },
-        { source: 'audit-trail', target: 'reporting', value: 3 },
-        { source: 'approval-workflow', target: 'exception-handling', value: 3 },
-        { source: 'customer-data', target: 'transaction-data', value: 3 },
+        // Connect IRMAI Bank to main categories
+        { source: 'irmai-bank', target: 'processes', value: 5 },
+        { source: 'irmai-bank', target: 'risks', value: 5 },
+        { source: 'irmai-bank', target: 'controls', value: 5 },
+        
+        // Connect Processes to subcategories
+        { source: 'processes', target: 'customer-onboarding', value: 4 },
+        { source: 'processes', target: 'payment-process', value: 4 },
+        { source: 'processes', target: 'kyc', value: 3 },
+        
+        // Connect Risks to subcategories
+        { source: 'risks', target: 'fraud', value: 3 },
+        { source: 'risks', target: 'compliance', value: 4 },
+        { source: 'risks', target: 'operational', value: 3 },
+        
+        // Connect Controls to subcategories
+        { source: 'controls', target: 'audit', value: 3 },
+        { source: 'controls', target: 'transaction-monitoring', value: 4 },
+        { source: 'controls', target: 'control-validation', value: 3 },
+        
+        // Cross-connections between categories
+        { source: 'payment-process', target: 'fraud', value: 2 },
+        { source: 'customer-onboarding', target: 'compliance', value: 2 },
+        { source: 'kyc', target: 'compliance', value: 2 },
+        { source: 'fraud', target: 'transaction-monitoring', value: 2 },
+        { source: 'compliance', target: 'audit', value: 2 },
+        { source: 'operational', target: 'control-validation', value: 2 },
       ];
       
       setGraphData({ nodes, links });
@@ -109,10 +118,10 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
   const getNodeColor = (node: any) => {
     const groupColors = [
       '#3b82f6', // blue
-      '#ef4444', // red
       '#10b981', // green
-      '#f59e0b', // amber
+      '#ef4444', // red
       '#8b5cf6', // purple
+      '#f59e0b', // amber
       '#ec4899', // pink
       '#06b6d4', // cyan
       '#6366f1', // indigo
