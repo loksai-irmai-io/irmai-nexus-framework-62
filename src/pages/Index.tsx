@@ -16,24 +16,11 @@ import {
   SearchX, 
   TestTube, 
   Presentation,
-  Gauge,
-  BarChart4,
-  FileText,
-  Building,
-  Users,
-  Zap,
-  Target,
-  Briefcase,
-  Database,
-  Bell,
-  Calendar,
-  ExternalLink
+  Bell
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const emptyLossEventsData = [
   { name: 'Jan 2025', value: 0, amount: 0, events: 0 },
@@ -133,12 +120,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       title: 'Predictive Risk Analytics',
       subtitle: 'Risk Assessment Insights',
       icon: <Shield className="h-5 w-5 text-primary" />,
-      metrics: [
-        { label: 'Open Risks', value: '0', icon: 'alert-triangle' },
-        { label: 'High Severity', value: '0', icon: 'trending-up' },
-        { label: 'Medium Severity', value: '0', icon: 'trending-up' },
-        { label: 'Low Severity', value: '0', icon: 'trending-down' },
-      ],
+      metrics: [],
       insights: [],
       chartData: [],
       chartSeries: [{ name: 'Value', dataKey: 'value', color: '#8b5cf6' }],
@@ -153,12 +135,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       title: 'Outlier Analysis',
       subtitle: 'Predictive Risk Analytics',
       icon: <SearchX className="h-5 w-5 text-primary" />,
-      metrics: [
-        { label: 'Sequence Fails', value: '0', icon: 'activity' },
-        { label: 'Timing Fails', value: '0', icon: 'alert-triangle' },
-        { label: 'Rework Fails', value: '0', icon: 'trending-up' },
-        { label: 'Resource Outliers', value: '0', icon: 'shield' },
-      ],
+      metrics: [],
       insights: [],
       chartData: [],
       chartSeries: [{ name: 'Value', dataKey: 'value', color: '#f43f5e' }],
@@ -173,12 +150,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       title: 'Compliance Monitoring',
       subtitle: 'Regulatory Industry & Internal Policy Gaps',
       icon: <FileText className="h-5 w-5 text-primary" />,
-      metrics: [
-        { label: 'Compliance Score', value: '0%', icon: 'activity' },
-        { label: 'Critical Gaps', value: '0', icon: 'layers' },
-        { label: 'Controls', value: '0', icon: 'alert-triangle' },
-        { label: 'Frameworks', value: '0%', icon: 'check-circle' },
-      ],
+      metrics: [],
       insights: [],
       chartData: [],
       chartSeries: [{ name: 'Compliance', dataKey: 'value', color: '#10b981' }],
@@ -193,12 +165,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       title: 'Process Mining',
       subtitle: 'End-End Process Insights',
       icon: <GitBranch className="h-5 w-5 text-primary" />,
-      metrics: [
-        { label: 'Events', value: '0', icon: 'git-branch' },
-        { label: 'Critical Activities', value: '0', icon: 'box' },
-        { label: 'Objects', value: '0', icon: 'git-merge' },
-        { label: 'Cases', value: '0', icon: 'alert-triangle' },
-      ],
+      metrics: [],
       insights: [],
       chartData: [],
       chartSeries: [{ name: 'Value', dataKey: 'value', color: '#0ea5e9' }],
@@ -213,12 +180,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       title: 'Controls Monitoring',
       subtitle: 'Automated Controls Testing and Validation',
       icon: <TestTube className="h-5 w-5 text-primary" />,
-      metrics: [
-        { label: 'Total Controls', value: '0', icon: 'shield' },
-        { label: 'Tested', value: '0', icon: 'x-circle' },
-        { label: 'Pass Rate', value: '0', icon: 'check-circle' },
-        { label: 'Fail Rate', value: '0', icon: 'help-circle' },
-      ],
+      metrics: [],
       insights: [],
       chartData: [],
       chartSeries: [{ name: 'Controls', dataKey: 'value', color: '#0ea5e9' }],
@@ -233,38 +195,10 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       title: 'Incident Management',
       subtitle: 'Loss Events and Issue Tracking',
       icon: <AlertTriangle className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Open Incidents', 
-          value: '0', 
-          icon: 'alert-triangle',
-          tooltip: 'Number of open incidents'
-        },
-        { 
-          label: 'Resolved', 
-          value: '0', 
-          icon: 'check-circle',
-          tooltip: 'Number of resolved incidents'
-        },
-        { 
-          label: 'Avg. Resolution', 
-          value: '0 days', 
-          icon: 'clock',
-          tooltip: 'Average incident resolution time'
-        },
-        { 
-          label: 'Critical Incidents', 
-          value: '0', 
-          icon: 'alert-circle',
-          tooltip: 'Number of critical incidents'
-        }
-      ],
+      metrics: [],
       insights: [],
       chartData: [],
-      chartSeries: [
-        { name: 'Incident Count', dataKey: 'events', color: '#a855f7' },
-        { name: 'Financial Loss ($K)', dataKey: 'amount', color: '#ef4444', type: 'line' }
-      ],
+      chartSeries: [],
       chartType: 'composed',
       status: 'info',
       actionText: 'View Incident Management',
@@ -276,16 +210,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       title: 'Scenario Modeling',
       subtitle: 'Risk Scenario Modeling and Simulation',
       icon: <Presentation className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Scenarios', value: '0', icon: 'copy' },
-        { 
-          label: 'Simulations Run', value: '0', icon: 'refresh-cw' },
-        { 
-          label: 'Coverage', value: '0%', icon: 'pie-chart' },
-        { 
-          label: 'Avg. Loss', value: '$0', icon: 'dollar-sign' },
-      ],
+      metrics: [],
       insights: [],
       chartData: [],
       chartSeries: [{ name: 'Scenarios', dataKey: 'value', color: '#f97316' }],
@@ -305,35 +230,10 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       title: 'Predictive Risk Analytics',
       subtitle: 'Risk Assessment Insights',
       icon: <Shield className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Current Score', 
-          value: '**', 
-          icon: 'shield',
-          tooltip: 'Risk score data hidden for privacy'
-        },
-        { 
-          label: 'Critical Risks', 
-          value: '**', 
-          icon: 'alert-triangle',
-          tooltip: 'Number of critical risks hidden for privacy'
-        },
-        { 
-          label: 'High Risks', 
-          value: '**', 
-          icon: 'trending-up',
-          tooltip: 'Number of high risks hidden for privacy'
-        },
-        { 
-          label: 'Q3 Prediction', 
-          value: '**', 
-          icon: 'sparkles',
-          tooltip: 'Prediction data hidden for privacy'
-        }
-      ],
+      metrics: [],
       insights: [],
       chartData: [],
-      chartSeries: [{ name: 'Risk', dataKey: 'value', color: '#8b5cf6' }],
+      chartSeries: [],
       chartType: 'line',
       status: 'info',
       actionText: 'View Risk Analytics',
@@ -345,32 +245,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       title: 'Outlier Analysis',
       subtitle: 'Predictive Risk Analytics',
       icon: <SearchX className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Sequence Fails', 
-          value: '**', 
-          icon: 'activity',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Timing Fails', 
-          value: '**', 
-          icon: 'clock',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Rework Fails', 
-          value: '**', 
-          icon: 'repeat',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Resource Outliers', 
-          value: '**', 
-          icon: 'users',
-          tooltip: 'Data hidden for privacy'
-        }
-      ],
+      metrics: [],
       insights: [],
       chartData: [],
       chartSeries: [],
@@ -385,32 +260,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       title: 'Compliance Monitoring',
       subtitle: 'Regulatory Industry & Internal Policy Gaps',
       icon: <FileText className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Compliance Score', 
-          value: '**', 
-          icon: 'activity',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Critical Gaps', 
-          value: '**', 
-          icon: 'layers',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Controls', 
-          value: '**', 
-          icon: 'alert-triangle',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Frameworks', 
-          value: '**', 
-          icon: 'check-circle',
-          tooltip: 'Data hidden for privacy'
-        }
-      ],
+      metrics: [],
       insights: [],
       chartData: [],
       chartSeries: [],
@@ -425,32 +275,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       title: 'Process Mining',
       subtitle: 'End-End Process Insights',
       icon: <GitBranch className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Events', 
-          value: '**', 
-          icon: 'git-branch',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Critical Activities', 
-          value: '**', 
-          icon: 'box',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Objects', 
-          value: '**', 
-          icon: 'git-merge',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Cases', 
-          value: '**', 
-          icon: 'alert-triangle',
-          tooltip: 'Data hidden for privacy'
-        }
-      ],
+      metrics: [],
       insights: [],
       chartData: [],
       chartSeries: [],
@@ -465,32 +290,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       title: 'Controls Monitoring',
       subtitle: 'Automated Controls Testing and Validation',
       icon: <TestTube className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Total Controls', 
-          value: '**', 
-          icon: 'shield',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Tested', 
-          value: '**', 
-          icon: 'x-circle',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Pass Rate', 
-          value: '**', 
-          icon: 'check-circle',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Fail Rate', 
-          value: '**', 
-          icon: 'help-circle',
-          tooltip: 'Data hidden for privacy'
-        }
-      ],
+      metrics: [],
       insights: [],
       chartData: [],
       chartSeries: [],
@@ -505,32 +305,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       title: 'Incident Management',
       subtitle: 'Loss Events and Issue Tracking',
       icon: <AlertTriangle className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Open Incidents', 
-          value: '**', 
-          icon: 'alert-triangle',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Resolved', 
-          value: '**', 
-          icon: 'check-circle',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Avg. Resolution', 
-          value: '**', 
-          icon: 'clock',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Critical Incidents', 
-          value: '**', 
-          icon: 'alert-circle',
-          tooltip: 'Data hidden for privacy'
-        }
-      ],
+      metrics: [],
       insights: [],
       chartData: [],
       chartSeries: [],
@@ -545,32 +320,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       title: 'Scenario Modeling',
       subtitle: 'Risk Scenario Modeling and Simulation',
       icon: <Presentation className="h-5 w-5 text-primary" />,
-      metrics: [
-        { 
-          label: 'Scenarios', 
-          value: '**', 
-          icon: 'copy',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Simulations Run', 
-          value: '**', 
-          icon: 'refresh-cw',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Coverage', 
-          value: '**', 
-          icon: 'pie-chart',
-          tooltip: 'Data hidden for privacy'
-        },
-        { 
-          label: 'Avg. Loss', 
-          value: '**', 
-          icon: 'dollar-sign',
-          tooltip: 'Data hidden for privacy'
-        }
-      ],
+      metrics: [],
       insights: [],
       chartData: [],
       chartSeries: [],
@@ -845,4 +595,29 @@ const Index = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <Bell className="h-5 w-5 text-primary mr-2" />
-                  <CardTitle>Announcements</
+                  <CardTitle>Announcements</CardTitle>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {announcements.map((announcement) => (
+                <div key={announcement.id} className="mb-4">
+                  <h3 className="text-lg font-semibold">{announcement.title}</h3>
+                  <p className="text-muted-foreground">{announcement.description}</p>
+                  <div className="flex items-center mt-2">
+                    <p className="text-sm text-muted-foreground">{announcement.date}</p>
+                    <Button variant="outline" className="ml-2" onClick={() => handleNavigate('announcements', { link: announcement.link })}>
+                      View Details
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default Index;
