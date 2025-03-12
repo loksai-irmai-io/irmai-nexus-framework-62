@@ -10,6 +10,7 @@ export const processFileUpload = async (file: File): Promise<EventLogResponse> =
       toast.success(response.message);
       
       // The event dispatch is now handled in the processService
+      // Both processDataUpdated and digitalTwinActivated events are triggered there
     } else {
       toast.error(response.message);
     }

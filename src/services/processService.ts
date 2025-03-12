@@ -62,6 +62,11 @@ export const processService = {
         detail: { processData: MOCK_PROCESS_DATA }
       }));
       
+      // Trigger digital twin update event
+      window.dispatchEvent(new CustomEvent('digitalTwinActivated', {
+        detail: { active: true }
+      }));
+      
       return {
         status_code: 'success',
         message: `File "${file.name}" uploaded successfully`,
@@ -82,6 +87,11 @@ export const processService = {
     // Trigger the event to update the dashboard components
     window.dispatchEvent(new CustomEvent('processDataUpdated', {
       detail: { processData: MOCK_PROCESS_DATA }
+    }));
+    
+    // Trigger digital twin update event
+    window.dispatchEvent(new CustomEvent('digitalTwinActivated', {
+      detail: { active: true }
     }));
     
     return {
