@@ -23,9 +23,10 @@ interface RiskInsight {
 
 interface AIRiskSummaryProps {
   className?: string;
+  isLoading?: boolean;
 }
 
-const AIRiskSummary: React.FC<AIRiskSummaryProps> = ({ className }) => {
+const AIRiskSummary: React.FC<AIRiskSummaryProps> = ({ className, isLoading = false }) => {
   const insights: RiskInsight[] = [
     {
       title: "Payment Fraud Risk",
@@ -78,6 +79,31 @@ const AIRiskSummary: React.FC<AIRiskSummaryProps> = ({ className }) => {
       default: return null;
     }
   };
+  
+  if (isLoading) {
+    return (
+      <Card className={cn("w-full", className)}>
+        <CardHeader className="pb-2 animate-pulse">
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+        </CardHeader>
+        <CardContent className="animate-pulse">
+          <div className="space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex items-start space-x-3">
+                <div className="h-5 w-5 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2 w-3/4"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                  <div className="h-3 mt-2 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
   
   return (
     <Card className={cn("w-full", className)}>

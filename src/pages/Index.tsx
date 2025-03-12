@@ -894,7 +894,6 @@ const Index = () => {
           <h2 className="text-2xl font-bold tracking-tight mb-4">Process Knowledge Graph</h2>
           <KnowledgeGraph
             className=""
-            isLoading={loading}
           />
         </div>
       </div>
