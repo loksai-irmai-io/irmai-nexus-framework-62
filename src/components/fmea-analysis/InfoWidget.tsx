@@ -104,7 +104,6 @@ export const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onMetricClick }) =
               type={data.chartType}
               xAxisKey="name"
               height={180}
-              width="100%"
               showPercentages={data.chartType === 'pie'}
             />
           ) : (
@@ -153,4 +152,3 @@ export const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onMetricClick }) =
     </Card>
   );
 };
-

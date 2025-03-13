@@ -119,8 +119,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = fals
                 data={data.chartData}
                 series={data.chartSeries}
                 xAxisKey="name"
-                height={data.chartHeight || 190} 
-                width="100%" 
+                height={data.chartHeight || 190}
                 showLegend={false}
               />
             </div>
