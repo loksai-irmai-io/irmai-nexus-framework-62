@@ -1,10 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import KnowledgeGraph from '@/components/dashboard/KnowledgeGraph';
 import MetricCard from '@/components/dashboard/MetricCard';
 import InfoWidget, { InfoWidgetData } from '@/components/dashboard/InfoWidget';
-import Chart from '@/components/dashboard/Chart';
 import RibbonNav from '@/components/dashboard/RibbonNav';
 import AIRiskSummary from '@/components/dashboard/AIRiskSummary';
 import { 
