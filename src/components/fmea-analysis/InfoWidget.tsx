@@ -94,20 +94,29 @@ export const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onMetricClick }) =
           ))}
         </div>
         
-        <div className="mt-4 h-[200px]">
-          <Chart 
-            title=""
-            data={data.chartData}
-            series={data.chartSeries}
-            type={data.chartType}
-            xAxisKey="name"
-            height={180}
-            showPercentages={data.chartType === 'pie'}
-          />
+        {/* Updated chart container with better sizing constraints */}
+        <div className="mt-4 h-[200px] w-full overflow-hidden">
+          {data.chartData && data.chartData.length > 0 ? (
+            <Chart 
+              title=""
+              data={data.chartData}
+              series={data.chartSeries}
+              type={data.chartType}
+              xAxisKey="name"
+              height={180}
+              width="100%"
+              showPercentages={data.chartType === 'pie'}
+            />
+          ) : (
+            <div className="h-full w-full flex items-center justify-center text-muted-foreground text-sm">
+              No chart data available
+            </div>
+          )}
         </div>
         
+        {/* Added a defined height container for insights to prevent overlap */}
         {data.insights && data.insights.length > 0 && (
-          <div className="mt-4 pt-3 border-t">
+          <div className="mt-4 pt-3 border-t max-h-[120px] overflow-y-auto">
             <div className="text-xs text-muted-foreground uppercase mb-2 flex items-center">
               <span>Key Insights</span>
               <TooltipProvider>
@@ -126,7 +135,7 @@ export const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onMetricClick }) =
               {data.insights.map((insight, index) => (
                 <li key={index} className="flex items-start group transition-colors hover:bg-muted/20 p-1 rounded cursor-pointer">
                   <span className="mr-2 mt-0.5 text-primary">•</span>
-                  <span>{insight}</span>
+                  <span className="flex-1">{insight}</span>
                   <ExternalLink className="h-3 w-3 ml-auto opacity-0 group-hover:opacity-100 text-blue-500" />
                 </li>
               ))}
@@ -144,3 +153,4 @@ export const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onMetricClick }) =
     </Card>
   );
 };
+

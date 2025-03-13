@@ -70,7 +70,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = fals
 
   return (
     <Card 
-      className="hover:shadow-md transition-shadow cursor-pointer" 
+      className="hover:shadow-md transition-shadow cursor-pointer overflow-hidden" 
       onClick={onClick}
     >
       <CardContent className="p-6">
@@ -110,24 +110,25 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = fals
             ))}
           </div>
 
-          {/* Chart Section */}
+          {/* Chart Section - Added better sizing constraints */}
           {data.chartData.length > 0 && (
-            <div className="h-[200px] w-full">
+            <div className="h-[200px] w-full overflow-hidden">
               <Chart
                 title=""
                 type={data.chartType}
                 data={data.chartData}
                 series={data.chartSeries}
                 xAxisKey="name"
-                height={data.chartHeight || 200}
+                height={data.chartHeight || 190} 
+                width="100%" 
                 showLegend={false}
               />
             </div>
           )}
 
-          {/* Insights Section */}
+          {/* Insights Section - Added better height control */}
           {data.insights.length > 0 && (
-            <div className="space-y-1">
+            <div className="space-y-1 max-h-[100px] overflow-y-auto">
               {data.insights.map((insight, index) => (
                 <p 
                   key={`${data.id}-insight-${index}`}
