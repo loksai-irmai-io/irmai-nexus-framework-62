@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -38,27 +37,49 @@ export const AuthForm = () => {
         });
         
         if (signInError) {
-          const { error: signUpError } = await supabase.auth.signUp({
+          console.log("Admin user doesn't exist yet, creating...");
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: { 
+                role: 'admin' 
+              }
+            }
+          });
+          
+          if (signUpError) {
+            console.error("Error creating admin user:", signUpError);
+            throw signUpError;
+          }
+          
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          const { error: retrySignInError } = await supabase.auth.signInWithPassword({
             email,
             password
           });
           
-          if (signUpError) throw signUpError;
+          if (retrySignInError) throw retrySignInError;
         }
+      } else {
+        await signIn(email, password);
       }
-
-      await signIn(email, password);
       
-      await supabase.functions.invoke('send-auth-email', {
-        body: { email, type: 'login' }
-      });
+      try {
+        await supabase.functions.invoke('send-auth-email', {
+          body: { email, type: 'login' }
+        });
+      } catch (emailError) {
+        console.error("Error sending auth email:", emailError);
+      }
       
       navigate('/');
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message,
+        title: "Authentication Error",
+        description: error.message || "Failed to sign in. Please check your credentials.",
       });
     } finally {
       setLoading(false);
