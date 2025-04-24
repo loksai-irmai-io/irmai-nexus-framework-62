@@ -32,7 +32,7 @@ const SidebarLink = ({
   icon: React.ElementType; 
   label: string; 
   active: boolean;
-  onClick?: (e: React.MouseEvent) => void | Promise<void>; // Updated type definition to accept a Promise<void> return type
+  onClick?: (e: React.MouseEvent) => void | Promise<void>; 
   isExpanded: boolean;
 }) => (
   <NavLink
