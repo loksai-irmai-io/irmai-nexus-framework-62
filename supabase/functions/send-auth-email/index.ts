@@ -40,6 +40,27 @@ serve(async (req) => {
           <p>If you didn't request this, please ignore this email.</p>
         `
         break
+      case 'magic-link':
+        const baseUrl = "https://phofdpcnmjikjrocvjaz.supabase.co"
+        const redirectUrl = `${Deno.env.get('SITE_URL') || 'https://irmai.app'}/dashboard`
+        const token = resetToken
+        
+        // Create the full magic link URL
+        const magicLinkUrl = `${baseUrl}/auth/v1/verify?token=${encodeURIComponent(token)}&type=magiclink&redirect_to=${encodeURIComponent(redirectUrl)}`
+        
+        subject = 'Your Magic Link'
+        content = `
+          <h1>Your Magic Login Link</h1>
+          <p>Click the button below to log in to your account:</p>
+          <p>
+            <a href="${magicLinkUrl}" style="background-color: #4F46E5; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 10px;">
+              Log In
+            </a>
+          </p>
+          <p>If you didn't request this login link, please ignore this email.</p>
+          <p>This link will expire in 24 hours.</p>
+        `
+        break
       default:
         throw new Error('Invalid email type')
     }
@@ -50,6 +71,8 @@ serve(async (req) => {
       subject,
       html: content,
     })
+
+    console.log("Email sent successfully:", emailResponse)
 
     return new Response(JSON.stringify(emailResponse), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/components/ui/use-toast';
 
 interface AuthContextType {
   user: User | null;
@@ -22,6 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     // First check for existing session
@@ -38,25 +40,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .single()
           .then(({ data }) => {
             setIsAdmin(data?.role === 'admin');
+            setLoading(false);
+          })
+          .catch(() => {
+            setIsAdmin(false);
+            setLoading(false);
           });
+      } else {
+        setLoading(false);
       }
-      
-      setLoading(false);
     });
 
-    // Then set up auth state listener
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      (event, newSession) => {
+        // Avoid infinite loops by not making Supabase calls directly in the callback
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
         
-        if (session?.user) {
-          const { data } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
-          setIsAdmin(data?.role === 'admin');
+        if (newSession?.user) {
+          // Use setTimeout to defer the database call to prevent deadlocks
+          setTimeout(() => {
+            supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', newSession.user.id)
+              .single()
+              .then(({ data }) => {
+                setIsAdmin(data?.role === 'admin');
+              })
+              .catch(() => {
+                setIsAdmin(false);
+              });
+          }, 0);
         } else {
           setIsAdmin(false);
           
@@ -73,20 +89,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [navigate]);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    navigate('/dashboard');
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Login failed",
+          description: error.message,
+        });
+        throw error;
+      }
+      
+      if (data?.user) {
+        toast({
+          title: "Login successful",
+          description: "Welcome back!",
+        });
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error("Authentication error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signInWithMagicLink = async (email: string) => {
-    const { error } = await supabase.auth.signInWithOtp({ email });
-    if (error) throw error;
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({ 
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        }
+      });
+      
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message,
+        });
+        throw error;
+      }
+      
+      toast({
+        title: "Magic Link Sent",
+        description: "Check your email for the login link",
+      });
+    } catch (error) {
+      console.error("Magic link error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    navigate('/auth');
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      navigate('/auth');
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast({
+        variant: "destructive",
+        title: "Sign out failed",
+        description: "There was a problem signing you out.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

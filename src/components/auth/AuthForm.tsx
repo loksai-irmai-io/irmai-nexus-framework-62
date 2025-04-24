@@ -9,14 +9,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { ForgotPasswordButton } from './ForgotPasswordButton';
 import { MagicLinkButton } from './MagicLinkButton';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export const AuthForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, signInWithMagicLink } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -25,78 +25,10 @@ export const AuthForm = () => {
     setLoading(true);
     
     try {
-      const adminEmails = ['jennings@irmai.io', 'aniket@irmai.io', 'sofiya@irmai.io'];
-      const isAdminEmail = adminEmails.includes(email);
-
-      // First try to sign in
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      // If sign in succeeds, send notification and navigate
-      if (signInData?.user) {
-        try {
-          await supabase.functions.invoke('send-auth-email', {
-            body: { email, type: 'login' }
-          });
-        } catch (emailError) {
-          console.error("Error sending login notification:", emailError);
-        }
-        
-        navigate('/dashboard');
-        return;
-      }
-
-      // If sign in fails and this is an admin email, try to create the account
-      if (signInError && isAdminEmail) {
-        console.log("Creating new admin account...");
-        
-        try {
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-            email,
-            password,
-          });
-
-          if (signUpError) {
-            if (signUpError.message.includes("Database error saving new user")) {
-              throw new Error("Database schema issue detected. Please check that the user_role enum exists in the database.");
-            } else {
-              throw signUpError;
-            }
-          }
-
-          // Wait for the trigger to create the profile and role
-          await new Promise(resolve => setTimeout(resolve, 3000));
-
-          // Try signing in again
-          const { error: retryError } = await supabase.auth.signInWithPassword({
-            email,
-            password
-          });
-
-          if (retryError) throw retryError;
-
-          navigate('/dashboard');
-          return;
-        } catch (error: any) {
-          throw error;
-        }
-      } 
-      
-      // For non-admin users
-      if (signInError) {
-        await signIn(email, password);
-        navigate('/dashboard');
-      }
-
+      await signIn(email, password);
     } catch (error: any) {
       console.error("Authentication error:", error);
-      toast({
-        variant: "destructive",
-        title: "Authentication Error",
-        description: error.message || "Failed to sign in. Please check your credentials.",
-      });
+      // Error is already handled in the signIn function
     } finally {
       setLoading(false);
     }
@@ -113,23 +45,10 @@ export const AuthForm = () => {
       return;
     }
 
-    setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({ email });
-      if (error) throw error;
-      
-      toast({
-        title: "Magic Link Sent",
-        description: "Check your email for the login link",
-      });
+      await signInWithMagicLink(email);
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    } finally {
-      setLoading(false);
+      // Error is already handled in the signInWithMagicLink function
     }
   };
 
@@ -145,6 +64,7 @@ export const AuthForm = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
             className="h-12"
+            disabled={loading}
           />
         </div>
 
@@ -158,11 +78,13 @@ export const AuthForm = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="h-12 pr-10"
+              disabled={loading}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              disabled={loading}
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
@@ -180,7 +102,12 @@ export const AuthForm = () => {
         className="w-full h-12 text-lg font-semibold" 
         disabled={loading}
       >
-        {loading ? "Signing in..." : "Sign In"}
+        {loading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Signing in...
+          </>
+        ) : "Sign In"}
       </Button>
     </form>
   );
