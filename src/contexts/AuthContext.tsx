@@ -27,33 +27,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // First check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        // Get user role
-        supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single()
-          .then(({ data }) => {
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Get user role
+          try {
+            const { data } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', session.user.id)
+              .single();
             setIsAdmin(data?.role === 'admin');
-            setLoading(false);
-          })
-          .catch((error) => {
+          } catch (error) {
             console.error("Error fetching user profile:", error);
             setIsAdmin(false);
-            setLoading(false);
-          });
-      } else {
+          }
+        }
+      } catch (error) {
+        console.error("Session fetch error:", error);
+        setIsAdmin(false);
+      } finally {
         setLoading(false);
       }
-    }).catch(error => {
-      console.error("Session fetch error:", error);
-      setLoading(false);
-    });
+    };
+    
+    checkSession();
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -64,19 +66,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         if (newSession?.user) {
           // Use setTimeout to defer the database call to prevent deadlocks
-          setTimeout(() => {
-            supabase
-              .from('profiles')
-              .select('role')
-              .eq('id', newSession.user.id)
-              .single()
-              .then(({ data }) => {
-                setIsAdmin(data?.role === 'admin');
-              })
-              .catch((error) => {
-                console.error("Error fetching user profile:", error);
-                setIsAdmin(false);
-              });
+          setTimeout(async () => {
+            try {
+              const { data } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', newSession.user.id)
+                .single();
+              setIsAdmin(data?.role === 'admin');
+            } catch (error) {
+              console.error("Error fetching user profile:", error);
+              setIsAdmin(false);
+            }
           }, 0);
         } else {
           setIsAdmin(false);
