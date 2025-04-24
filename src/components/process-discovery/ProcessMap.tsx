@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { ProcessData } from './types';
+import { cn } from '@/lib/utils';
 import ProcessControls from './controls/ProcessControls';
 import ProcessNode from './nodes/ProcessNode';
 import ProcessEdge from './edges/ProcessEdge';

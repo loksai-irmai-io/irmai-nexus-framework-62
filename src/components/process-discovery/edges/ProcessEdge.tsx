@@ -17,14 +17,16 @@ const ProcessEdge: React.FC<ProcessEdgeProps> = ({
   selectedNode,
   showFrequency,
 }) => {
+  const isSelected = selectedNode && (selectedNode === edge.source || selectedNode === edge.target);
+  
   return (
-    <g className={`edge ${selectedNode && (selectedNode === edge.source || selectedNode === edge.target) ? 'opacity-100' : 'opacity-70'} transition-opacity duration-200`}>
+    <g className={`edge ${isSelected ? 'opacity-100' : 'opacity-70'} transition-opacity duration-200`}>
       <line 
         x1={sourcePosition.x + 50} 
         y1={sourcePosition.y} 
         x2={targetPosition.x - 50} 
         y2={targetPosition.y}
-        className={`stroke-gray-300 dark:stroke-gray-600 stroke-[1.5px] ${selectedNode && (selectedNode === edge.source || selectedNode === edge.target) ? 'stroke-blue-400 dark:stroke-blue-500 stroke-[2px]' : ''}`}
+        className={`stroke-gray-300 dark:stroke-gray-600 stroke-[1.5px] ${isSelected ? 'stroke-blue-400 dark:stroke-blue-500 stroke-[2px]' : ''}`}
         strokeDasharray={edge.id.includes('alternative') ? "5,5" : undefined}
       />
       {edge.label && (
