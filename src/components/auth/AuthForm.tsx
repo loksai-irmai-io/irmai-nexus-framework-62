@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,11 +8,13 @@ import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { ForgotPasswordButton } from './ForgotPasswordButton';
 import { MagicLinkButton } from './MagicLinkButton';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'; 
 
 export const AuthForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showTip, setShowTip] = useState(false);
   const { signIn } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -19,6 +22,7 @@ export const AuthForm = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setShowTip(false);
     
     try {
       const adminEmails = ['jennings@irmai.io', 'aniket@irmai.io', 'sofiya@irmai.io'];
@@ -44,32 +48,41 @@ export const AuthForm = () => {
         return;
       }
 
-      // If sign in fails and this is an admin email, create the account
+      // If sign in fails and this is an admin email, try to create the account
       if (signInError && isAdminEmail) {
         console.log("Creating new admin account...");
         
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-        });
+        try {
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email,
+            password,
+          });
 
-        if (signUpError) {
-          throw signUpError;
+          if (signUpError) {
+            if (signUpError.message.includes("Database error saving new user")) {
+              setShowTip(true);
+              throw new Error("Database schema issue detected. Please check that the user_role enum exists in the database.");
+            } else {
+              throw signUpError;
+            }
+          }
+
+          // Wait for the trigger to create the profile and role
+          await new Promise(resolve => setTimeout(resolve, 3000));
+
+          // Try signing in again
+          const { error: retryError } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+
+          if (retryError) throw retryError;
+
+          navigate('/');
+          return;
+        } catch (error: any) {
+          throw error;
         }
-
-        // Wait for the trigger to create the profile and role
-        await new Promise(resolve => setTimeout(resolve, 3000));
-
-        // Try signing in again
-        const { error: retryError } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (retryError) throw retryError;
-
-        navigate('/');
-        return;
       } 
       
       // For non-admin users
@@ -123,6 +136,14 @@ export const AuthForm = () => {
 
   return (
     <form onSubmit={handleSignIn}>
+      {showTip && (
+        <Alert className="mb-4 bg-amber-50 border-amber-500 text-amber-800">
+          <AlertTitle>Database Setup Required</AlertTitle>
+          <AlertDescription>
+            There appears to be an issue with the database schema. Make sure the SQL migrations have been executed to create the necessary tables and enums.
+          </AlertDescription>
+        </Alert>
+      )}
       <div className="space-y-4">
         <div className="space-y-2">
           <Input
