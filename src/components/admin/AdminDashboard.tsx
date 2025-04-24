@@ -9,7 +9,7 @@ import LogViewer from './LogViewer';
 import TroubleshootingGuide from './TroubleshootingGuide';
 import { useSystemHealth } from '@/hooks/useAdminData';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, AlertTriangle, ServerCrash, Users, ShieldAlert, Database } from 'lucide-react';
+import { RefreshCw, AlertTriangle, ServerCrash } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 
@@ -34,8 +34,8 @@ const AdminDashboard: React.FC = () => {
     <div className="container mx-auto p-4 space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-          <p className="text-muted-foreground">System management, monitoring and user administration</p>
+          <h1 className="text-2xl font-bold">Admin & Dependencies</h1>
+          <p className="text-muted-foreground">System monitoring and troubleshooting tools</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -87,95 +87,6 @@ const AdminDashboard: React.FC = () => {
           </AlertDescription>
         </Alert>
       )}
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
-              <CardTitle>User Management</CardTitle>
-            </div>
-            <CardDescription>Manage user accounts and permissions</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm">Total Users</span>
-                <span className="font-bold">42</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm">Admins</span>
-                <span className="font-bold">3</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm">Active Now</span>
-                <span className="font-bold">12</span>
-              </div>
-              <Button variant="outline" size="sm" className="w-full mt-2">
-                User Management Console
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <ShieldAlert className="h-5 w-5 text-primary" />
-              <CardTitle>Security & Access</CardTitle>
-            </div>
-            <CardDescription>Security settings and access control</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm">Security Level</span>
-                <Badge variant="outline" className="bg-green-100">High</Badge>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm">2FA Enabled Users</span>
-                <span className="font-bold">87%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm">Failed Logins (24h)</span>
-                <span className="font-bold">3</span>
-              </div>
-              <Button variant="outline" size="sm" className="w-full mt-2">
-                Security Console
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-2">
-              <Database className="h-5 w-5 text-primary" />
-              <CardTitle>Data Management</CardTitle>
-            </div>
-            <CardDescription>Database status and management</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm">Database Status</span>
-                <Badge className="bg-green-500">Healthy</Badge>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm">Storage Used</span>
-                <span className="font-bold">42%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm">Last Backup</span>
-                <span className="font-bold">2h ago</span>
-              </div>
-              <Button variant="outline" size="sm" className="w-full mt-2">
-                Database Console
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       <Tabs 
         value={activeTab} 
