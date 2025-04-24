@@ -60,11 +60,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else {
           setIsAdmin(false);
           
-          // Only redirect to auth if not already on auth or reset-password pages
-          const currentPath = window.location.pathname;
-          if (currentPath !== '/auth' && currentPath !== '/reset-password') {
-            navigate('/auth');
-          }
+          // Remove forced redirection - allow users to see all pages
+          // const currentPath = window.location.pathname;
+          // if (currentPath !== '/auth' && currentPath !== '/reset-password') {
+          //   navigate('/auth');
+          // }
         }
       }
     );
