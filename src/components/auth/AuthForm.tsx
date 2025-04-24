@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -22,7 +23,6 @@ export const AuthForm = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setShowTip(false);
     
     try {
       const adminEmails = ['jennings@irmai.io', 'aniket@irmai.io', 'sofiya@irmai.io'];
@@ -60,7 +60,6 @@ export const AuthForm = () => {
 
           if (signUpError) {
             if (signUpError.message.includes("Database error saving new user")) {
-              setShowTip(true);
               throw new Error("Database schema issue detected. Please check that the user_role enum exists in the database.");
             } else {
               throw signUpError;
