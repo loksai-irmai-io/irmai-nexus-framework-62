@@ -38,9 +38,8 @@ export const AuthForm = () => {
         password
       });
 
-      // If sign in succeeds, navigate to home
+      // If sign in succeeds, send login notification and navigate to home
       if (signInData?.user) {
-        // Send welcome email
         try {
           await supabase.functions.invoke('send-auth-email', {
             body: { email, type: 'login' }
@@ -56,9 +55,12 @@ export const AuthForm = () => {
       // If sign in fails and this is an admin user, create the account
       if (signInError && isAdminUser) {
         console.log("Creating new admin user account...");
+        
+        // For admin users, create account without any role metadata
+        // Let the database trigger handle role assignment
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
-          password
+          password,
         });
 
         if (signUpError) {
@@ -69,7 +71,7 @@ export const AuthForm = () => {
         console.log("Admin user created successfully:", signUpData);
         
         // Wait for the trigger to create the profile
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
         // Try signing in again
         const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
@@ -83,7 +85,6 @@ export const AuthForm = () => {
         }
 
         if (retryData?.user) {
-          // Send welcome email
           try {
             await supabase.functions.invoke('send-auth-email', {
               body: { email, type: 'login' }
@@ -96,10 +97,9 @@ export const AuthForm = () => {
           return;
         }
       } else if (signInError) {
-        // If it's not an admin user and sign in failed, try regular sign in
+        // Regular sign in process for non-admin users
         await signIn(email, password);
         
-        // Send welcome email
         try {
           await supabase.functions.invoke('send-auth-email', {
             body: { email, type: 'login' }
@@ -111,6 +111,7 @@ export const AuthForm = () => {
         navigate('/');
       }
     } catch (error: any) {
+      console.error("Authentication error:", error);
       toast({
         variant: "destructive",
         title: "Authentication Error",

@@ -15,7 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    const { email, type } = await req.json()
+    const { email, type, resetToken } = await req.json()
 
     let subject, content
 
@@ -31,7 +31,13 @@ serve(async (req) => {
         subject = 'Reset Your Password'
         content = `
           <h1>Password Reset Requested</h1>
-          <p>Click the link in the email from Supabase to reset your password. If you didn't request this, please ignore this email.</p>
+          <p>Click the link below to reset your password:</p>
+          <p>
+            <a href="${resetToken}" style="background-color: #4F46E5; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 10px;">
+              Reset Password
+            </a>
+          </p>
+          <p>If you didn't request this, please ignore this email.</p>
         `
         break
       default:
@@ -50,6 +56,7 @@ serve(async (req) => {
       status: 200,
     })
   } catch (error) {
+    console.error("Error in send-auth-email function:", error)
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
