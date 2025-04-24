@@ -9,10 +9,10 @@ export const MagicLinkButton = ({ onMagicLink, loading }: MagicLinkButtonProps) 
     <button
       type="button"
       onClick={onMagicLink}
-      className="text-blue-600 hover:text-blue-700 text-base font-medium"
+      className="text-blue-600 hover:text-blue-700 text-sm font-medium"
       disabled={loading}
     >
-      Sign in with magic link
+      Sign in with Magic Link
     </button>
   );
 };

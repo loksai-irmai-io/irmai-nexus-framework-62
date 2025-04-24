@@ -7,7 +7,6 @@ import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { ForgotPasswordButton } from './ForgotPasswordButton';
 import { MagicLinkButton } from './MagicLinkButton';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -15,7 +14,6 @@ export const AuthForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showTip, setShowTip] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signIn } = useAuth();
   const { toast } = useToast();
@@ -137,18 +135,7 @@ export const AuthForm = () => {
   };
 
   return (
-    <form onSubmit={handleSignIn} className="space-y-6">
-      {showTip && (
-        <Alert className="mb-4 bg-amber-50 border-amber-500 text-amber-800">
-          <AlertTitle>Database Setup Required</AlertTitle>
-          <AlertDescription>
-            There appears to be an issue with the database schema. Make sure the SQL migrations have been executed to create the necessary tables and enums.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
-
+    <form onSubmit={handleSignIn} className="space-y-6 px-6">
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
@@ -184,21 +171,18 @@ export const AuthForm = () => {
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center">
+        <MagicLinkButton onMagicLink={handleMagicLink} loading={loading} />
         <ForgotPasswordButton email={email} loading={loading} />
       </div>
 
       <Button 
         type="submit" 
-        className="w-full h-12 text-lg font-semibold bg-blue-600 hover:bg-blue-700" 
+        className="w-full h-12 text-lg font-semibold" 
         disabled={loading}
       >
         {loading ? "Signing in..." : "Sign In"}
       </Button>
-      
-      <div className="text-center">
-        <MagicLinkButton onMagicLink={handleMagicLink} loading={loading} />
-      </div>
     </form>
   );
 };
