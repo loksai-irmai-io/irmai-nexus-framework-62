@@ -23,13 +23,12 @@ export const ForgotPasswordButton = ({ email, loading }: ForgotPasswordButtonPro
 
     try {
       const resetUrl = `${window.location.origin}/reset-password`;
-      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: resetUrl,
       });
       
       if (error) throw error;
       
-      // Pass the reset URL to the edge function
       await supabase.functions.invoke('send-auth-email', {
         body: { 
           email, 
