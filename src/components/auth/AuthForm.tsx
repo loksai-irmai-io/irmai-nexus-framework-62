@@ -30,42 +30,41 @@ export const AuthForm = () => {
         user => user.email === email && user.password === password
       );
 
-      if (isAdminUser) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
+      // First try to sign in
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      // If sign in fails and this is an admin user, create the account
+      if (signInError && isAdminUser) {
+        console.log("Creating new admin user account...");
+        const { error: signUpError } = await supabase.auth.signUp({
           email,
           password
         });
-        
-        if (signInError) {
-          console.log("Admin user doesn't exist yet, creating...");
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              data: { 
-                role: 'admin' 
-              }
-            }
-          });
-          
-          if (signUpError) {
-            console.error("Error creating admin user:", signUpError);
-            throw signUpError;
-          }
-          
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          const { error: retrySignInError } = await supabase.auth.signInWithPassword({
-            email,
-            password
-          });
-          
-          if (retrySignInError) throw retrySignInError;
+
+        if (signUpError) {
+          console.error("Error creating admin user:", signUpError);
+          throw signUpError;
         }
-      } else {
+
+        // Wait for the trigger to create the profile
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Try signing in again
+        const { error: retryError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (retryError) throw retryError;
+      } else if (signInError) {
+        // If it's not an admin user and sign in failed, try regular sign in
         await signIn(email, password);
       }
-      
+
+      // Send welcome email
       try {
         await supabase.functions.invoke('send-auth-email', {
           body: { email, type: 'login' }
@@ -73,7 +72,7 @@ export const AuthForm = () => {
       } catch (emailError) {
         console.error("Error sending auth email:", emailError);
       }
-      
+
       navigate('/');
     } catch (error: any) {
       toast({
