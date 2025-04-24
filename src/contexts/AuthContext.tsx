@@ -24,6 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
@@ -36,26 +37,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .eq('id', session.user.id)
             .single();
           setIsAdmin(data?.role === 'admin');
-          
-          // Redirect to dashboard if on auth page
-          if (window.location.pathname === '/auth') {
-            navigate('/dashboard');
-          }
         } else {
           setIsAdmin(false);
+          
+          // Only redirect to auth if not already on auth or reset-password pages
+          const currentPath = window.location.pathname;
+          if (currentPath !== '/auth' && currentPath !== '/reset-password') {
+            navigate('/auth');
+          }
         }
       }
     );
 
+    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
       
-      // Redirect authenticated users to dashboard if on auth page
-      if (session?.user && window.location.pathname === '/auth') {
-        navigate('/dashboard');
+      if (session?.user) {
+        // Get user role
+        supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single()
+          .then(({ data }) => {
+            setIsAdmin(data?.role === 'admin');
+          });
+      } else {
+        // Only redirect to auth if not already on auth or reset-password pages
+        const currentPath = window.location.pathname;
+        if (currentPath !== '/auth' && currentPath !== '/reset-password') {
+          navigate('/auth');
+        }
       }
+      
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();

@@ -16,14 +16,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, adminOnly = f
     </div>;
   }
 
+  // If not authenticated, redirect to auth page
   if (!user) {
-    return <Navigate to="/auth" />;
+    return <Navigate to="/auth" replace />;
   }
 
+  // If adminOnly route but user is not admin
   if (adminOnly && !isAdmin) {
-    return <Navigate to="/dashboard" />;
+    return <Navigate to="/dashboard" replace />;
   }
 
+  // User is authenticated (and admin if required), show the protected content
   return <>{children}</>;
 };
 
