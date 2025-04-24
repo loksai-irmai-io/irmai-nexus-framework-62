@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { ForgotPasswordButton } from './ForgotPasswordButton';
+import { MagicLinkButton } from './MagicLinkButton';
 
 export const AuthForm = () => {
   const [email, setEmail] = useState('');
