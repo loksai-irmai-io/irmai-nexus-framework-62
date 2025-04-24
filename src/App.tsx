@@ -4,8 +4,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import Auth from "./pages/Auth";
+import ProtectedRoute from "./components/ProtectedRoute";
 
-// Use React.lazy for code splitting
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ProcessDiscovery = lazy(() => import("./pages/ProcessDiscovery"));
@@ -15,7 +17,6 @@ const FMEAAnalysis = lazy(() => import("./pages/FMEAAnalysis"));
 const Admin = lazy(() => import("./pages/Admin"));
 const ApiIntegrations = lazy(() => import("./pages/ApiIntegrations"));
 
-// Loading fallback
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-screen">
     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -23,7 +24,6 @@ const LoadingFallback = () => (
   </div>
 );
 
-// Error boundary for route loading
 const ErrorFallback = () => (
   <div className="flex flex-col items-center justify-center h-screen">
     <h2 className="text-2xl font-bold mb-4">Something went wrong</h2>
@@ -36,12 +36,11 @@ const ErrorFallback = () => (
   </div>
 );
 
-// Create a new QueryClient with improved configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      staleTime: 30 * 1000, // 30 seconds
+      staleTime: 30 * 1000,
       refetchOnWindowFocus: false,
       refetchOnMount: true,
     },
@@ -50,33 +49,27 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/process-discovery" element={<ProcessDiscovery />} />
-            <Route path="/outlier-analysis" element={<OutlierAnalysis />} />
-            <Route path="/compliance-monitoring" element={<ComplianceMonitoring />} />
-            <Route path="/fmea-analysis" element={<FMEAAnalysis />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/api-integrations" element={<ApiIntegrations />} />
-            
-            {/* Redirect routes with clear communication */}
-            <Route path="/gap-analysis" element={<Navigate to="/not-found" state={{ message: "Gap Analysis module is coming soon" }} />} />
-            <Route path="/incident-management" element={<Navigate to="/not-found" state={{ message: "Incident Management module is under development" }} />} />
-            <Route path="/controls-testing" element={<Navigate to="/not-found" state={{ message: "Controls Testing module is not yet available" }} />} />
-            <Route path="/scenario-analysis" element={<Navigate to="/not-found" state={{ message: "Scenario Analysis module is in progress" }} />} />
-            <Route path="/risk-catalog" element={<Navigate to="/not-found" state={{ message: "Risk Catalog module is coming soon" }} />} />
-            
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </TooltipProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/process-discovery" element={<ProtectedRoute><ProcessDiscovery /></ProtectedRoute>} />
+              <Route path="/outlier-analysis" element={<ProtectedRoute><OutlierAnalysis /></ProtectedRoute>} />
+              <Route path="/compliance-monitoring" element={<ProtectedRoute><ComplianceMonitoring /></ProtectedRoute>} />
+              <Route path="/fmea-analysis" element={<ProtectedRoute><FMEAAnalysis /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
+              <Route path="/api-integrations" element={<ProtectedRoute><ApiIntegrations /></ProtectedRoute>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </TooltipProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 
