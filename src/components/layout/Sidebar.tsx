@@ -1,255 +1,154 @@
 
-import React, { useEffect, useRef } from 'react';
-import { useSidebarContext } from './SidebarProvider';
+import React from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useLocation } from 'react-router-dom';
+import { useSidebarContext } from './SidebarProvider';
 import { 
-  LayoutDashboard, 
-  GitBranch, 
-  SearchX, 
-  Shield, 
-  Share2, 
-  CheckCheck, 
-  Siren, 
+  LineChart, 
+  AlertTriangle, 
+  Gauge, 
+  Network, 
   Settings, 
-  TestTube, 
-  Presentation, 
-  BookText,
-  Plug
+  LogOut, 
+  Home, 
+  Globe, 
+  Shield,
+  FileStack,
+  AlertCircle,
 } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/contexts/AuthContext';
+import { Avatar } from '@/components/ui/avatar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-type MenuItem = {
-  id: string;
-  label: string;
-  icon: React.ElementType;
-  href: string;
-  comingSoon?: boolean;
-};
+const SidebarLink = ({ 
+  to, 
+  icon: Icon, 
+  label, 
+  active, 
+  onClick,
+  isExpanded
+}: { 
+  to: string; 
+  icon: React.ElementType; 
+  label: string; 
+  active: boolean;
+  onClick?: () => void;
+  isExpanded: boolean;
+}) => (
+  <NavLink
+    to={to}
+    onClick={onClick}
+    className={cn(
+      "flex items-center px-3 py-2 rounded-md mb-1 transition-colors",
+      "hover:bg-primary/10",
+      active ? "bg-primary/10 text-primary" : "text-muted-foreground"
+    )}
+  >
+    <TooltipProvider>
+      <Tooltip delayDuration={300}>
+        <TooltipTrigger asChild>
+          <span className={cn(
+            "flex items-center",
+            isExpanded ? "justify-start" : "justify-center w-full"
+          )}>
+            <Icon className={cn(
+              "h-5 w-5",
+              isExpanded ? "mr-2" : ""
+            )} />
+            {isExpanded && <span>{label}</span>}
+          </span>
+        </TooltipTrigger>
+        {!isExpanded && <TooltipContent side="right" className="ml-1">{label}</TooltipContent>}
+      </Tooltip>
+    </TooltipProvider>
+  </NavLink>
+);
 
-const mainMenuItems: MenuItem[] = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard (Summary)',
-    icon: LayoutDashboard,
-    href: '/'
-  },
-  {
-    id: 'process-discovery',
-    label: 'Process Discovery',
-    icon: GitBranch,
-    href: '/process-discovery'
-  },
-  {
-    id: 'outlier-analysis',
-    label: 'Outlier Analysis',
-    icon: SearchX,
-    href: '/outlier-analysis'
-  },
-  {
-    id: 'fmea-analysis',
-    label: 'Predictive Risk Analytics',
-    icon: Shield,
-    href: '/fmea-analysis'
-  },
-  {
-    id: 'gap-analysis',
-    label: 'Gap Analysis',
-    icon: Share2,
-    href: '/gap-analysis'
-  },
-  {
-    id: 'compliance-monitoring',
-    label: 'Compliance & Monitoring',
-    icon: CheckCheck,
-    href: '/compliance-monitoring'
-  },
-  {
-    id: 'incident-management',
-    label: 'Incident Management',
-    icon: Siren,
-    href: '/incident-management'
-  },
-  {
-    id: 'api-integrations',
-    label: 'API Integrations',
-    icon: Plug,
-    href: '/api-integrations'
-  },
-  {
-    id: 'admin',
-    label: 'Admin & Dependencies',
-    icon: Settings,
-    href: '/admin'
-  },
-  {
-    id: 'controls-testing',
-    label: 'Controls Testing',
-    icon: TestTube,
-    comingSoon: true,
-    href: '/controls-testing'
-  },
-  {
-    id: 'scenario-analysis',
-    label: 'Scenario Analysis',
-    icon: Presentation,
-    comingSoon: true,
-    href: '/scenario-analysis'
-  },
-  {
-    id: 'risk-catalog',
-    label: 'Risk Catalog',
-    icon: BookText,
-    comingSoon: true,
-    href: '/risk-catalog'
-  }
-];
-
-const Sidebar: React.FC = () => {
+const Sidebar = () => {
   const { isOpen, setIsOpen } = useSidebarContext();
   const location = useLocation();
-  const currentPath = location.pathname;
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const hoverZoneRef = useRef<HTMLDivElement>(null);
-  
-  // Handle clicks outside the sidebar to auto-hide it
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        sidebarRef.current && 
-        !sidebarRef.current.contains(event.target as Node) &&
-        isOpen
-      ) {
-        setIsOpen(false);
-      }
-    };
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen, setIsOpen]);
+  const { signOut, user, isAdmin } = useAuth();
 
-  // Handle mouse movement to show sidebar on hover
-  useEffect(() => {
-    const handleHover = () => {
-      if (!isOpen) {
-        setIsOpen(true);
-      }
-    };
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    await signOut();
+  };
 
-    const hoverZone = hoverZoneRef.current;
-    if (hoverZone) {
-      hoverZone.addEventListener('mouseenter', handleHover);
-      return () => {
-        hoverZone.removeEventListener('mouseenter', handleHover);
-      };
+  const isActive = (path: string) => {
+    return location.pathname.startsWith(path);
+  };
+
+  const userInitials = () => {
+    if (!user?.email) return "?";
+    const parts = user.email.split('@')[0].split('.');
+    if (parts.length > 1) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
     }
-  }, [isOpen, setIsOpen]);
+    return parts[0].substring(0, 2).toUpperCase();
+  };
 
   return (
-    <>
-      {/* Invisible hover zone to detect when user hovers near the edge */}
-      <div 
-        ref={hoverZoneRef}
-        className={cn(
-          "fixed inset-y-0 left-0 w-4 z-20",
-          isOpen && "hidden"
-        )}
-      />
+    <aside 
+      id="main-sidebar"
+      className={cn(
+        "h-screen fixed top-0 left-0 z-30 bg-background border-r transition-all duration-300",
+        "flex flex-col shadow-sm pt-16",
+        isOpen ? "w-64" : "w-16"
+      )}
+    >
+      <div className="flex-1 overflow-y-auto px-3 py-4">
+        <nav className="space-y-2">
+          {/* Dashboard */}
+          <SidebarLink to="/dashboard" icon={Home} label="Dashboard" active={isActive("/dashboard")} isExpanded={isOpen} />
+          
+          {/* Process Discovery */}
+          <SidebarLink to="/process-discovery" icon={Network} label="Process Discovery" active={isActive("/process-discovery")} isExpanded={isOpen} />
+          
+          {/* Outlier Analysis */}
+          <SidebarLink to="/outlier-analysis" icon={AlertTriangle} label="Outlier Analysis" active={isActive("/outlier-analysis")} isExpanded={isOpen} />
+          
+          {/* Compliance Monitoring */}
+          <SidebarLink to="/compliance-monitoring" icon={Shield} label="Compliance Monitoring" active={isActive("/compliance-monitoring")} isExpanded={isOpen} />
+          
+          {/* FMEA Analysis */}
+          <SidebarLink to="/fmea-analysis" icon={Gauge} label="FMEA Analysis" active={isActive("/fmea-analysis")} isExpanded={isOpen} />
+
+          {/* Gap Analysis */}
+          <SidebarLink to="/gap-analysis" icon={FileStack} label="Gap Analysis" active={isActive("/gap-analysis")} isExpanded={isOpen} />
+
+          {/* Incident Management */}
+          <SidebarLink to="/incident-management" icon={AlertCircle} label="Incident Management" active={isActive("/incident-management")} isExpanded={isOpen} />
+
+          {/* API Integrations */}
+          <SidebarLink to="/api-integrations" icon={Globe} label="API Integrations" active={isActive("/api-integrations")} isExpanded={isOpen} />
+          
+          {/* Admin (only visible for admin users) */}
+          {isAdmin && <SidebarLink to="/admin" icon={Settings} label="Admin" active={isActive("/admin")} isExpanded={isOpen} />}
+
+          {/* Logout */}
+          <SidebarLink to="#" icon={LogOut} label="Logout" active={false} onClick={handleLogout} isExpanded={isOpen} />
+        </nav>
+      </div>
       
-      <aside 
-        ref={sidebarRef}
-        className={cn(
-          "fixed inset-y-0 left-0 z-30 flex flex-col border-r shadow-lg transition-all duration-300 ease-in-out animate-fade-in bg-sidebar",
-          isOpen ? "w-64" : "w-0 -translate-x-full sm:translate-x-0 sm:w-16"
+      {/* User profile at bottom */}
+      <div className={cn(
+        "p-3 border-t flex",
+        isOpen ? "items-center" : "justify-center",
+        "transition-all duration-300"
+      )}>
+        <Avatar className="h-8 w-8 bg-primary text-primary-foreground">
+          <span className="text-xs font-medium">{userInitials()}</span>
+        </Avatar>
+        {isOpen && (
+          <div className="ml-2 overflow-hidden">
+            <p className="text-sm font-medium truncate">{user?.email || "User"}</p>
+            <p className="text-xs text-muted-foreground">
+              {isAdmin ? "Administrator" : "User"}
+            </p>
+          </div>
         )}
-      >
-        <div className="flex flex-col h-full overflow-y-auto">
-          <div className="h-20 flex items-center justify-center px-4 border-b bg-sidebar">
-            {isOpen ? (
-              <div className="flex items-center justify-center w-full h-full">
-                <img 
-                  src="/lovable-uploads/f6af323e-8e1e-41cb-a223-30dc2436352c.png" 
-                  alt="IRMAI Logo" 
-                  className="h-12 object-contain" 
-                />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center w-full h-full">
-                <img 
-                  src="/lovable-uploads/f6af323e-8e1e-41cb-a223-30dc2436352c.png" 
-                  alt="IRMAI Logo" 
-                  className="h-10 w-10 object-contain" 
-                />
-              </div>
-            )}
-          </div>
-          <nav className="flex-1 p-3 space-y-2 overflow-y-auto">
-            {mainMenuItems.map((item) => {
-              const isActive = currentPath === item.href || 
-                             (item.href !== '/' && currentPath.startsWith(item.href));
-              
-              return (
-                <TooltipProvider key={item.id}>
-                  <Tooltip delayDuration={isOpen ? 1000 : 0}>
-                    <TooltipTrigger asChild>
-                      <a
-                        href={item.href}
-                        className={cn(
-                          "flex items-center px-3 py-2.5 rounded-lg text-sm group transition-all hover:bg-sidebar-accent/50",
-                          isActive 
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
-                            : "text-sidebar-foreground",
-                          item.comingSoon && "opacity-60"
-                        )}
-                      >
-                        <item.icon className={cn(
-                          "h-5 w-5 flex-shrink-0",
-                          isOpen ? "mr-3" : "mx-auto"
-                        )} />
-                        {isOpen && (
-                          <div className="flex items-center justify-between w-full min-w-0">
-                            <span className="truncate mr-2">{item.label}</span>
-                            {item.comingSoon && (
-                              <Badge 
-                                variant="outline" 
-                                className="text-[10px] py-0.5 px-1.5 whitespace-nowrap bg-secondary/10"
-                              >
-                                Coming Soon
-                              </Badge>
-                            )}
-                          </div>
-                        )}
-                      </a>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" sideOffset={10} className={cn(isOpen && "hidden")}>
-                      <div className="flex flex-col">
-                        <span>{item.label}</span>
-                        {item.comingSoon && (
-                          <Badge 
-                            variant="outline" 
-                            className="text-[10px] py-0 px-1.5 mt-1"
-                          >
-                            Coming Soon
-                          </Badge>
-                        )}
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              );
-            })}
-          </nav>
-          <div className="p-3 border-t">
-            <div className="text-xs text-center text-muted-foreground py-2">
-              {isOpen ? 'IRMAI v1.0.0' : 'v1'}
-            </div>
-          </div>
-        </div>
-      </aside>
-    </>
+      </div>
+    </aside>
   );
 };
 

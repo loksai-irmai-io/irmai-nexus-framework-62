@@ -19,6 +19,8 @@ const ComplianceMonitoring = lazy(() => import("./pages/ComplianceMonitoring"));
 const FMEAAnalysis = lazy(() => import("./pages/FMEAAnalysis"));
 const Admin = lazy(() => import("./pages/Admin"));
 const ApiIntegrations = lazy(() => import("./pages/ApiIntegrations"));
+const GapAnalysis = lazy(() => import("./pages/GapAnalysis"));
+const IncidentManagement = lazy(() => import("./pages/IncidentManagement"));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-screen">
@@ -56,6 +58,8 @@ const App = () => (
                 <Route path="/outlier-analysis" element={<ProtectedRoute><OutlierAnalysis /></ProtectedRoute>} />
                 <Route path="/compliance-monitoring" element={<ProtectedRoute><ComplianceMonitoring /></ProtectedRoute>} />
                 <Route path="/fmea-analysis" element={<ProtectedRoute><FMEAAnalysis /></ProtectedRoute>} />
+                <Route path="/gap-analysis" element={<ProtectedRoute><GapAnalysis /></ProtectedRoute>} />
+                <Route path="/incident-management" element={<ProtectedRoute><IncidentManagement /></ProtectedRoute>} />
                 <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
                 <Route path="/api-integrations" element={<ProtectedRoute><ApiIntegrations /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
