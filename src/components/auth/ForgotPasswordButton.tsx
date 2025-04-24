@@ -54,7 +54,7 @@ export const ForgotPasswordButton = ({ email, loading }: ForgotPasswordButtonPro
     <button
       type="button"
       onClick={handleForgotPassword}
-      className="text-primary hover:underline"
+      className="text-blue-600 hover:text-blue-700 text-sm font-medium"
       disabled={loading}
     >
       Forgot Password?
