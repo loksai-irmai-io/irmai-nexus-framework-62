@@ -1,3 +1,4 @@
+
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -26,18 +27,6 @@ const LoadingFallback = () => (
   </div>
 );
 
-const ErrorFallback = () => (
-  <div className="flex flex-col items-center justify-center h-screen">
-    <h2 className="text-2xl font-bold mb-4">Something went wrong</h2>
-    <button 
-      onClick={() => window.location.reload()}
-      className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-    >
-      Try again
-    </button>
-  </div>
-);
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -61,7 +50,7 @@ const App = () => (
               <Routes>
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/" element={<Navigate to="/auth" replace />} />
                 <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                 <Route path="/process-discovery" element={<ProtectedRoute><ProcessDiscovery /></ProtectedRoute>} />
                 <Route path="/outlier-analysis" element={<ProtectedRoute><OutlierAnalysis /></ProtectedRoute>} />
