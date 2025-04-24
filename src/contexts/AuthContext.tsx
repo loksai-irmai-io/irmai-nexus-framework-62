@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: User | null;
@@ -42,13 +42,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setIsAdmin(data?.role === 'admin');
             setLoading(false);
           })
-          .catch(() => {
+          .catch((error) => {
+            console.error("Error fetching user profile:", error);
             setIsAdmin(false);
             setLoading(false);
           });
       } else {
         setLoading(false);
       }
+    }).catch(error => {
+      console.error("Session fetch error:", error);
+      setLoading(false);
     });
 
     // Set up auth state listener
@@ -69,7 +73,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               .then(({ data }) => {
                 setIsAdmin(data?.role === 'admin');
               })
-              .catch(() => {
+              .catch((error) => {
+                console.error("Error fetching user profile:", error);
                 setIsAdmin(false);
               });
           }, 0);
