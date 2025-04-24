@@ -19,12 +19,45 @@ export default function Auth() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
     try {
-      await signIn(email, password);
+      // Demo credentials handling
+      if ((email === 'jennings@irmai.io' && password === 'irmai_jennings11') || 
+          (email === 'aniket@irmai.io' && password === 'irmai_aniket22')) {
+        
+        // Create user if it doesn't exist
+        // Check if user exists first (by trying to sign in)
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (signInError) {
+          console.log("User doesn't exist, creating account");
+          // User doesn't exist, sign up
+          const { error: signUpError } = await supabase.auth.signUp({
+            email,
+            password
+          });
+          
+          if (signUpError) throw signUpError;
+          
+          // Try signin again
+          await signIn(email, password);
+        } else {
+          // User exists, proceed with normal sign in
+          await signIn(email, password);
+        }
+      } else {
+        // Regular sign in for other users
+        await signIn(email, password);
+      }
+
       // Send login notification email
       await supabase.functions.invoke('send-auth-email', {
         body: { email, type: 'login' }
       });
+      
       navigate('/');
     } catch (error: any) {
       toast({
@@ -39,6 +72,15 @@ export default function Auth() {
 
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email) {
+      toast({
+        variant: "destructive",
+        title: "Error", 
+        description: "Please enter your email address",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       await signInWithMagicLink(email);
