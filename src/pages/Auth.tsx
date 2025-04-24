@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -21,38 +20,37 @@ export default function Auth() {
     setLoading(true);
     
     try {
-      // Demo credentials handling
-      if ((email === 'jennings@irmai.io' && password === 'irmai_jennings11') || 
-          (email === 'aniket@irmai.io' && password === 'irmai_aniket22')) {
-        
-        // Create user if it doesn't exist
-        // Check if user exists first (by trying to sign in)
+      // Predefined admin users with specific credentials
+      const adminUsers = [
+        { email: 'jennings@irmai.io', password: 'irmai_Jennings11' },
+        { email: 'aniket@irmai.io', password: 'irmai_Aniket22' }
+      ];
+
+      const isAdminUser = adminUsers.some(
+        user => user.email === email && user.password === password
+      );
+
+      if (isAdminUser) {
+        // Attempt to sign in first
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password
         });
         
+        // If sign-in fails, sign up the user
         if (signInError) {
-          console.log("User doesn't exist, creating account");
-          // User doesn't exist, sign up
           const { error: signUpError } = await supabase.auth.signUp({
             email,
             password
           });
           
           if (signUpError) throw signUpError;
-          
-          // Try signin again
-          await signIn(email, password);
-        } else {
-          // User exists, proceed with normal sign in
-          await signIn(email, password);
         }
-      } else {
-        // Regular sign in for other users
-        await signIn(email, password);
       }
 
+      // Standard sign-in process
+      await signIn(email, password);
+      
       // Send login notification email
       await supabase.functions.invoke('send-auth-email', {
         body: { email, type: 'login' }
