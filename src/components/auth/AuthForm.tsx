@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,7 +24,8 @@ export const AuthForm = () => {
     try {
       const adminUsers = [
         { email: 'jennings@irmai.io', password: 'irmai_Jennings11' },
-        { email: 'aniket@irmai.io', password: 'irmai_Aniket22' }
+        { email: 'aniket@irmai.io', password: 'irmai_Aniket22' },
+        { email: 'sofiya@irmai.io', password: 'irmai_Sofiya45' }
       ];
 
       const isAdminUser = adminUsers.some(
@@ -31,15 +33,30 @@ export const AuthForm = () => {
       );
 
       // First try to sign in
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
+      // If sign in succeeds, navigate to home
+      if (signInData?.user) {
+        // Send welcome email
+        try {
+          await supabase.functions.invoke('send-auth-email', {
+            body: { email, type: 'login' }
+          });
+        } catch (emailError) {
+          console.error("Error sending auth email:", emailError);
+        }
+        
+        navigate('/');
+        return;
+      }
+
       // If sign in fails and this is an admin user, create the account
       if (signInError && isAdminUser) {
         console.log("Creating new admin user account...");
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
           password
         });
@@ -49,31 +66,50 @@ export const AuthForm = () => {
           throw signUpError;
         }
 
+        console.log("Admin user created successfully:", signUpData);
+        
         // Wait for the trigger to create the profile
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
         // Try signing in again
-        const { error: retryError } = await supabase.auth.signInWithPassword({
+        const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
           email,
           password
         });
 
-        if (retryError) throw retryError;
+        if (retryError) {
+          console.error("Error signing in after creating admin user:", retryError);
+          throw retryError;
+        }
+
+        if (retryData?.user) {
+          // Send welcome email
+          try {
+            await supabase.functions.invoke('send-auth-email', {
+              body: { email, type: 'login' }
+            });
+          } catch (emailError) {
+            console.error("Error sending auth email:", emailError);
+          }
+          
+          navigate('/');
+          return;
+        }
       } else if (signInError) {
         // If it's not an admin user and sign in failed, try regular sign in
         await signIn(email, password);
+        
+        // Send welcome email
+        try {
+          await supabase.functions.invoke('send-auth-email', {
+            body: { email, type: 'login' }
+          });
+        } catch (emailError) {
+          console.error("Error sending auth email:", emailError);
+        }
+        
+        navigate('/');
       }
-
-      // Send welcome email
-      try {
-        await supabase.functions.invoke('send-auth-email', {
-          body: { email, type: 'login' }
-        });
-      } catch (emailError) {
-        console.error("Error sending auth email:", emailError);
-      }
-
-      navigate('/');
     } catch (error: any) {
       toast({
         variant: "destructive",
