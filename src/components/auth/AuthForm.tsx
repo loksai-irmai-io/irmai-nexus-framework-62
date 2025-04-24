@@ -20,11 +20,39 @@ export const AuthForm = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Function to check password security
+  const checkPasswordSecurity = (password: string): boolean => {
+    if (!password || password.length < 8) return false;
+    
+    // Check for common patterns
+    const commonPatterns = [
+      /^123456/, /^password/, /^qwerty/, /admin/, /^welcome/,
+      /^letmein/, /^abc123/, /^monkey/, /^1234567890/
+    ];
+    
+    for (const pattern of commonPatterns) {
+      if (pattern.test(password.toLowerCase())) {
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
+      // Basic validation
+      if (!email || !email.includes('@')) {
+        throw new Error("Please enter a valid email address");
+      }
+      
+      if (!password) {
+        throw new Error("Password is required");
+      }
+
       const adminEmails = ['jennings@irmai.io', 'aniket@irmai.io', 'sofiya@irmai.io'];
       const isAdminEmail = adminEmails.includes(email);
 
@@ -50,6 +78,11 @@ export const AuthForm = () => {
 
       // If sign in fails and this is an admin email, try to create the account
       if (signInError && isAdminEmail) {
+        // Check password security for new accounts
+        if (!checkPasswordSecurity(password)) {
+          throw new Error("Password is not secure enough. Please use a stronger password with at least 8 characters, including uppercase, lowercase, and numbers or special characters.");
+        }
+
         console.log("Creating new admin account...");
         
         try {
