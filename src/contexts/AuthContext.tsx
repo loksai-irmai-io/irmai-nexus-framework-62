@@ -36,6 +36,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .eq('id', session.user.id)
             .single();
           setIsAdmin(data?.role === 'admin');
+          
+          // Redirect to dashboard if on auth page
+          if (window.location.pathname === '/auth') {
+            navigate('/dashboard');
+          }
         } else {
           setIsAdmin(false);
         }
@@ -46,14 +51,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      // Redirect authenticated users to dashboard if on auth page
+      if (session?.user && window.location.pathname === '/auth') {
+        navigate('/dashboard');
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
+    navigate('/dashboard');
   };
 
   const signInWithMagicLink = async (email: string) => {

@@ -44,7 +44,7 @@ export const AuthForm = () => {
           console.error("Error sending login notification:", emailError);
         }
         
-        navigate('/');
+        navigate('/dashboard');
         return;
       }
 
@@ -77,7 +77,7 @@ export const AuthForm = () => {
 
           if (retryError) throw retryError;
 
-          navigate('/');
+          navigate('/dashboard');
           return;
         } catch (error: any) {
           throw error;
@@ -87,7 +87,7 @@ export const AuthForm = () => {
       // For non-admin users
       if (signInError) {
         await signIn(email, password);
-        navigate('/');
+        navigate('/dashboard');
       }
 
     } catch (error: any) {

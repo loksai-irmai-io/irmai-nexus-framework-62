@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Eye, EyeOff } from 'lucide-react';
+import { AuthLogo } from '@/components/auth/AuthLogo';
 
 export default function ResetPassword() {
   const [newPassword, setNewPassword] = useState('');
