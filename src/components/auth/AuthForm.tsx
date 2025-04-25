@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -16,16 +16,64 @@ export const AuthForm = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HTMLDivElement>(null);
   const { signIn, signInWithMagicLink } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Load the Turnstile script
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup script on component unmount
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Initialize Turnstile when the script is loaded
+    const initTurnstile = () => {
+      if (window.turnstile && captchaRef.current) {
+        window.turnstile.render(captchaRef.current, {
+          sitekey: '0x4AAAAAAACNsWYuiQaQCFC',
+          callback: function(token: string) {
+            setCaptchaToken(token);
+          },
+          'expired-callback': function() {
+            setCaptchaToken(null);
+          }
+        });
+      }
+    };
+
+    // Check if Turnstile is already loaded
+    if (window.turnstile) {
+      initTurnstile();
+    } else {
+      // Wait for Turnstile to load
+      const checkTurnstile = setInterval(() => {
+        if (window.turnstile) {
+          clearInterval(checkTurnstile);
+          initTurnstile();
+        }
+      }, 100);
+
+      return () => clearInterval(checkTurnstile);
+    }
+  }, [captchaRef]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      await signIn(email, password);
+      await signIn(email, password, captchaToken);
     } catch (error: any) {
       console.error("Authentication error:", error);
       // Error is already handled in the signIn function
@@ -46,7 +94,7 @@ export const AuthForm = () => {
     }
 
     try {
-      await signInWithMagicLink(email);
+      await signInWithMagicLink(email, captchaToken);
     } catch (error: any) {
       // Error is already handled in the signInWithMagicLink function
     }
@@ -92,15 +140,19 @@ export const AuthForm = () => {
         </div>
       </div>
 
+      <div className="flex justify-center my-4">
+        <div ref={captchaRef}></div>
+      </div>
+
       <div className="flex justify-between items-center">
-        <MagicLinkButton onMagicLink={handleMagicLink} loading={loading} />
+        <MagicLinkButton onMagicLink={handleMagicLink} loading={loading || !captchaToken} />
         <ForgotPasswordButton email={email} loading={loading} />
       </div>
 
       <Button 
         type="submit" 
         className="w-full h-12 text-lg font-semibold" 
-        disabled={loading}
+        disabled={loading || !captchaToken}
       >
         {loading ? (
           <>
