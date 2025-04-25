@@ -14,7 +14,8 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react';
 export const AuthForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [signingIn, setSigningIn] = useState(false);
+  const [magicLinkLoading, setMagicLinkLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const captchaRef = useRef<HTMLDivElement>(null);
@@ -70,7 +71,7 @@ export const AuthForm = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSigningIn(true);
     
     try {
       await signIn(email, password, captchaToken);
@@ -78,7 +79,7 @@ export const AuthForm = () => {
       console.error("Authentication error:", error);
       // Error is already handled in the signIn function
     } finally {
-      setLoading(false);
+      setSigningIn(false);
     }
   };
 
@@ -93,10 +94,13 @@ export const AuthForm = () => {
       return;
     }
 
+    setMagicLinkLoading(true);
     try {
       await signInWithMagicLink(email, captchaToken);
     } catch (error: any) {
       // Error is already handled in the signInWithMagicLink function
+    } finally {
+      setMagicLinkLoading(false);
     }
   };
 
@@ -112,7 +116,7 @@ export const AuthForm = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
             className="h-12"
-            disabled={loading}
+            disabled={signingIn || magicLinkLoading}
           />
         </div>
 
@@ -126,13 +130,13 @@ export const AuthForm = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="h-12 pr-10"
-              disabled={loading}
+              disabled={signingIn || magicLinkLoading}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              disabled={loading}
+              disabled={signingIn || magicLinkLoading}
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
@@ -145,16 +149,16 @@ export const AuthForm = () => {
       </div>
 
       <div className="flex justify-between items-center">
-        <MagicLinkButton onMagicLink={handleMagicLink} loading={loading || !captchaToken} />
-        <ForgotPasswordButton email={email} loading={loading} />
+        <MagicLinkButton onMagicLink={handleMagicLink} loading={magicLinkLoading || !captchaToken} />
+        <ForgotPasswordButton email={email} loading={signingIn || magicLinkLoading} />
       </div>
 
       <Button 
         type="submit" 
         className="w-full h-12 text-lg font-semibold" 
-        disabled={loading || !captchaToken}
+        disabled={signingIn || !captchaToken}
       >
-        {loading ? (
+        {signingIn ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Signing in...
