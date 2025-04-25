@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const { data: healthData, isLoading, isError, error, refetch } = useSystemHealth();
-  
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'healthy':
@@ -141,3 +141,4 @@ const AdminDashboard: React.FC = () => {
 };
 
 export default AdminDashboard;
+
