@@ -29,33 +29,18 @@ const AdminDashboard: React.FC = () => {
         isError={isError} 
       />
 
-      <Tabs 
-        value={activeTab} 
-        onValueChange={setActiveTab} 
-        className="space-y-4"
-      >
-        <TabSection activeTab={activeTab} />
+      <TabSection 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab}
+      />
 
-        <TabsContent value="overview" className="mt-0">
-          <SystemOverview />
-        </TabsContent>
-        
-        <TabsContent value="dependencies" className="mt-0">
-          <DependencyGraph />
-        </TabsContent>
-        
-        <TabsContent value="services" className="mt-0">
-          <ServiceMonitor />
-        </TabsContent>
-        
-        <TabsContent value="logs" className="mt-0">
-          <LogViewer />
-        </TabsContent>
-
-        <TabsContent value="troubleshooting" className="mt-0">
-          <TroubleshootingGuide />
-        </TabsContent>
-      </Tabs>
+      <div className="space-y-4">
+        {activeTab === 'overview' && <SystemOverview />}
+        {activeTab === 'dependencies' && <DependencyGraph />}
+        {activeTab === 'services' && <ServiceMonitor />}
+        {activeTab === 'logs' && <LogViewer />}
+        {activeTab === 'troubleshooting' && <TroubleshootingGuide />}
+      </div>
 
       <div className="text-xs text-muted-foreground text-center pt-4">
         Last updated: {healthData?.lastUpdated ? new Date(healthData.lastUpdated).toLocaleString() : 'Unknown'}

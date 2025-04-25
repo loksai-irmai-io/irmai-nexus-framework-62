@@ -1,13 +1,14 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface TabSectionProps {
   activeTab: string;
+  onTabChange: (value: string) => void;
 }
 
-const TabSection: React.FC<TabSectionProps> = ({ activeTab }) => {
+const TabSection: React.FC<TabSectionProps> = ({ activeTab, onTabChange }) => {
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -18,13 +19,15 @@ const TabSection: React.FC<TabSectionProps> = ({ activeTab }) => {
       </CardHeader>
       
       <CardContent className="pt-0">
-        <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="dependencies">Dependencies</TabsTrigger>
-          <TabsTrigger value="services">Services</TabsTrigger>
-          <TabsTrigger value="logs">System Logs</TabsTrigger>
-          <TabsTrigger value="troubleshooting">Troubleshooting</TabsTrigger>
-        </TabsList>
+        <Tabs value={activeTab} onValueChange={onTabChange}>
+          <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="dependencies">Dependencies</TabsTrigger>
+            <TabsTrigger value="services">Services</TabsTrigger>
+            <TabsTrigger value="logs">System Logs</TabsTrigger>
+            <TabsTrigger value="troubleshooting">Troubleshooting</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </CardContent>
     </Card>
   );
