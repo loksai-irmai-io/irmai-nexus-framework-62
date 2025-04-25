@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { useSidebarContext } from './SidebarProvider';
 import { cn } from '@/lib/utils';
@@ -54,22 +53,10 @@ const mainMenuItems: MenuItem[] = [
     href: '/fmea-analysis'
   },
   {
-    id: 'gap-analysis',
-    label: 'Gap Analysis',
-    icon: Share2,
-    href: '/gap-analysis'
-  },
-  {
     id: 'compliance-monitoring',
     label: 'Compliance & Monitoring',
     icon: CheckCheck,
     href: '/compliance-monitoring'
-  },
-  {
-    id: 'incident-management',
-    label: 'Incident Management',
-    icon: Siren,
-    href: '/incident-management'
   },
   {
     id: 'api-integrations',
@@ -103,6 +90,13 @@ const mainMenuItems: MenuItem[] = [
     icon: BookText,
     comingSoon: true,
     href: '/risk-catalog'
+  },
+  {
+    id: 'incident-management',
+    label: 'Incident Management',
+    icon: Siren,
+    comingSoon: true,
+    href: '/incident-management'
   }
 ];
 
@@ -113,7 +107,6 @@ const Sidebar: React.FC = () => {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const hoverZoneRef = useRef<HTMLDivElement>(null);
   
-  // Handle clicks outside the sidebar to auto-hide it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -131,7 +124,6 @@ const Sidebar: React.FC = () => {
     };
   }, [isOpen, setIsOpen]);
 
-  // Handle mouse movement to show sidebar on hover
   useEffect(() => {
     const handleHover = () => {
       if (!isOpen) {
@@ -150,7 +142,6 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      {/* Invisible hover zone to detect when user hovers near the edge */}
       <div 
         ref={hoverZoneRef}
         className={cn(
