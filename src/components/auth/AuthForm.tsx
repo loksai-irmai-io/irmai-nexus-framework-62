@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -14,72 +14,23 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react';
 export const AuthForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [signingIn, setSigningIn] = useState(false);
-  const [magicLinkLoading, setMagicLinkLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaRef = useRef<HTMLDivElement>(null);
   const { signIn, signInWithMagicLink } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Load the Turnstile script
-    const script = document.createElement('script');
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
-
-    return () => {
-      // Cleanup script on component unmount
-      document.body.removeChild(script);
-    };
-  }, []);
-
-  useEffect(() => {
-    // Initialize Turnstile when the script is loaded
-    const initTurnstile = () => {
-      if (window.turnstile && captchaRef.current) {
-        window.turnstile.render(captchaRef.current, {
-          sitekey: '0x4AAAAAAACNsWYuiQaQCFC',
-          callback: function(token: string) {
-            setCaptchaToken(token);
-          },
-          'expired-callback': function() {
-            setCaptchaToken(null);
-          }
-        });
-      }
-    };
-
-    // Check if Turnstile is already loaded
-    if (window.turnstile) {
-      initTurnstile();
-    } else {
-      // Wait for Turnstile to load
-      const checkTurnstile = setInterval(() => {
-        if (window.turnstile) {
-          clearInterval(checkTurnstile);
-          initTurnstile();
-        }
-      }, 100);
-
-      return () => clearInterval(checkTurnstile);
-    }
-  }, [captchaRef]);
-
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSigningIn(true);
+    setLoading(true);
     
     try {
-      await signIn(email, password, captchaToken);
+      await signIn(email, password);
     } catch (error: any) {
       console.error("Authentication error:", error);
       // Error is already handled in the signIn function
     } finally {
-      setSigningIn(false);
+      setLoading(false);
     }
   };
 
@@ -94,13 +45,10 @@ export const AuthForm = () => {
       return;
     }
 
-    setMagicLinkLoading(true);
     try {
-      await signInWithMagicLink(email, captchaToken);
+      await signInWithMagicLink(email);
     } catch (error: any) {
       // Error is already handled in the signInWithMagicLink function
-    } finally {
-      setMagicLinkLoading(false);
     }
   };
 
@@ -116,7 +64,7 @@ export const AuthForm = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
             className="h-12"
-            disabled={signingIn || magicLinkLoading}
+            disabled={loading}
           />
         </div>
 
@@ -130,13 +78,13 @@ export const AuthForm = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="h-12 pr-10"
-              disabled={signingIn || magicLinkLoading}
+              disabled={loading}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              disabled={signingIn || magicLinkLoading}
+              disabled={loading}
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
@@ -144,21 +92,17 @@ export const AuthForm = () => {
         </div>
       </div>
 
-      <div className="flex justify-center my-4">
-        <div ref={captchaRef}></div>
-      </div>
-
       <div className="flex justify-between items-center">
-        <MagicLinkButton onMagicLink={handleMagicLink} loading={magicLinkLoading || !captchaToken} />
-        <ForgotPasswordButton email={email} loading={signingIn || magicLinkLoading} />
+        <MagicLinkButton onMagicLink={handleMagicLink} loading={loading} />
+        <ForgotPasswordButton email={email} loading={loading} />
       </div>
 
       <Button 
         type="submit" 
         className="w-full h-12 text-lg font-semibold" 
-        disabled={signingIn || !captchaToken}
+        disabled={loading}
       >
-        {signingIn ? (
+        {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Signing in...

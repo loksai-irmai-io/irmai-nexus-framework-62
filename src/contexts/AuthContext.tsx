@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,8 +9,8 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isAdmin: boolean;
-  signIn: (email: string, password: string, captchaToken: string | null) => Promise<void>;
-  signInWithMagicLink: (email: string, captchaToken: string | null) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
+  signInWithMagicLink: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
   loading: boolean;
 }
@@ -25,6 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
+    // First check for existing session
     const checkSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -32,6 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          // Get user role
           try {
             const { data } = await supabase
               .from('profiles')
@@ -54,12 +57,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     checkSession();
 
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
+        // Avoid infinite loops by not making Supabase calls directly in the callback
         setSession(newSession);
         setUser(newSession?.user ?? null);
         
         if (newSession?.user) {
+          // Use setTimeout to defer the database call to prevent deadlocks
           setTimeout(async () => {
             try {
               const { data } = await supabase
@@ -75,6 +81,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }, 0);
         } else {
           setIsAdmin(false);
+          
+          // Remove forced redirection - allow users to see all pages
+          // const currentPath = window.location.pathname;
+          // if (currentPath !== '/auth' && currentPath !== '/reset-password') {
+          //   navigate('/auth');
+          // }
         }
       }
     );
@@ -82,25 +94,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const signIn = async (email: string, password: string, captchaToken: string | null) => {
+  const signIn = async (email: string, password: string) => {
     setLoading(true);
     try {
-      if (!captchaToken) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Please complete the captcha",
-        });
-        throw new Error("Captcha not completed");
-      }
-      
-      const { data, error } = await supabase.auth.signInWithPassword({ 
-        email, 
-        password,
-        options: {
-          captchaToken: captchaToken
-        }
-      });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
         toast({
@@ -125,23 +122,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signInWithMagicLink = async (email: string, captchaToken: string | null) => {
+  const signInWithMagicLink = async (email: string) => {
     setLoading(true);
     try {
-      if (!captchaToken) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Please complete the captcha",
-        });
-        throw new Error("Captcha not completed");
-      }
-      
       const { error } = await supabase.auth.signInWithOtp({ 
         email,
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard`,
-          captchaToken: captchaToken
         }
       });
       
