@@ -1,104 +1,11 @@
+
 import React, { useEffect, useRef } from 'react';
 import { useSidebarContext } from './SidebarProvider';
 import { cn } from '@/lib/utils';
 import { useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  GitBranch, 
-  SearchX, 
-  Shield, 
-  Share2, 
-  CheckCheck, 
-  Siren, 
-  Settings, 
-  TestTube, 
-  Presentation, 
-  BookText,
-  Plug
-} from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Badge } from '@/components/ui/badge';
-
-type MenuItem = {
-  id: string;
-  label: string;
-  icon: React.ElementType;
-  href: string;
-  comingSoon?: boolean;
-};
-
-const mainMenuItems: MenuItem[] = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard (Summary)',
-    icon: LayoutDashboard,
-    href: '/'
-  },
-  {
-    id: 'process-discovery',
-    label: 'Process Discovery',
-    icon: GitBranch,
-    href: '/process-discovery'
-  },
-  {
-    id: 'outlier-analysis',
-    label: 'Outlier Analysis',
-    icon: SearchX,
-    href: '/outlier-analysis'
-  },
-  {
-    id: 'fmea-analysis',
-    label: 'Predictive Risk Analytics',
-    icon: Shield,
-    href: '/fmea-analysis'
-  },
-  {
-    id: 'compliance-monitoring',
-    label: 'Compliance & Monitoring',
-    icon: CheckCheck,
-    href: '/compliance-monitoring'
-  },
-  {
-    id: 'api-integrations',
-    label: 'API Integrations',
-    icon: Plug,
-    href: '/api-integrations'
-  },
-  {
-    id: 'admin',
-    label: 'Admin & Dependencies',
-    icon: Settings,
-    href: '/admin'
-  },
-  {
-    id: 'controls-testing',
-    label: 'Controls Testing',
-    icon: TestTube,
-    comingSoon: true,
-    href: '/controls-testing'
-  },
-  {
-    id: 'scenario-analysis',
-    label: 'Scenario Analysis',
-    icon: Presentation,
-    comingSoon: true,
-    href: '/scenario-analysis'
-  },
-  {
-    id: 'risk-catalog',
-    label: 'Risk Catalog',
-    icon: BookText,
-    comingSoon: true,
-    href: '/risk-catalog'
-  },
-  {
-    id: 'incident-management',
-    label: 'Incident Management',
-    icon: Siren,
-    comingSoon: true,
-    href: '/incident-management'
-  }
-];
+import { mainMenuItems } from './data/menuItems';
+import SidebarLogo from './SidebarLogo';
+import SidebarMenuItem from './SidebarMenuItem';
 
 const Sidebar: React.FC = () => {
   const { isOpen, setIsOpen } = useSidebarContext();
@@ -158,78 +65,19 @@ const Sidebar: React.FC = () => {
         )}
       >
         <div className="flex flex-col h-full overflow-y-auto">
-          <div className="h-20 flex items-center justify-center px-4 border-b bg-sidebar">
-            {isOpen ? (
-              <div className="flex items-center justify-center w-full h-full">
-                <img 
-                  src="/lovable-uploads/f6af323e-8e1e-41cb-a223-30dc2436352c.png" 
-                  alt="IRMAI Logo" 
-                  className="h-12 object-contain" 
-                />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center w-full h-full">
-                <img 
-                  src="/lovable-uploads/f6af323e-8e1e-41cb-a223-30dc2436352c.png" 
-                  alt="IRMAI Logo" 
-                  className="h-10 w-10 object-contain" 
-                />
-              </div>
-            )}
-          </div>
+          <SidebarLogo isOpen={isOpen} />
           <nav className="flex-1 p-3 space-y-2 overflow-y-auto">
             {mainMenuItems.map((item) => {
               const isActive = currentPath === item.href || 
                              (item.href !== '/' && currentPath.startsWith(item.href));
               
               return (
-                <TooltipProvider key={item.id}>
-                  <Tooltip delayDuration={isOpen ? 1000 : 0}>
-                    <TooltipTrigger asChild>
-                      <a
-                        href={item.href}
-                        className={cn(
-                          "flex items-center px-3 py-2.5 rounded-lg text-sm group transition-all hover:bg-sidebar-accent/50",
-                          isActive 
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
-                            : "text-sidebar-foreground",
-                          item.comingSoon && "opacity-60"
-                        )}
-                      >
-                        <item.icon className={cn(
-                          "h-5 w-5 flex-shrink-0",
-                          isOpen ? "mr-3" : "mx-auto"
-                        )} />
-                        {isOpen && (
-                          <div className="flex items-center justify-between w-full min-w-0">
-                            <span className="truncate mr-2">{item.label}</span>
-                            {item.comingSoon && (
-                              <Badge 
-                                variant="outline" 
-                                className="text-[10px] py-0.5 px-1.5 whitespace-nowrap bg-secondary/10"
-                              >
-                                Coming Soon
-                              </Badge>
-                            )}
-                          </div>
-                        )}
-                      </a>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" sideOffset={10} className={cn(isOpen && "hidden")}>
-                      <div className="flex flex-col">
-                        <span>{item.label}</span>
-                        {item.comingSoon && (
-                          <Badge 
-                            variant="outline" 
-                            className="text-[10px] py-0 px-1.5 mt-1"
-                          >
-                            Coming Soon
-                          </Badge>
-                        )}
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <SidebarMenuItem
+                  key={item.id}
+                  item={item}
+                  isOpen={isOpen}
+                  isActive={isActive}
+                />
               );
             })}
           </nav>
@@ -245,3 +93,4 @@ const Sidebar: React.FC = () => {
 };
 
 export default Sidebar;
+
