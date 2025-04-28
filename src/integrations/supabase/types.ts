@@ -11,52 +11,82 @@ export type Database = {
     Tables: {
       irmai_notification: {
         Row: {
+          content: string
           created_at: string
           id: string
-          message: string
-          read: boolean
+          is_read: boolean
+          notification_type: string
           title: string
           user_id: string
         }
         Insert: {
+          content: string
           created_at?: string
           id?: string
-          message: string
-          read?: boolean
+          is_read?: boolean
+          notification_type: string
           title: string
           user_id: string
         }
         Update: {
+          content?: string
           created_at?: string
           id?: string
-          message?: string
-          read?: boolean
+          is_read?: boolean
+          notification_type?: string
           title?: string
           user_id?: string
         }
         Relationships: []
       }
-      user_logs: {
+      profiles: {
         Row: {
-          email: string
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
           id: string
-          login_method: string
-          login_time: string
-          user_id: string
+          is_admin: boolean
+          updated_at: string
         }
         Insert: {
-          email: string
-          id?: string
-          login_method: string
-          login_time?: string
-          user_id: string
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          is_admin?: boolean
+          updated_at?: string
         }
         Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          is_admin?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
           email?: string
           id?: string
-          login_method?: string
-          login_time?: string
-          user_id?: string
+          name?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -65,8 +95,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      create_notification: {
-        Args: { p_user_id: string; p_title: string; p_message: string }
+      generate_schema_types: {
+        Args: Record<PropertyKey, never>
         Returns: string
       }
     }
