@@ -9,60 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      notifications: {
+      irmai_notification: {
         Row: {
           created_at: string
           id: string
           message: string
-          read: boolean | null
+          read: boolean
           title: string
-          type: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           message: string
-          read?: boolean | null
+          read?: boolean
           title: string
-          type: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           message?: string
-          read?: boolean | null
+          read?: boolean
           title?: string
-          type?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
-      profiles: {
+      user_logs: {
         Row: {
-          created_at: string
-          first_name: string | null
+          email: string
           id: string
-          last_name: string | null
-          role: Database["public"]["Enums"]["user_role"]
-          updated_at: string
+          login_method: string
+          login_time: string
+          user_id: string
         }
         Insert: {
-          created_at?: string
-          first_name?: string | null
-          id: string
-          last_name?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
-          updated_at?: string
+          email: string
+          id?: string
+          login_method: string
+          login_time?: string
+          user_id: string
         }
         Update: {
-          created_at?: string
-          first_name?: string | null
+          email?: string
           id?: string
-          last_name?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
-          updated_at?: string
+          login_method?: string
+          login_time?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -71,13 +65,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      is_admin: {
-        Args: Record<PropertyKey, never> | { user_id: string }
-        Returns: boolean
+      create_notification: {
+        Args: { p_user_id: string; p_title: string; p_message: string }
+        Returns: string
       }
     }
     Enums: {
-      user_role: "admin" | "user"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -192,8 +186,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      user_role: ["admin", "user"],
-    },
+    Enums: {},
   },
 } as const
