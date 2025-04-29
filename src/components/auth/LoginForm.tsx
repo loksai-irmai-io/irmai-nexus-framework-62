@@ -6,13 +6,17 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { ForgotPasswordButton } from './ForgotPasswordButton';
+import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { signIn, signInWithMagicLink, signInWithGoogle } = useAuth();
+  const [magicLinkLoading, setMagicLinkLoading] = useState(false);
+  const { signIn, signInWithGoogle } = useAuth();
+  const { toast } = useToast();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,19 +34,65 @@ export const LoginForm = () => {
   const handleMagicLink = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!email) {
-      return; // Email validation is handled at the form level
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please enter your email address in the email field above",
+      });
+      return;
     }
     
+    setMagicLinkLoading(true);
     try {
-      await signInWithMagicLink(email);
-    } catch (error) {
-      console.error("Magic link error:", error);
+      const { data, error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        }
+      });
+      
+      if (error) throw error;
+      
+      // If OTP sign-in was successful, send custom email
+      try {
+        // Construct the magic link URL - this should be adjusted based on your setup
+        const redirectUrl = `${window.location.origin}/dashboard`;
+        const tokenUrl = `${data?.session?.access_token || ''}`;
+        
+        await supabase.functions.invoke('send-auth-email', {
+          body: { 
+            email, 
+            type: 'magic-link',
+            token: tokenUrl
+          }
+        });
+      } catch (emailError) {
+        console.error("Error sending magic link email:", emailError);
+        // Continue with the success message even if the custom email fails
+      }
+      
+      toast({
+        title: "Magic Link Sent",
+        description: "Check your email for the login link",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    } finally {
+      setMagicLinkLoading(false);
     }
   };
 
   const handleGoogleSignIn = async (e: React.MouseEvent) => {
     e.preventDefault();
-    await signInWithGoogle();
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Google login error:", error);
+    }
   };
 
   return (
@@ -98,8 +148,14 @@ export const LoginForm = () => {
       <button
         onClick={handleMagicLink}
         className="w-full text-center text-blue-600 hover:text-blue-700 py-2"
+        disabled={magicLinkLoading}
       >
-        Sign in with Magic Link
+        {magicLinkLoading ? (
+          <>
+            <Loader2 className="inline mr-2 h-4 w-4 animate-spin" />
+            Sending magic link...
+          </>
+        ) : "Sign in with Magic Link"}
       </button>
 
       <div className="relative">

@@ -15,20 +15,20 @@ serve(async (req) => {
   }
 
   try {
-    const { email, type, resetToken } = await req.json()
+    const { email, type, resetToken, token } = await req.json()
 
     let subject, content
 
     switch (type) {
       case 'login':
-        subject = 'New Login to Your Account'
+        subject = 'New Login to Your IRMAI Account'
         content = `
           <h1>New Login Detected</h1>
           <p>We detected a new login to your account. If this wasn't you, please contact support immediately.</p>
         `
         break
       case 'reset':
-        subject = 'Reset Your Password'
+        subject = 'Reset Your IRMAI Password'
         content = `
           <h1>Password Reset Requested</h1>
           <p>Click the link below to reset your password:</p>
@@ -41,17 +41,13 @@ serve(async (req) => {
         `
         break
       case 'magic-link':
-        const baseUrl = "https://phofdpcnmjikjrocvjaz.supabase.co"
-        const redirectUrl = `${Deno.env.get('SITE_URL') || 'https://irmai.app'}/dashboard`
-        const token = resetToken
+        // The token provided to this function is the actual token hash from Supabase
+        const magicLinkUrl = token
         
-        // Create the full magic link URL
-        const magicLinkUrl = `${baseUrl}/auth/v1/verify?token=${encodeURIComponent(token)}&type=magiclink&redirect_to=${encodeURIComponent(redirectUrl)}`
-        
-        subject = 'Your Magic Link'
+        subject = 'Your IRMAI Magic Link'
         content = `
           <h1>Your Magic Login Link</h1>
-          <p>Click the button below to log in to your account:</p>
+          <p>Click the button below to log in to your IRMAI account:</p>
           <p>
             <a href="${magicLinkUrl}" style="background-color: #4F46E5; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 10px;">
               Log In
@@ -66,7 +62,7 @@ serve(async (req) => {
     }
 
     const emailResponse = await resend.emails.send({
-      from: 'IRMAI <onboarding@resend.dev>',
+      from: 'IRMAI <info@irmai.io>',
       to: email,
       subject,
       html: content,

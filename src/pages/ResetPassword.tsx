@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { AuthLogo } from '@/components/auth/AuthLogo';
 
 export default function ResetPassword() {
@@ -46,11 +46,28 @@ export default function ResetPassword() {
 
       if (error) throw error;
 
+      // Log an Auth event if successful
+      try {
+        await supabase.functions.invoke('send-auth-email', {
+          body: { 
+            email: supabase.auth.getUser().then(data => data.data.user?.email), 
+            type: 'login'
+          }
+        });
+      } catch (emailError) {
+        console.error("Error sending login notification:", emailError);
+        // This is just a notification, so we can proceed even if it fails
+      }
+
       toast({
         title: "Success",
         description: "Your password has been updated successfully",
       });
-      navigate('/auth');
+      
+      // Slight delay before redirect
+      setTimeout(() => {
+        navigate('/auth');
+      }, 1500);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -67,11 +84,7 @@ export default function ResetPassword() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2">
           <div className="flex justify-center mb-6">
-            <img 
-              src="/lovable-uploads/12b81df1-17a5-4185-9aea-80ded0aee7ad.png" 
-              alt="Integrated Risk Management using AI" 
-              className="h-16 object-contain"
-            />
+            <AuthLogo />
           </div>
           <CardTitle className="text-2xl text-center">Reset Your Password</CardTitle>
         </CardHeader>
@@ -123,7 +136,12 @@ export default function ResetPassword() {
               className="w-full h-12 text-lg font-semibold" 
               disabled={loading}
             >
-              {loading ? "Updating..." : "Update Password"}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : "Update Password"}
             </Button>
           </CardFooter>
         </form>
@@ -134,4 +152,4 @@ export default function ResetPassword() {
       </Card>
     </div>
   );
-}
+};

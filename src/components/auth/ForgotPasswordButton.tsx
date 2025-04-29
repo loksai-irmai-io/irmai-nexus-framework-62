@@ -27,12 +27,13 @@ export const ForgotPasswordButton = ({ email = '', loading = false }: ForgotPass
     setIsLoading(true);
     try {
       const resetUrl = `${window.location.origin}/reset-password`;
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: resetUrl,
       });
       
       if (error) throw error;
       
+      // Send custom email using our function
       try {
         await supabase.functions.invoke('send-auth-email', {
           body: { 
