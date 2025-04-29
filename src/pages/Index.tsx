@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -27,13 +26,24 @@ import {
   Database,
   Bell,
   Calendar,
-  ExternalLink
+  ExternalLink,
+  User,
+  Mail,
+  Save,
+  RefreshCw
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const emptyLossEventsData = [
   { name: 'Jan 2025', value: 0, amount: 0, events: 0 },
@@ -719,7 +729,20 @@ const populatedAnnouncementsData = [
 
 const Index = () => {
   const [loading, setLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [subscriberLoading, setSubscriberLoading] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  // Profile state
+  const [profileData, setProfileData] = useState({
+    full_name: '',
+    email: '',
+    avatar_url: ''
+  });
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   
   const [lossEventsData, setLossEventsData] = useState(emptyLossEventsData);
   const [riskDistributionData, setRiskDistributionData] = useState(emptyRiskDistributionData);
@@ -755,6 +778,174 @@ const Index = () => {
       window.removeEventListener('processDataUpdated', handleProcessDataUpdated);
     };
   }, []);
+  
+  const fetchProfileData = async () => {
+    if (!user) return;
+    
+    setProfileLoading(true);
+    try {
+      // Get user data
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+        
+      if (profileError) throw profileError;
+      
+      // Check if user is subscribed
+      const { data: subscriberData, error: subscriberError } = await supabase
+        .from('subscribers')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+        
+      if (subscriberError) throw subscriberError;
+      
+      setIsSubscribed(!!subscriberData);
+      
+      // Set profile data from both auth and profile table
+      setProfileData({
+        full_name: profileData?.full_name || user.user_metadata?.full_name || '',
+        email: user.email || '',
+        avatar_url: profileData?.avatar_url || ''
+      });
+
+      // Set last updated time
+      if (profileData?.updated_at) {
+        setLastUpdated(profileData.updated_at);
+      }
+      
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      toast.error("Failed to load your profile data.");
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+  
+  const updateProfile = async () => {
+    if (!user) return;
+    
+    setProfileSaving(true);
+    try {
+      // Update profile data
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: profileData.full_name,
+          avatar_url: profileData.avatar_url,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+        
+      if (error) throw error;
+      
+      // Update user metadata
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { full_name: profileData.full_name }
+      });
+      
+      if (updateError) throw updateError;
+      
+      toast.success("Profile information has been updated");
+      
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Failed to update your profile");
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
+  const handleSubscriptionToggle = async () => {
+    if (!user) return;
+    
+    setSubscriberLoading(true);
+    try {
+      if (isSubscribed) {
+        // Unsubscribe
+        const { error } = await supabase
+          .from('subscribers')
+          .delete()
+          .eq('user_id', user.id);
+          
+        if (error) throw error;
+        
+        toast.success("You have been unsubscribed from IRMAI updates");
+        setIsSubscribed(false);
+      } else {
+        // Subscribe
+        const { error } = await supabase
+          .from('subscribers')
+          .insert({
+            user_id: user.id,
+            email: user.email,
+            name: profileData.full_name
+          });
+          
+        if (error) throw error;
+        
+        // Send confirmation email
+        try {
+          await supabase.functions.invoke('send-auth-email', {
+            body: { 
+              email: user.email, 
+              type: 'subscribe',
+              name: profileData.full_name
+            }
+          });
+        } catch (emailError) {
+          console.error("Error sending subscription confirmation:", emailError);
+        }
+        
+        toast.success("You have been subscribed to IRMAI updates");
+        setIsSubscribed(true);
+      }
+    } catch (error) {
+      console.error("Error updating subscription:", error);
+      toast.error("Failed to update your subscription");
+    } finally {
+      setSubscriberLoading(false);
+    }
+  };
+  
+  useEffect(() => {
+    if (user) {
+      fetchProfileData();
+      
+      // Set up real-time listener for profile changes
+      const profileChannel = supabase
+        .channel('profile-changes')
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` },
+          (payload) => {
+            console.log('Profile updated:', payload);
+            fetchProfileData();
+          }
+        )
+        .subscribe();
+        
+      // Set up real-time listener for subscriber changes
+      const subscriberChannel = supabase
+        .channel('subscriber-changes')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'subscribers', filter: `user_id=eq.${user.id}` },
+          (payload) => {
+            console.log('Subscription updated:', payload);
+            fetchProfileData();
+          }
+        )
+        .subscribe();
+        
+      return () => {
+        supabase.removeChannel(profileChannel);
+        supabase.removeChannel(subscriberChannel);
+      };
+    }
+  }, [user]);
   
   const handleNavigate = (module: string, filter?: any) => {
     setLoading(true);
@@ -830,6 +1021,136 @@ const Index = () => {
         <p className="text-muted-foreground mb-6">
           Real-time insights and analytics for operational risk management
         </p>
+        
+        {/* User profile and subscription card */}
+        {user && (
+          <Card className="mb-6 overflow-hidden border-primary/10">
+            <CardHeader className="bg-muted/30">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16 border-2 border-primary/10">
+                    {profileData.avatar_url ? (
+                      <AvatarImage src={profileData.avatar_url} alt={profileData.full_name || 'User'} />
+                    ) : (
+                      <AvatarFallback className="text-xl bg-primary/10">
+                        {profileData.full_name?.charAt(0) || user.email?.charAt(0).toUpperCase() || '?'}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <div>
+                    <CardTitle className="mb-1">Welcome, {profileData.full_name || 'User'}</CardTitle>
+                    <CardDescription className="flex items-center gap-1">
+                      <Mail className="h-3.5 w-3.5" />
+                      <span>{profileData.email}</span>
+                      {isSubscribed && (
+                        <Badge variant="secondary" className="ml-2 bg-green-500 text-white">Subscribed</Badge>
+                      )}
+                    </CardDescription>
+                    {lastUpdated && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Last updated: {new Date(lastUpdated).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => navigate('/profile')} 
+                  className="ml-auto"
+                >
+                  View Full Profile
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="col-span-1 md:col-span-2 space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        id="name" 
+                        value={profileData.full_name} 
+                        onChange={e => setProfileData({...profileData, full_name: e.target.value})}
+                        disabled={profileLoading || profileSaving}
+                      />
+                      <Button 
+                        onClick={updateProfile} 
+                        disabled={profileLoading || profileSaving}
+                      >
+                        {profileSaving ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Saving
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4 mr-2" />
+                            Save
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="avatar">Avatar URL</Label>
+                    <Input 
+                      id="avatar" 
+                      value={profileData.avatar_url || ''} 
+                      onChange={e => setProfileData({...profileData, avatar_url: e.target.value})}
+                      placeholder="https://example.com/avatar.jpg" 
+                      disabled={profileLoading || profileSaving}
+                    />
+                  </div>
+                </div>
+                
+                <Card className="col-span-1 border shadow-sm">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center">
+                      <Bell className="h-4 w-4 mr-2 text-primary" />
+                      <CardTitle className="text-base">Subscription Status</CardTitle>
+                    </div>
+                    <Separator />
+                  </CardHeader>
+                  <CardContent className="pt-0 pb-0">
+                    <div className="flex items-center justify-between py-4">
+                      <div>
+                        <h4 className="font-medium text-sm">Subscribe to Updates</h4>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Receive new feature announcements and important updates
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch 
+                          checked={isSubscribed} 
+                          disabled={subscriberLoading}
+                          onCheckedChange={handleSubscriptionToggle} 
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="pt-2">
+                    {subscriberLoading ? (
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground w-full justify-center">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        <span>Updating subscription...</span>
+                      </div>
+                    ) : isSubscribed ? (
+                      <p className="text-xs text-muted-foreground text-center w-full">
+                        You will receive notifications about new features and updates
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground text-center w-full">
+                        Subscribe to stay informed about new features
+                      </p>
+                    )}
+                  </CardFooter>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        )}
         
         <RibbonNav className="mb-6 animate-fade-in" style={{ animationDelay: '100ms' }}>
           <MetricCard
