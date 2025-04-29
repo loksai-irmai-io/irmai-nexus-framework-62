@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +17,49 @@ export default function ResetPassword() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Extract the access_token from URL if present
+  useEffect(() => {
+    const handlePasswordReset = async () => {
+      // Check for hash params from Supabase auth redirect
+      const hashParams = window.location.hash.substring(1).split('&').reduce((params, param) => {
+        const [key, value] = param.split('=');
+        if (key && value) params[key] = decodeURIComponent(value);
+        return params;
+      }, {} as Record<string, string>);
+
+      if (hashParams.access_token) {
+        try {
+          // Set the session with the access token from the URL
+          const { error } = await supabase.auth.setSession({
+            access_token: hashParams.access_token,
+            refresh_token: hashParams.refresh_token || '',
+          });
+
+          if (error) throw error;
+
+          // Clear the URL hash to remove tokens for security
+          history.replaceState(null, '', window.location.pathname);
+          
+          toast({
+            title: "Authentication Successful",
+            description: "You can now reset your password.",
+          });
+        } catch (error: any) {
+          console.error("Error setting session:", error);
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "Failed to authenticate. Please try again.",
+          });
+          navigate('/auth');
+        }
+      }
+    };
+
+    handlePasswordReset();
+  }, [navigate, toast]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,35 +83,29 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      // Get current user email
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Authentication session missing. Please try again by clicking the reset password link from your email.",
-        });
-        return;
-      }
-      
-      const { error } = await supabase.auth.updateUser({
+      const { error, data } = await supabase.auth.updateUser({
         password: newPassword
       });
 
       if (error) throw error;
 
+      // Get current user email
+      const { data: userData } = await supabase.auth.getUser();
+      const email = userData?.user?.email;
+      
       // Log an Auth event if successful
-      try {
-        await supabase.functions.invoke('send-auth-email', {
-          body: { 
-            email: user.email, 
-            type: 'login'
-          }
-        });
-      } catch (emailError) {
-        console.error("Error sending login notification:", emailError);
-        // This is just a notification, so we can proceed even if it fails
+      if (email) {
+        try {
+          await supabase.functions.invoke('send-auth-email', {
+            body: { 
+              email, 
+              type: 'login'
+            }
+          });
+        } catch (emailError) {
+          console.error("Error sending login notification:", emailError);
+          // This is just a notification, so we can proceed even if it fails
+        }
       }
 
       toast({
@@ -78,13 +115,14 @@ export default function ResetPassword() {
       
       // Slight delay before redirect
       setTimeout(() => {
-        navigate('/auth');
+        navigate('/dashboard');
       }, 1500);
     } catch (error: any) {
+      console.error("Password update error:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to update password. Make sure your reset link is valid.",
       });
     } finally {
       setLoading(false);

@@ -11,6 +11,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ResetPassword from "./pages/ResetPassword";
 import Index from "./pages/Index";
 import ErrorBoundary from "./components/ErrorBoundary";
+import Profile from "./pages/Profile";
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ProcessDiscovery = lazy(() => import("./pages/ProcessDiscovery"));
@@ -52,6 +53,7 @@ const App = () => (
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/" element={<Navigate to="/auth" replace />} />
                 <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="/process-discovery" element={<ProtectedRoute><ProcessDiscovery /></ProtectedRoute>} />
                 <Route path="/outlier-analysis" element={<ProtectedRoute><OutlierAnalysis /></ProtectedRoute>} />
                 <Route path="/compliance-monitoring" element={<ProtectedRoute><ComplianceMonitoring /></ProtectedRoute>} />

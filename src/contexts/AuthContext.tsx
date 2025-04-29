@@ -49,7 +49,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               
               // If user just logged in, redirect to dashboard
               if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-                navigate('/dashboard');
+                // Check if we're not already on the dashboard to prevent unnecessary redirects
+                if (!window.location.pathname.includes('/dashboard')) {
+                  navigate('/dashboard');
+                }
               }
             } catch (error) {
               console.error("Error fetching user profile:", error);
@@ -111,6 +114,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       if (data?.user) {
+        // Send a login notification email
+        try {
+          await supabase.functions.invoke('send-auth-email', {
+            body: { 
+              email: data.user.email, 
+              type: 'login'
+            }
+          });
+        } catch (emailError) {
+          console.error("Error sending login notification:", emailError);
+        }
+        
         toast({
           title: "Login successful",
           description: "Welcome back!",
@@ -126,6 +141,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, password: string, name?: string) => {
     setLoading(true);
     try {
+      const origin = window.location.origin;
+      const redirectUrl = `${origin}/dashboard`;
+      
       const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
@@ -133,7 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           data: {
             full_name: name || null,
           },
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: redirectUrl,
         }
       });
       
@@ -162,10 +180,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithMagicLink = async (email: string) => {
     setLoading(true);
     try {
+      const origin = window.location.origin;
+      const redirectUrl = `${origin}/dashboard`;
+      
       const { error } = await supabase.auth.signInWithOtp({ 
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: redirectUrl,
         }
       });
       
@@ -191,10 +212,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
+      const origin = window.location.origin;
+      const redirectUrl = `${origin}/dashboard`;
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`
+          redirectTo: redirectUrl,
+          queryParams: {
+            prompt: 'select_account', // Force Google to show the account selector
+          }
         }
       });
       

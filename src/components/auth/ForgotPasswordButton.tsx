@@ -1,76 +1,77 @@
 
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
 
 interface ForgotPasswordButtonProps {
-  email?: string;
+  email: string;
   loading?: boolean;
 }
 
-export const ForgotPasswordButton = ({ email = '', loading = false }: ForgotPasswordButtonProps) => {
+export const ForgotPasswordButton = ({ email, loading: parentLoading }: ForgotPasswordButtonProps) => {
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleForgotPassword = async () => {
     if (!email) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Please enter your email address in the email field above",
+        title: "Missing email",
+        description: "Please enter your email address first",
       });
       return;
     }
 
-    setIsLoading(true);
+    setLoading(true);
+
     try {
-      const resetUrl = `${window.location.origin}/reset-password`;
-      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: resetUrl,
+      // Get the current origin for redirect
+      const origin = window.location.origin;
+      const resetRedirectUrl = `${origin}/reset-password`;
+      
+      // Request password reset with redirect URL
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: resetRedirectUrl,
       });
-      
-      if (error) throw error;
-      
-      // Send custom email using our function
-      try {
-        await supabase.functions.invoke('send-auth-email', {
-          body: { 
-            email, 
-            type: 'reset',
-            resetToken: resetUrl
-          }
-        });
-      } catch (emailError) {
-        console.error("Error sending reset email:", emailError);
-        // Continue with the success message even if the custom email fails
+
+      if (error) {
+        throw error;
       }
-      
+
       toast({
-        title: "Password Reset Email Sent",
-        description: "Check your email for the password reset link",
+        title: "Password reset email sent",
+        description: "Check your email for a link to reset your password",
       });
     } catch (error: any) {
+      console.error("Password reset error:", error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message,
+        title: "Password reset failed",
+        description: error.message || "Failed to send reset email",
       });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <button
+    <Button
       type="button"
+      variant="link"
+      className="p-0 h-auto font-normal text-muted-foreground"
       onClick={handleForgotPassword}
-      className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center"
-      disabled={loading || isLoading}
+      disabled={loading || parentLoading}
     >
-      {isLoading ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
-      Forgot password?
-    </button>
+      {loading ? (
+        <>
+          <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+          Sending...
+        </>
+      ) : (
+        "Forgot password?"
+      )}
+    </Button>
   );
 };
