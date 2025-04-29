@@ -39,16 +39,17 @@ function App() {
   useEffect(() => {
     const enableRealtime = async () => {
       try {
-        // Execute SQL to enable realtime on tables
-        await supabase.rpc('enable_realtime_tables', {
-          tables: ['profiles', 'subscribers']
-        }).then(({ error }) => {
-          if (error) {
-            console.error('Error enabling realtime:', error);
-          } else {
-            console.log('Realtime enabled for tables');
-          }
-        });
+        // Enable realtime for tables directly with subscription
+        await supabase.channel('custom-all-channel')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {})
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'subscribers' }, () => {})
+          .subscribe(status => {
+            if (status === 'SUBSCRIBED') {
+              console.log('Realtime enabled for tables');
+            } else if (status === 'CHANNEL_ERROR') {
+              console.error('Error enabling realtime');
+            }
+          });
       } catch (error) {
         console.error('Failed to enable realtime:', error);
       }
