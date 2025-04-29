@@ -6,7 +6,6 @@ import KnowledgeGraph from '@/components/dashboard/KnowledgeGraph';
 import AIRiskSummary from '@/components/dashboard/AIRiskSummary';
 import { Separator } from '@/components/ui/separator';
 import ProfileCard from '@/components/dashboard/ProfileCard';
-import SubscriptionCard from '@/components/dashboard/SubscriptionCard';
 import DashboardMetrics from '@/components/dashboard/DashboardMetrics';
 import DashboardWidgets from '@/components/dashboard/DashboardWidgets';
 import AnnouncementsList from '@/components/dashboard/AnnouncementsList';
@@ -31,14 +30,11 @@ const Index = () => {
           Real-time insights and analytics for operational risk management
         </p>
         
-        {/* User profile and subscription card */}
+        {/* User profile card */}
         {user && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="col-span-1 md:col-span-3">
+          <div className="grid grid-cols-1 gap-6 mb-6">
+            <div className="col-span-1">
               <ProfileCard />
-            </div>
-            <div className="col-span-1 md:col-span-1">
-              <SubscriptionCard />
             </div>
           </div>
         )}

@@ -1,73 +1,89 @@
 
-import { Suspense, lazy } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import Auth from "./pages/Auth";
-import ProtectedRoute from "./components/ProtectedRoute";
-import ResetPassword from "./pages/ResetPassword";
-import Index from "./pages/Index";
-import ErrorBoundary from "./components/ErrorBoundary";
-import Profile from "./pages/Profile";
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from '@/components/ui/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-const NotFound = lazy(() => import("./pages/NotFound"));
-const ProcessDiscovery = lazy(() => import("./pages/ProcessDiscovery"));
-const OutlierAnalysis = lazy(() => import("./pages/OutlierAnalysis"));
-const ComplianceMonitoring = lazy(() => import("./pages/ComplianceMonitoring"));
-const FMEAAnalysis = lazy(() => import("./pages/FMEAAnalysis"));
-const Admin = lazy(() => import("./pages/Admin"));
-const ApiIntegrations = lazy(() => import("./pages/ApiIntegrations"));
+// Pages
+import Index from '@/pages/Index';
+import Auth from '@/pages/Auth';
+import Profile from '@/pages/Profile';
+import ProcessDiscovery from '@/pages/ProcessDiscovery';
+import FMEAAnalysis from '@/pages/FMEAAnalysis';
+import OutlierAnalysis from '@/pages/OutlierAnalysis';
+import ComplianceMonitoring from '@/pages/ComplianceMonitoring';
+import ApiIntegrations from '@/pages/ApiIntegrations';
+import ResetPassword from '@/pages/ResetPassword';
+import Admin from '@/pages/Admin';
 
-const LoadingFallback = () => (
-  <div className="flex items-center justify-center h-screen">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-    <span className="ml-2">Loading...</span>
-  </div>
-);
+// Components
+import ProtectedRoute from '@/components/ProtectedRoute';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import NotFound from '@/pages/NotFound';
+
+import { AuthProvider } from '@/contexts/AuthContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
       retry: 1,
-      staleTime: 30 * 1000,
-      refetchOnWindowFocus: false,
-      refetchOnMount: true,
     },
   },
 });
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <ErrorBoundary>
-            <Suspense fallback={<LoadingFallback />}>
+function App() {
+  // Enable realtime for profiles and subscribers tables
+  useEffect(() => {
+    const enableRealtime = async () => {
+      try {
+        // Execute SQL to enable realtime on tables
+        await supabase.rpc('enable_realtime_tables', {
+          tables: ['profiles', 'subscribers']
+        }).then(({ error }) => {
+          if (error) {
+            console.error('Error enabling realtime:', error);
+          } else {
+            console.log('Realtime enabled for tables');
+          }
+        });
+      } catch (error) {
+        console.error('Failed to enable realtime:', error);
+      }
+    };
+    
+    enableRealtime();
+  }, []);
+  
+  return (
+    <ErrorBoundary>
+      <ThemeProvider defaultTheme="system" storageKey="irmai-ui-theme">
+        <AuthProvider>
+          <QueryClientProvider client={queryClient}>
+            <Router>
               <Routes>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/" element={<Navigate to="/auth" replace />} />
-                <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="/process-discovery" element={<ProtectedRoute><ProcessDiscovery /></ProtectedRoute>} />
+                <Route path="/fmea-analysis" element={<ProtectedRoute><FMEAAnalysis /></ProtectedRoute>} />
                 <Route path="/outlier-analysis" element={<ProtectedRoute><OutlierAnalysis /></ProtectedRoute>} />
                 <Route path="/compliance-monitoring" element={<ProtectedRoute><ComplianceMonitoring /></ProtectedRoute>} />
-                <Route path="/fmea-analysis" element={<ProtectedRoute><FMEAAnalysis /></ProtectedRoute>} />
-                <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
                 <Route path="/api-integrations" element={<ProtectedRoute><ApiIntegrations /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </Suspense>
-          </ErrorBoundary>
-        </TooltipProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+            </Router>
+            <Toaster closeButton position="bottom-right" />
+          </QueryClientProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
+  );
+}
 
 export default App;

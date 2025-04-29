@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -25,9 +25,26 @@ const ProfileCard = () => {
   
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) {
       fetchProfileData();
+      
+      // Set up real-time listener for profile changes
+      const channel = supabase
+        .channel('profile-changes')
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user?.id}` },
+          (payload) => {
+            console.log('Profile updated in real-time:', payload);
+            fetchProfileData();
+          }
+        )
+        .subscribe();
+        
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [user]);
 
@@ -70,13 +87,15 @@ const ProfileCard = () => {
     
     setProfileSaving(true);
     try {
+      const now = new Date().toISOString();
+      
       // Update profile data
       const { error } = await supabase
         .from('profiles')
         .update({
           full_name: profileData.full_name,
           avatar_url: profileData.avatar_url,
-          updated_at: new Date().toISOString()
+          updated_at: now
         })
         .eq('id', user.id);
         
@@ -89,6 +108,7 @@ const ProfileCard = () => {
       
       if (updateError) throw updateError;
       
+      setLastUpdated(now);
       toast.success("Profile information has been updated");
       
     } catch (error) {
@@ -109,7 +129,7 @@ const ProfileCard = () => {
                 <AvatarImage src={profileData.avatar_url} alt={profileData.full_name || 'User'} />
               ) : (
                 <AvatarFallback className="text-xl bg-primary/10">
-                  {profileData.full_name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || '?'}
+                  {profileData.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || '?'}
                 </AvatarFallback>
               )}
             </Avatar>
