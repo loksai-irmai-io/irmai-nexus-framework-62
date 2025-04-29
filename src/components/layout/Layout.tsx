@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import Header from './Header';
 import Sidebar from './Sidebar';
-import { SidebarProvider, useSidebarContext } from './SidebarProvider';
+import { SidebarProvider, useSidebar } from './SidebarProvider';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -11,7 +11,7 @@ interface LayoutProps {
 
 // Main content component that adjusts based on sidebar state
 const MainContent: React.FC<{children: React.ReactNode}> = ({ children }) => {
-  const { isOpen, setIsOpen } = useSidebarContext();
+  const { isOpen, setIsOpen } = useSidebar();
   
   // Handle clicks outside the sidebar to close it on mobile/tablet
   useEffect(() => {

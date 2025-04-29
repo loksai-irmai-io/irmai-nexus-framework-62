@@ -1,6 +1,5 @@
-
 import React, { useEffect, useRef } from 'react';
-import { useSidebarContext } from './SidebarProvider';
+import { useSidebar } from './SidebarProvider';
 import { cn } from '@/lib/utils';
 import { useLocation } from 'react-router-dom';
 import { mainMenuItems } from './data/menuItems';
@@ -8,7 +7,7 @@ import SidebarLogo from './SidebarLogo';
 import SidebarMenuItem from './SidebarMenuItem';
 
 const Sidebar: React.FC = () => {
-  const { isOpen, setIsOpen } = useSidebarContext();
+  const { isOpen, setIsOpen } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -93,4 +92,3 @@ const Sidebar: React.FC = () => {
 };
 
 export default Sidebar;
-
