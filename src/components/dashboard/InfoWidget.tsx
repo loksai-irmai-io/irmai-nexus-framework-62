@@ -21,7 +21,7 @@ export interface InfoWidgetData {
   id: string;
   title: string;
   subtitle: string;
-  icon: React.ReactNode;
+  icon: () => React.ReactNode;
   metrics: InfoWidgetMetric[];
   insights: string[];
   chartData: any[];
@@ -79,7 +79,7 @@ const InfoWidget: React.FC<InfoWidgetProps> = ({ data, onClick, isLoading = fals
           <div className="flex items-start justify-between">
             <div className="space-y-1.5">
               <div className="flex items-center">
-                <span className="flex-shrink-0">{data.icon}</span>
+                <span className="flex-shrink-0">{data.icon()}</span>
                 <h3 className="text-base font-medium ml-2">
                   {data.title}
                 </h3>

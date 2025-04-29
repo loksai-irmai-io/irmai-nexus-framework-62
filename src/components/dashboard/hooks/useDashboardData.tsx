@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { InfoWidgetData } from '@/components/dashboard/InfoWidget';
 import { Shield, AlertTriangle, FileText, GitBranch, TestTube, Presentation, SearchX } from 'lucide-react';
@@ -142,7 +141,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       id: 'fmea-analysis',
       title: 'Predictive Risk Analytics',
       subtitle: 'Risk Assessment Insights',
-      icon: <Shield className="h-5 w-5 text-primary" />,
+      icon: () => <Shield className="h-5 w-5 text-primary" />,
       metrics: [
         { label: 'Open Risks', value: '0', icon: 'alert-triangle' },
         { label: 'High Severity', value: '0', icon: 'trending-up' },
@@ -165,7 +164,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       id: 'outlier-analysis',
       title: 'Outlier Analysis',
       subtitle: 'Predictive Risk Analytics',
-      icon: <SearchX className="h-5 w-5 text-primary" />,
+      icon: () => <SearchX className="h-5 w-5 text-primary" />,
       metrics: [
         { label: 'Sequence Fails', value: '0', icon: 'activity' },
         { label: 'Timing Fails', value: '0', icon: 'alert-triangle' },
@@ -188,7 +187,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       id: 'compliance-monitoring',
       title: 'Compliance Monitoring',
       subtitle: 'Regulatory Industry & Internal Policy Gaps',
-      icon: <FileText className="h-5 w-5 text-primary" />,
+      icon: () => <FileText className="h-5 w-5 text-primary" />,
       metrics: [
         { label: 'Compliance Score', value: '0%', icon: 'activity' },
         { label: 'Critical Gaps', value: '0', icon: 'layers' },
@@ -211,7 +210,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       id: 'process-discovery',
       title: 'Process Mining',
       subtitle: 'End-End Process Insights',
-      icon: <GitBranch className="h-5 w-5 text-primary" />,
+      icon: () => <GitBranch className="h-5 w-5 text-primary" />,
       metrics: [
         { label: 'Events', value: '0', icon: 'git-branch' },
         { label: 'Critical Activities', value: '0', icon: 'box' },
@@ -234,7 +233,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       id: 'controls-testing',
       title: 'Controls Monitoring',
       subtitle: 'Automated Controls Testing and Validation',
-      icon: <TestTube className="h-5 w-5 text-primary" />,
+      icon: () => <TestTube className="h-5 w-5 text-primary" />,
       metrics: [
         { label: 'Total Controls', value: '0', icon: 'shield' },
         { label: 'Tested', value: '0', icon: 'x-circle' },
@@ -257,7 +256,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       id: 'incident-management',
       title: 'Incident Management',
       subtitle: 'Loss Events and Issue Tracking',
-      icon: <AlertTriangle className="h-5 w-5 text-primary" />,
+      icon: () => <AlertTriangle className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Open Incidents', 
@@ -303,7 +302,7 @@ const createEmptyInfoWidgetData = (): InfoWidgetData[] => {
       id: 'scenario-analysis',
       title: 'Scenario Modeling',
       subtitle: 'Risk Scenario Modeling and Simulation',
-      icon: <Presentation className="h-5 w-5 text-primary" />,
+      icon: () => <Presentation className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Scenarios', value: '0', icon: 'copy' },
@@ -335,7 +334,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       id: 'fmea-analysis',
       title: 'Predictive Risk Analytics',
       subtitle: 'Risk Assessment Insights',
-      icon: <Shield className="h-5 w-5 text-primary" />,
+      icon: () => <Shield className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Open Risks', 
@@ -390,7 +389,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       id: 'outlier-analysis',
       title: 'Outlier Analysis',
       subtitle: 'Predictive Risk Analytics',
-      icon: <SearchX className="h-5 w-5 text-primary" />,
+      icon: () => <SearchX className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Sequence Fails', 
@@ -438,7 +437,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       id: 'compliance-monitoring',
       title: 'Compliance Monitoring',
       subtitle: 'Regulatory Industry & Internal Policy Gaps',
-      icon: <FileText className="h-5 w-5 text-primary" />,
+      icon: () => <FileText className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Compliance Score', 
@@ -492,7 +491,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       id: 'process-discovery',
       title: 'Process Discovery',
       subtitle: 'End-End Process Insights',
-      icon: <GitBranch className="h-5 w-5 text-primary" />,
+      icon: () => <GitBranch className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Events', 
@@ -538,7 +537,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       id: 'controls-testing',
       title: 'Controls Testing',
       subtitle: 'Automated Controls Testing and Validation',
-      icon: <TestTube className="h-5 w-5 text-primary" />,
+      icon: () => <TestTube className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Total Controls', 
@@ -585,7 +584,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       id: 'incident-management',
       title: 'Incident Management',
       subtitle: 'Loss Events and Issue Tracking',
-      icon: <AlertTriangle className="h-5 w-5 text-primary" />,
+      icon: () => <AlertTriangle className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Open Incidents', 
@@ -633,7 +632,7 @@ const createPopulatedInfoWidgetData = (): InfoWidgetData[] => {
       id: 'scenario-analysis',
       title: 'Scenario Analysis',
       subtitle: 'Risk Scenario Modeling and Simulation',
-      icon: <Presentation className="h-5 w-5 text-primary" />,
+      icon: () => <Presentation className="h-5 w-5 text-primary" />,
       metrics: [
         { 
           label: 'Scenarios', 
