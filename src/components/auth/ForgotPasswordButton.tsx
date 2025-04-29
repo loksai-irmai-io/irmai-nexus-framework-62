@@ -6,11 +6,12 @@ import { useState } from 'react';
 
 interface ForgotPasswordButtonProps {
   email?: string;
+  loading?: boolean;
 }
 
-export const ForgotPasswordButton = ({ email = '' }: ForgotPasswordButtonProps) => {
+export const ForgotPasswordButton = ({ email = '', loading = false }: ForgotPasswordButtonProps) => {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +24,7 @@ export const ForgotPasswordButton = ({ email = '' }: ForgotPasswordButtonProps) 
       return;
     }
 
-    setLoading(true);
+    setIsLoading(true);
     try {
       const resetUrl = `${window.location.origin}/reset-password`;
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -56,7 +57,7 @@ export const ForgotPasswordButton = ({ email = '' }: ForgotPasswordButtonProps) 
         description: error.message,
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -65,9 +66,9 @@ export const ForgotPasswordButton = ({ email = '' }: ForgotPasswordButtonProps) 
       type="button"
       onClick={handleForgotPassword}
       className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center"
-      disabled={loading}
+      disabled={loading || isLoading}
     >
-      {loading ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
+      {isLoading ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
       Forgot password?
     </button>
   );
