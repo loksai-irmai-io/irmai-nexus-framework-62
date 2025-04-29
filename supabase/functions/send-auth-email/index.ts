@@ -31,30 +31,55 @@ serve(async (req) => {
         subject = 'Reset Your IRMAI Password'
         content = `
           <h1>Password Reset Requested</h1>
-          <p>Click the link below to reset your password:</p>
-          <p>
-            <a href="${resetToken}" style="background-color: #4F46E5; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 10px;">
-              Reset Password
-            </a>
-          </p>
+          <p>Click the button below to reset your password:</p>
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="min-width:100%;border-collapse:collapse">
+            <tbody>
+              <tr>
+                <td style="padding:15px 0" valign="top" align="center">
+                  <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:separate!important;border-radius:4px;background-color:#4F46E5">
+                    <tbody>
+                      <tr>
+                        <td align="center" valign="middle" style="font-family:Arial;font-size:16px;padding:15px 25px">
+                          <a href="${resetToken}" style="font-weight:bold;letter-spacing:normal;line-height:100%;text-align:center;text-decoration:none;color:#FFFFFF;display:block" target="_blank">Reset Password</a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
           <p>If you didn't request this, please ignore this email.</p>
+          <p>Link not working? Copy and paste this URL into your browser: ${resetToken}</p>
         `
         break
       case 'magic-link':
-        // The token provided to this function is the actual token hash from Supabase
         const magicLinkUrl = token
         
         subject = 'Your IRMAI Magic Link'
         content = `
           <h1>Your Magic Login Link</h1>
           <p>Click the button below to log in to your IRMAI account:</p>
-          <p>
-            <a href="${magicLinkUrl}" style="background-color: #4F46E5; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 10px;">
-              Log In
-            </a>
-          </p>
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="min-width:100%;border-collapse:collapse">
+            <tbody>
+              <tr>
+                <td style="padding:15px 0" valign="top" align="center">
+                  <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:separate!important;border-radius:4px;background-color:#4F46E5">
+                    <tbody>
+                      <tr>
+                        <td align="center" valign="middle" style="font-family:Arial;font-size:16px;padding:15px 25px">
+                          <a href="${magicLinkUrl}" style="font-weight:bold;letter-spacing:normal;line-height:100%;text-align:center;text-decoration:none;color:#FFFFFF;display:block" target="_blank">Log In</a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
           <p>If you didn't request this login link, please ignore this email.</p>
           <p>This link will expire in 24 hours.</p>
+          <p>Link not working? Copy and paste this URL into your browser: ${magicLinkUrl}</p>
         `
         break
       default:

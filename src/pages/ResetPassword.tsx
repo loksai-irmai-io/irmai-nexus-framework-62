@@ -40,6 +40,18 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
+      // Get current user email
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Authentication session missing. Please try again by clicking the reset password link from your email.",
+        });
+        return;
+      }
+      
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
@@ -50,7 +62,7 @@ export default function ResetPassword() {
       try {
         await supabase.functions.invoke('send-auth-email', {
           body: { 
-            email: supabase.auth.getUser().then(data => data.data.user?.email), 
+            email: user.email, 
             type: 'login'
           }
         });
@@ -152,4 +164,4 @@ export default function ResetPassword() {
       </Card>
     </div>
   );
-};
+}

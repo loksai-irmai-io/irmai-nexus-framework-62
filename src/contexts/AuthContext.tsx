@@ -46,6 +46,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .eq('id', newSession.user.id)
                 .maybeSingle();
               setIsAdmin(data?.is_admin || false);
+              
+              // If user just logged in, redirect to dashboard
+              if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                navigate('/dashboard');
+              }
             } catch (error) {
               console.error("Error fetching user profile:", error);
               setIsAdmin(false);
@@ -53,12 +58,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }, 0);
         } else {
           setIsAdmin(false);
-          
-          // Remove forced redirection - allow users to see all pages
-          // const currentPath = window.location.pathname;
-          // if (currentPath !== '/auth' && currentPath !== '/reset-password') {
-          //   navigate('/auth');
-          // }
         }
       }
     );
@@ -116,7 +115,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           title: "Login successful",
           description: "Welcome back!",
         });
-        navigate('/dashboard');
       }
     } catch (error) {
       console.error("Authentication error:", error);

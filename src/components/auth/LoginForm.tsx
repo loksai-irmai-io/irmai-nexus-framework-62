@@ -53,17 +53,15 @@ export const LoginForm = () => {
       
       if (error) throw error;
       
-      // If OTP sign-in was successful, send custom email
+      // Send custom email
       try {
-        // Construct the magic link URL - this should be adjusted based on your setup
         const redirectUrl = `${window.location.origin}/dashboard`;
-        const tokenUrl = `${data?.session?.access_token || ''}`;
         
         await supabase.functions.invoke('send-auth-email', {
           body: { 
             email, 
             type: 'magic-link',
-            token: tokenUrl
+            token: redirectUrl
           }
         });
       } catch (emailError) {

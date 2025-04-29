@@ -36,7 +36,11 @@ export const RegisterForm = () => {
 
   const handleGoogleSignIn = async (e: React.MouseEvent) => {
     e.preventDefault();
-    await signInWithGoogle();
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Google sign-in error:", error);
+    }
   };
 
   return (
