@@ -3,11 +3,12 @@ import React from 'react';
 
 interface SidebarLogoProps {
   isOpen: boolean;
+  className?: string;
 }
 
-const SidebarLogo: React.FC<SidebarLogoProps> = ({ isOpen }) => {
+const SidebarLogo: React.FC<SidebarLogoProps> = ({ isOpen, className }) => {
   return (
-    <div className="h-20 flex items-center justify-center px-4 border-b bg-sidebar">
+    <div className={`h-20 flex items-center justify-center px-4 border-b bg-sidebar ${className || ''}`}>
       {isOpen ? (
         <div className="flex items-center justify-center w-full h-full">
           <img 
@@ -30,4 +31,3 @@ const SidebarLogo: React.FC<SidebarLogoProps> = ({ isOpen }) => {
 };
 
 export default SidebarLogo;
-

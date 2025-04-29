@@ -45,7 +45,7 @@ const Header = () => {
           <Menu className="h-5 w-5" />
         </Button>
         <Link to="/dashboard" className="flex items-center gap-2">
-          <SidebarLogo className="h-8 w-8" />
+          <SidebarLogo isOpen={true} />
           <span className="font-semibold text-xl hidden md:inline-block">IRMAI</span>
         </Link>
       </div>

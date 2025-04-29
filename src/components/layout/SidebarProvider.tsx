@@ -10,10 +10,10 @@ interface SidebarContextType {
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
-export const useSidebarContext = () => {
+export const useSidebar = () => {
   const context = useContext(SidebarContext);
   if (context === undefined) {
-    throw new Error('useSidebarContext must be used within a SidebarProvider');
+    throw new Error('useSidebar must be used within a SidebarProvider');
   }
   return context;
 };
