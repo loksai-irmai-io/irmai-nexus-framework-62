@@ -12,6 +12,8 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signInWithMagicLink: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
+  signUp: (email: string, password: string, name?: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   loading: boolean;
 }
 
@@ -38,10 +40,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           try {
             const { data } = await supabase
               .from('profiles')
-              .select('role')
+              .select('is_admin')
               .eq('id', session.user.id)
               .single();
-            setIsAdmin(data?.role === 'admin');
+            setIsAdmin(data?.is_admin || false);
           } catch (error) {
             console.error("Error fetching user profile:", error);
             setIsAdmin(false);
@@ -70,10 +72,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             try {
               const { data } = await supabase
                 .from('profiles')
-                .select('role')
+                .select('is_admin')
                 .eq('id', newSession.user.id)
                 .single();
-              setIsAdmin(data?.role === 'admin');
+              setIsAdmin(data?.is_admin || false);
             } catch (error) {
               console.error("Error fetching user profile:", error);
               setIsAdmin(false);
@@ -122,6 +124,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signUp = async (email: string, password: string, name?: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          data: {
+            full_name: name || null,
+          },
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        }
+      });
+      
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Registration failed",
+          description: error.message,
+        });
+        throw error;
+      }
+      
+      if (data?.user) {
+        toast({
+          title: "Registration successful",
+          description: "Check your email to confirm your account",
+        });
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const signInWithMagicLink = async (email: string) => {
     setLoading(true);
     try {
@@ -152,6 +190,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`
+        }
+      });
+      
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Google login failed",
+          description: error.message,
+        });
+        throw error;
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      toast({
+        variant: "destructive",
+        title: "Google login failed",
+        description: "An error occurred during Google login.",
+      });
+    }
+  };
+
   const signOut = async () => {
     setLoading(true);
     try {
@@ -171,7 +236,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, signIn, signInWithMagicLink, signOut, loading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      isAdmin, 
+      signIn, 
+      signInWithMagicLink, 
+      signOut, 
+      signUp, 
+      signInWithGoogle, 
+      loading 
+    }}>
       {children}
     </AuthContext.Provider>
   );

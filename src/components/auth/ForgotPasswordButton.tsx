@@ -5,11 +5,10 @@ import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface ForgotPasswordButtonProps {
-  email: string;
-  loading: boolean;
+  email?: string;
 }
 
-export const ForgotPasswordButton = ({ email, loading: externalLoading }: ForgotPasswordButtonProps) => {
+export const ForgotPasswordButton = ({ email = '' }: ForgotPasswordButtonProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +18,7 @@ export const ForgotPasswordButton = ({ email, loading: externalLoading }: Forgot
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Please enter your email address",
+        description: "Please enter your email address in the email field above",
       });
       return;
     }
@@ -66,10 +65,10 @@ export const ForgotPasswordButton = ({ email, loading: externalLoading }: Forgot
       type="button"
       onClick={handleForgotPassword}
       className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center"
-      disabled={loading || externalLoading}
+      disabled={loading}
     >
       {loading ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
-      Forgot Password?
+      Forgot password?
     </button>
   );
 };
