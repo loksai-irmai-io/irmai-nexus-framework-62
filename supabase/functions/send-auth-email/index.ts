@@ -1,107 +1,124 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { Resend } from "npm:resend@2.0.0"
-
-const resend = new Resend(Deno.env.get('RESEND_API_KEY'))
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+interface EmailRequestBody {
+  email: string
+  type: 'login' | 'signup' | 'reset' | 'subscribe'
+  name?: string
+}
+
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
   }
-
+  
   try {
-    const { email, type, resetToken, token } = await req.json()
-
-    let subject, content
-
-    // Get the application URL - use origin from request or fallback
-    const appUrl = req.headers.get('origin') || 'https://irmai-nexus-framework-62.lovable.app'
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
     
-    switch (type) {
-      case 'login':
-        subject = 'New Login to Your IRMAI Account'
-        content = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #4F46E5;">New Login Detected</h1>
-            <p style="font-size: 16px; line-height: 1.6;">We detected a new login to your account. If this wasn't you, please contact support immediately.</p>
-            <div style="margin: 30px 0; text-align: center;">
-              <a href="${appUrl}/dashboard" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Access Dashboard</a>
-            </div>
-            <p style="color: #6B7280; font-size: 14px;">If you did not request this email, please ignore it.</p>
-          </div>
-        `
-        break
-      case 'reset':
-        subject = 'Reset Your IRMAI Password'
-        content = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #4F46E5;">Password Reset Requested</h1>
-            <p style="font-size: 16px; line-height: 1.6;">Click the button below to reset your password:</p>
-            <div style="margin: 30px 0; text-align: center;">
-              <a href="${resetToken}" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Reset Password</a>
-            </div>
-            <p style="color: #6B7280; font-size: 14px;">If you didn't request this, please ignore this email.</p>
-            <p style="color: #6B7280; font-size: 14px;">Link not working? Copy and paste this URL into your browser: ${resetToken}</p>
-          </div>
-        `
-        break
-      case 'magic-link':
-        const magicLinkUrl = token
-        
-        subject = 'Your IRMAI Magic Link'
-        content = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #4F46E5;">Your Magic Login Link</h1>
-            <p style="font-size: 16px; line-height: 1.6;">Click the button below to log in to your IRMAI account:</p>
-            <div style="margin: 30px 0; text-align: center;">
-              <a href="${magicLinkUrl}" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Log In</a>
-            </div>
-            <p style="color: #6B7280; font-size: 14px;">If you didn't request this login link, please ignore this email.</p>
-            <p style="color: #6B7280; font-size: 14px;">This link will expire in 24 hours.</p>
-            <p style="color: #6B7280; font-size: 14px;">Link not working? Copy and paste this URL into your browser: ${magicLinkUrl}</p>
-          </div>
-        `
-        break
-      case 'subscribe':
-        subject = 'Welcome to IRMAI Updates'
-        content = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #4F46E5;">Subscription Confirmed</h1>
-            <p style="font-size: 16px; line-height: 1.6;">Thank you for subscribing to IRMAI updates! You will now receive notifications when new features and updates are available.</p>
-            <div style="margin: 30px 0; text-align: center;">
-              <a href="${appUrl}/dashboard" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Access Dashboard</a>
-            </div>
-            <p style="color: #6B7280; font-size: 14px;">If you did not request this subscription, you can unsubscribe by clicking <a href="${appUrl}/profile?unsubscribe=true">here</a>.</p>
-          </div>
-        `
-        break;
-      default:
-        throw new Error('Invalid email type')
+    const { email, type, name }: EmailRequestBody = await req.json();
+    
+    if (!email) {
+      throw new Error('Email is required');
+    }
+    
+    if (!type) {
+      throw new Error('Email type is required');
     }
 
-    const emailResponse = await resend.emails.send({
-      from: 'IRMAI <info@irmai.io>',
-      to: email,
-      subject,
-      html: content,
-    })
+    let emailSubject = '';
+    let emailHtml = '';
+    
+    switch(type) {
+      case 'login':
+        emailSubject = "Login detected on your IRMAI account";
+        emailHtml = `
+          <h1>New login detected</h1>
+          <p>A new login was detected on your IRMAI account. If this was you, no action is needed.</p>
+          <p>If you did not log in, please contact support immediately.</p>
+        `;
+        break;
+        
+      case 'signup':
+        emailSubject = "Welcome to IRMAI";
+        emailHtml = `
+          <h1>Welcome to IRMAI!</h1>
+          <p>Thank you for creating an account. We're excited to have you on board.</p>
+          <p>You can log in to your account at any time to access your dashboard.</p>
+        `;
+        break;
+        
+      case 'reset':
+        emailSubject = "Password reset requested";
+        emailHtml = `
+          <h1>Password Reset Request</h1>
+          <p>A password reset was requested for your IRMAI account.</p>
+          <p>If you did not request this, please ignore this email or contact support if you have concerns.</p>
+        `;
+        break;
+        
+      case 'subscribe':
+        emailSubject = "Subscription Confirmation";
+        emailHtml = `
+          <h1>Subscription Confirmed</h1>
+          <p>Hello ${name || 'there'},</p>
+          <p>Thank you for subscribing to IRMAI updates!</p>
+          <p>You will now receive notifications about new features, updates, and important announcements.</p>
+          <p>You can manage your subscription preferences at any time in your profile settings.</p>
+          <br>
+          <p>Best regards,</p>
+          <p>The IRMAI Team</p>
+        `;
+        break;
+        
+      default:
+        throw new Error('Invalid email type');
+    }
+    
+    // Send the email using Supabase Edge Function capabilities
+    const { data, error } = await supabase.auth.admin.generateLink({
+      type: 'noop',
+      email,
+      options: {
+        data: {
+          subject: emailSubject,
+          html: emailHtml,
+        },
+      }
+    });
 
-    console.log("Email sent successfully:", emailResponse)
-
-    return new Response(JSON.stringify(emailResponse), {
+    if (error) {
+      throw error;
+    }
+    
+    console.log("Email sent successfully:", { data, error });
+    
+    return new Response(JSON.stringify({ 
+      success: true,
+      message: 'Email sent successfully'
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
-    })
+    });
+    
   } catch (error) {
-    console.error("Error in send-auth-email function:", error)
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("Error sending email:", error);
+    
+    return new Response(JSON.stringify({ 
+      success: false,
+      error: error.message 
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
-    })
+    });
   }
 })
