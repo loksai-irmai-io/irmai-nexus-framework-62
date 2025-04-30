@@ -1,62 +1,16 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { AuthLogo } from '@/components/auth/AuthLogo';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 import { Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 
 type AuthTab = 'login' | 'register';
 
 export default function Auth() {
   const [activeTab, setActiveTab] = useState<AuthTab>('login');
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [showLoading, setShowLoading] = useState(false);
-  
-  // Only show loading state if it takes more than 300ms to determine auth state
-  // This prevents the brief flash of the loading screen
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (loading) {
-        setShowLoading(true);
-      }
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, [loading]);
-  
-  // Redirect authenticated users away from the login page
-  useEffect(() => {
-    if (user && !loading) {
-      // If there's a "from" state, redirect there, otherwise to dashboard
-      const from = location.state?.from || '/dashboard';
-      navigate(from, { replace: true });
-    }
-  }, [user, loading, navigate, location]);
-  
-  // Don't render anything during initial loading to prevent flashing
-  if (loading && !showLoading) {
-    return null;
-  }
-
-  // Show loading spinner only if it's taking a while
-  if (loading && showLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  // If already authenticated, don't render the auth page at all
-  if (user) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">

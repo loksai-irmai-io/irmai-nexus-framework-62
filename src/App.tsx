@@ -25,7 +25,6 @@ import NotFound from '@/pages/NotFound';
 
 import { AuthProvider } from '@/contexts/AuthContext';
 
-// Create a query client with appropriate configurations
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -41,17 +40,9 @@ function App() {
     const enableRealtime = async () => {
       try {
         // Enable realtime for tables directly with subscription
-        const channel = supabase.channel('custom-all-channel')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, (payload) => {
-            console.log('Profile changed:', payload);
-            // Invalidate queries that depend on this data
-            queryClient.invalidateQueries({ queryKey: ['profile'] });
-          })
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'subscribers' }, (payload) => {
-            console.log('Subscriber changed:', payload);
-            // Invalidate queries that depend on this data
-            queryClient.invalidateQueries({ queryKey: ['subscription'] });
-          })
+        await supabase.channel('custom-all-channel')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {})
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'subscribers' }, () => {})
           .subscribe(status => {
             if (status === 'SUBSCRIBED') {
               console.log('Realtime enabled for tables');
@@ -59,10 +50,6 @@ function App() {
               console.error('Error enabling realtime');
             }
           });
-          
-        return () => {
-          supabase.removeChannel(channel);
-        };
       } catch (error) {
         console.error('Failed to enable realtime:', error);
       }
@@ -75,8 +62,8 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider defaultTheme="system" storageKey="irmai-ui-theme">
         <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <Router>
+          <Router>
+            <AuthProvider>
               <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
@@ -88,12 +75,12 @@ function App() {
                 <Route path="/outlier-analysis" element={<ProtectedRoute><OutlierAnalysis /></ProtectedRoute>} />
                 <Route path="/compliance-monitoring" element={<ProtectedRoute><ComplianceMonitoring /></ProtectedRoute>} />
                 <Route path="/api-integrations" element={<ProtectedRoute><ApiIntegrations /></ProtectedRoute>} />
-                <Route path="/admin" element={<ProtectedRoute adminOnly={true}><Admin /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <Toaster closeButton position="bottom-right" />
-            </Router>
-          </AuthProvider>
+            </AuthProvider>
+          </Router>
         </QueryClientProvider>
       </ThemeProvider>
     </ErrorBoundary>

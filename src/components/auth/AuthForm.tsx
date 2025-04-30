@@ -1,10 +1,13 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
+import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { ForgotPasswordButton } from './ForgotPasswordButton';
+import { MagicLinkButton } from './MagicLinkButton';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
@@ -14,6 +17,8 @@ export const AuthForm = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signIn, signInWithMagicLink } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +37,11 @@ export const AuthForm = () => {
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
-      toast.error("Please enter your email address");
+      toast({
+        variant: "destructive",
+        title: "Error", 
+        description: "Please enter your email address",
+      });
       return;
     }
 
@@ -84,15 +93,7 @@ export const AuthForm = () => {
       </div>
 
       <div className="flex justify-between items-center">
-        <Button
-          type="button"
-          variant="link"
-          className="p-0 h-auto font-normal text-muted-foreground"
-          onClick={handleMagicLink}
-          disabled={loading}
-        >
-          Send magic link
-        </Button>
+        <MagicLinkButton onMagicLink={handleMagicLink} loading={loading} />
         <ForgotPasswordButton email={email} loading={loading} />
       </div>
 

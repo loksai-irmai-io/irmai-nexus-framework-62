@@ -1,20 +1,16 @@
 
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
-interface EmailRequest {
-  email: string;
-  type: "subscribe" | "unsubscribe" | "welcome";
-  name?: string;
+interface EmailRequestBody {
+  email: string
+  type: 'login' | 'signup' | 'reset' | 'subscribe'
+  name?: string
 }
 
 serve(async (req) => {
@@ -22,92 +18,107 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
-
+  
   try {
-    const { email, type, name = "" }: EmailRequest = await req.json();
-
-    if (!email) {
-      throw new Error("Email is required");
-    }
-
-    let subject = "";
-    let html = "";
-
-    // Format email based on type
-    switch (type) {
-      case "subscribe":
-        subject = "Welcome to IRMAI Updates!";
-        html = `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #2563eb;">You're Subscribed to IRMAI Updates</h1>
-            <p>Hello ${name || "there"},</p>
-            <p>Thank you for subscribing to IRMAI updates! You'll now receive notifications about:</p>
-            <ul>
-              <li>New features and improvements</li>
-              <li>Important system announcements</li>
-              <li>Tips and best practices</li>
-            </ul>
-            <p>You can unsubscribe at any time from your dashboard.</p>
-            <p>Best regards,<br>The IRMAI Team</p>
-          </div>
-        `;
-        break;
-      case "unsubscribe":
-        subject = "You've Unsubscribed from IRMAI Updates";
-        html = `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #2563eb;">You've Been Unsubscribed</h1>
-            <p>Hello ${name || "there"},</p>
-            <p>You have been successfully unsubscribed from IRMAI updates.</p>
-            <p>You can always subscribe again from your dashboard if you change your mind.</p>
-            <p>Best regards,<br>The IRMAI Team</p>
-          </div>
-        `;
-        break;
-      case "welcome":
-        subject = "Welcome to IRMAI!";
-        html = `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #2563eb;">Welcome to IRMAI!</h1>
-            <p>Hello ${name || "there"},</p>
-            <p>Thank you for signing up to IRMAI! We're excited to have you on board.</p>
-            <p>Log in anytime to access your dashboard and explore our features.</p>
-            <p>Best regards,<br>The IRMAI Team</p>
-          </div>
-        `;
-        break;
-      default:
-        throw new Error("Invalid email type");
-    }
-
-    const emailResponse = await resend.emails.send({
-      from: "IRMAI <onboarding@resend.dev>",
-      to: [email],
-      subject,
-      html,
-    });
-
-    console.log(`Email sent to ${email}:`, emailResponse);
-
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
-    });
-  } catch (error) {
-    console.error("Failed to send email:", error);
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
     
-    return new Response(
-      JSON.stringify({ error: error.message || "Failed to send email" }),
-      {
-        status: 400,
-        headers: {
-          "Content-Type": "application/json",
-          ...corsHeaders,
+    const { email, type, name }: EmailRequestBody = await req.json();
+    
+    if (!email) {
+      throw new Error('Email is required');
+    }
+    
+    if (!type) {
+      throw new Error('Email type is required');
+    }
+
+    let emailSubject = '';
+    let emailHtml = '';
+    
+    switch(type) {
+      case 'login':
+        emailSubject = "Login detected on your IRMAI account";
+        emailHtml = `
+          <h1>New login detected</h1>
+          <p>A new login was detected on your IRMAI account. If this was you, no action is needed.</p>
+          <p>If you did not log in, please contact support immediately.</p>
+        `;
+        break;
+        
+      case 'signup':
+        emailSubject = "Welcome to IRMAI";
+        emailHtml = `
+          <h1>Welcome to IRMAI!</h1>
+          <p>Thank you for creating an account. We're excited to have you on board.</p>
+          <p>You can log in to your account at any time to access your dashboard.</p>
+        `;
+        break;
+        
+      case 'reset':
+        emailSubject = "Password reset requested";
+        emailHtml = `
+          <h1>Password Reset Request</h1>
+          <p>A password reset was requested for your IRMAI account.</p>
+          <p>If you did not request this, please ignore this email or contact support if you have concerns.</p>
+        `;
+        break;
+        
+      case 'subscribe':
+        emailSubject = "Subscription Confirmation";
+        emailHtml = `
+          <h1>Subscription Confirmed</h1>
+          <p>Hello ${name || 'there'},</p>
+          <p>Thank you for subscribing to IRMAI updates!</p>
+          <p>You will now receive notifications about new features, updates, and important announcements.</p>
+          <p>You can manage your subscription preferences at any time in your profile settings.</p>
+          <br>
+          <p>Best regards,</p>
+          <p>The IRMAI Team</p>
+        `;
+        break;
+        
+      default:
+        throw new Error('Invalid email type');
+    }
+    
+    // Send the email using Supabase Edge Function capabilities
+    const { data, error } = await supabase.auth.admin.generateLink({
+      type: 'noop',
+      email,
+      options: {
+        data: {
+          subject: emailSubject,
+          html: emailHtml,
         },
       }
-    );
+    });
+
+    if (error) {
+      throw error;
+    }
+    
+    console.log("Email sent successfully:", { data, error });
+    
+    return new Response(JSON.stringify({ 
+      success: true,
+      message: 'Email sent successfully'
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    });
+    
+  } catch (error) {
+    console.error("Error sending email:", error);
+    
+    return new Response(JSON.stringify({ 
+      success: false,
+      error: error.message 
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500,
+    });
   }
-});
+})

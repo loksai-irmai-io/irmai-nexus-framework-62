@@ -4,36 +4,44 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Bell, Loader2, Mail } from 'lucide-react';
+import { Bell, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useQuery } from '@tanstack/react-query';
 
 const SubscriptionCard = () => {
   const { user } = useAuth();
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscriberLoading, setSubscriberLoading] = useState(false);
 
-  // Use React Query to fetch subscription status
-  const { data: subscriptionData, isLoading, refetch } = useQuery({
-    queryKey: ['subscription', user?.id],
-    queryFn: async () => {
-      if (!user) return null;
-      
-      const { data, error } = await supabase
+  React.useEffect(() => {
+    if (user) {
+      checkSubscriptionStatus();
+    }
+  }, [user]);
+
+  const checkSubscriptionStatus = async () => {
+    if (!user) return;
+    
+    setSubscriberLoading(true);
+    try {
+      // Check if user is subscribed
+      const { data: subscriberData, error: subscriberError } = await supabase
         .from('subscribers')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
         
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user,
-    staleTime: 1000 * 60 // 1 minute
-  });
-  
-  const isSubscribed = !!subscriptionData;
+      if (subscriberError) throw subscriberError;
+      
+      setIsSubscribed(!!subscriberData);
+      
+    } catch (error) {
+      console.error("Error checking subscription:", error);
+    } finally {
+      setSubscriberLoading(false);
+    }
+  };
 
   const handleSubscriptionToggle = async () => {
     if (!user) return;
@@ -50,6 +58,7 @@ const SubscriptionCard = () => {
         if (error) throw error;
         
         toast.success("You have been unsubscribed from IRMAI updates");
+        setIsSubscribed(false);
       } else {
         // Subscribe
         const { error } = await supabase
@@ -76,11 +85,8 @@ const SubscriptionCard = () => {
         }
         
         toast.success("You have been subscribed to IRMAI updates");
+        setIsSubscribed(true);
       }
-      
-      // Refresh subscription data
-      refetch();
-      
     } catch (error) {
       console.error("Error updating subscription:", error);
       toast.error("Failed to update your subscription");
@@ -89,30 +95,11 @@ const SubscriptionCard = () => {
     }
   };
 
-  // Set up realtime subscription for subscriber changes
-  React.useEffect(() => {
-    if (!user) return;
-    
-    const channel = supabase.channel('subscription-card')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'subscribers', filter: `user_id=eq.${user.id}` },
-        (payload) => {
-          console.log('Subscribers table changed:', payload);
-          refetch();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user, refetch]);
-
   return (
     <Card className="col-span-1 border shadow-sm">
       <CardHeader className="pb-3">
         <div className="flex items-center">
-          <Mail className="h-4 w-4 mr-2 text-primary" />
+          <Bell className="h-4 w-4 mr-2 text-primary" />
           <CardTitle className="text-base">Subscription Status</CardTitle>
         </div>
         <Separator />
@@ -129,7 +116,7 @@ const SubscriptionCard = () => {
             {isSubscribed && <Badge variant="secondary" className="bg-green-500 text-white">Subscribed</Badge>}
             <Switch 
               checked={isSubscribed} 
-              disabled={subscriberLoading || isLoading}
+              disabled={subscriberLoading}
               onCheckedChange={handleSubscriptionToggle} 
             />
           </div>
