@@ -13,14 +13,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, adminOnly = f
   const location = useLocation();
   const [showLoading, setShowLoading] = useState(false);
   
-  // Only show loading state if it takes more than 100ms to determine auth state
+  // Only show loading state if it takes more than 300ms to determine auth state
   // This prevents the brief flash of the loading screen
   useEffect(() => {
     const timer = setTimeout(() => {
       if (loading) {
         setShowLoading(true);
       }
-    }, 150);
+    }, 300);
     
     return () => clearTimeout(timer);
   }, [loading]);

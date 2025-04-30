@@ -75,8 +75,8 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider defaultTheme="system" storageKey="irmai-ui-theme">
         <QueryClientProvider client={queryClient}>
-          <Router>
-            <AuthProvider>
+          <AuthProvider>
+            <Router>
               <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
@@ -92,8 +92,8 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <Toaster closeButton position="bottom-right" />
-            </AuthProvider>
-          </Router>
+            </Router>
+          </AuthProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </ErrorBoundary>
