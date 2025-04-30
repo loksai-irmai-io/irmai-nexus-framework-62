@@ -1,6 +1,8 @@
+
 import { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   user: any;
@@ -10,6 +12,8 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName: string) => Promise<any>;
   signIn: (email: string, password: string) => Promise<any>;
   signOut: () => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  signInWithMagicLink: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -43,16 +47,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const checkAdminStatus = async () => {
       if (user) {
         try {
+          // Check if user.id exists in profiles table with is_admin = true
           const { data, error } = await supabase
-            .from('admins')
-            .select('*')
-            .eq('user_id', user.id)
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
             .single();
 
           if (error) {
+            console.error("Error checking admin status:", error);
             setIsAdmin(false);
           } else {
-            setIsAdmin(!!data);
+            setIsAdmin(data?.is_admin || false);
           }
         } catch (error) {
           console.error("Error checking admin status:", error);
@@ -118,6 +124,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+      
+      if (error) throw error;
+      
+    } catch (error: any) {
+      console.error("Google sign in failed:", error);
+      toast("Failed to sign in with Google", {
+        description: error.message,
+      });
+      throw error;
+    }
+  };
+
+  const signInWithMagicLink = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+      
+      if (error) throw error;
+      
+      toast("Magic link sent", {
+        description: "Check your email for the login link",
+      });
+      
+    } catch (error: any) {
+      console.error("Magic link sign in failed:", error);
+      toast("Failed to send magic link", {
+        description: error.message,
+      });
+      throw error;
+    }
+  };
+
   const signOut = async () => {
     setLoading(true);
     try {
@@ -140,6 +190,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     signUp,
     signIn,
+    signInWithGoogle,
+    signInWithMagicLink,
     signOut,
   };
 
