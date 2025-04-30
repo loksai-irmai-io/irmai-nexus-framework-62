@@ -1,16 +1,40 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { AuthLogo } from '@/components/auth/AuthLogo';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 import { Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 type AuthTab = 'login' | 'register';
 
 export default function Auth() {
   const [activeTab, setActiveTab] = useState<AuthTab>('login');
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Redirect authenticated users away from the login page
+  useEffect(() => {
+    if (user && !loading) {
+      // If there's a "from" state, redirect there, otherwise to dashboard
+      const from = location.state?.from || '/dashboard';
+      navigate(from, { replace: true });
+    }
+  }, [user, loading, navigate, location]);
+  
+  // Don't render anything during loading to prevent flashing
+  if (loading) {
+    return null;
+  }
+
+  // If already authenticated, don't render the auth page at all
+  if (user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">

@@ -2,8 +2,8 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   user: User | null;
@@ -25,7 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const location = useLocation();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               // If user just logged in, redirect to dashboard
               if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
                 // Check if we're not already on the dashboard to prevent unnecessary redirects
-                if (!window.location.pathname.includes('/dashboard')) {
+                if (location.pathname === '/auth') {
                   navigate('/dashboard');
                 }
               }
@@ -97,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkSession();
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   const signIn = async (email: string, password: string) => {
     setLoading(true);
@@ -105,11 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
-        toast({
-          variant: "destructive",
-          title: "Login failed",
-          description: error.message,
-        });
+        toast.error("Login failed: " + error.message);
         throw error;
       }
       
@@ -126,10 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.error("Error sending login notification:", emailError);
         }
         
-        toast({
-          title: "Login successful",
-          description: "Welcome back!",
-        });
+        toast.success("Welcome back!");
       }
     } catch (error) {
       console.error("Authentication error:", error);
@@ -156,19 +149,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       
       if (error) {
-        toast({
-          variant: "destructive",
-          title: "Registration failed",
-          description: error.message,
-        });
+        toast.error("Registration failed: " + error.message);
         throw error;
       }
       
       if (data?.user) {
-        toast({
-          title: "Registration successful",
-          description: "Check your email to confirm your account",
-        });
+        toast.success("Registration successful. Check your email to confirm your account");
       }
     } catch (error) {
       console.error("Registration error:", error);
@@ -191,18 +177,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       
       if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: error.message,
-        });
+        toast.error(error.message);
         throw error;
       }
       
-      toast({
-        title: "Magic Link Sent",
-        description: "Check your email for the login link",
-      });
+      toast.success("Magic Link Sent! Check your email for the login link");
     } catch (error) {
       console.error("Magic link error:", error);
     } finally {
@@ -226,20 +205,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       
       if (error) {
-        toast({
-          variant: "destructive",
-          title: "Google login failed",
-          description: error.message,
-        });
+        toast.error("Google login failed: " + error.message);
         throw error;
       }
     } catch (error) {
       console.error("Google login error:", error);
-      toast({
-        variant: "destructive",
-        title: "Google login failed",
-        description: "An error occurred during Google login.",
-      });
+      toast.error("Google login failed. Please try again.");
     }
   };
 
@@ -251,11 +222,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       navigate('/auth');
     } catch (error) {
       console.error("Sign out error:", error);
-      toast({
-        variant: "destructive",
-        title: "Sign out failed",
-        description: "There was a problem signing you out.",
-      });
+      toast.error("There was a problem signing you out.");
     } finally {
       setLoading(false);
     }

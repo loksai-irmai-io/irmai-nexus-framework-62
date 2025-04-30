@@ -6,8 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { ForgotPasswordButton } from './ForgotPasswordButton';
-import { useToast } from '@/components/ui/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -15,8 +14,7 @@ export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [magicLinkLoading, setMagicLinkLoading] = useState(false);
-  const { signIn, signInWithGoogle } = useAuth();
-  const { toast } = useToast();
+  const { signIn, signInWithGoogle, signInWithMagicLink } = useAuth();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,51 +32,15 @@ export const LoginForm = () => {
   const handleMagicLink = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!email) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter your email address in the email field above",
-      });
+      toast.error("Please enter your email address in the email field above");
       return;
     }
     
     setMagicLinkLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
-        }
-      });
-      
-      if (error) throw error;
-      
-      // Send custom email
-      try {
-        const redirectUrl = `${window.location.origin}/dashboard`;
-        
-        await supabase.functions.invoke('send-auth-email', {
-          body: { 
-            email, 
-            type: 'magic-link',
-            token: redirectUrl
-          }
-        });
-      } catch (emailError) {
-        console.error("Error sending magic link email:", emailError);
-        // Continue with the success message even if the custom email fails
-      }
-      
-      toast({
-        title: "Magic Link Sent",
-        description: "Check your email for the login link",
-      });
+      await signInWithMagicLink(email);
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
+      toast.error(error.message || "Failed to send magic link");
     } finally {
       setMagicLinkLoading(false);
     }

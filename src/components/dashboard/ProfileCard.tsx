@@ -7,81 +7,72 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Save, User, Loader2 } from 'lucide-react';
+import { Mail, Save, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const ProfileCard = () => {
-  const [profileLoading, setProfileLoading] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   
   const [profileData, setProfileData] = useState({
     full_name: '',
     email: '',
     avatar_url: ''
   });
-  
-  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      fetchProfileData();
+  // Use React Query to fetch profile data
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
       
-      // Set up real-time listener for profile changes
-      const channel = supabase
-        .channel('profile-changes')
-        .on(
-          'postgres_changes',
-          { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user?.id}` },
-          (payload) => {
-            console.log('Profile updated in real-time:', payload);
-            fetchProfileData();
-          }
-        )
-        .subscribe();
-        
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
-  }, [user]);
-
-  const fetchProfileData = async () => {
-    if (!user) return;
-    
-    setProfileLoading(true);
-    try {
-      // Get user data
-      const { data: profileData, error: profileError } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
         
-      if (profileError) throw profileError;
-      
-      // Set profile data from both auth and profile table
-      setProfileData({
-        full_name: profileData?.full_name || user.user_metadata?.full_name || '',
-        email: user.email || '',
-        avatar_url: profileData?.avatar_url || ''
-      });
-
-      // Set last updated time
-      if (profileData?.updated_at) {
-        setLastUpdated(profileData.updated_at);
-      }
-      
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-      toast.error("Failed to load your profile data.");
-    } finally {
-      setProfileLoading(false);
-    }
-  };
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user
+  });
   
+  // Update profile data when it changes
+  useEffect(() => {
+    if (user && profile) {
+      setProfileData({
+        full_name: profile?.full_name || user.user_metadata?.full_name || '',
+        email: user.email || '',
+        avatar_url: profile?.avatar_url || ''
+      });
+    }
+  }, [user, profile]);
+
+  // Set up realtime subscription
+  useEffect(() => {
+    if (!user) return;
+    
+    const channel = supabase.channel('profile-changes')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` },
+        (payload) => {
+          console.log('Profile updated in real-time:', payload);
+          queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+        }
+      )
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, queryClient]);
+
   const updateProfile = async () => {
     if (!user) return;
     
@@ -108,7 +99,7 @@ const ProfileCard = () => {
       
       if (updateError) throw updateError;
       
-      setLastUpdated(now);
+      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
       toast.success("Profile information has been updated");
       
     } catch (error) {
@@ -139,9 +130,9 @@ const ProfileCard = () => {
                 <Mail className="h-3.5 w-3.5" />
                 <span>{profileData.email}</span>
               </CardDescription>
-              {lastUpdated && (
+              {profile?.updated_at && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  Last updated: {new Date(lastUpdated).toLocaleString()}
+                  Last updated: {new Date(profile.updated_at).toLocaleString()}
                 </p>
               )}
             </div>
