@@ -16,6 +16,19 @@ export default function Auth() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [showLoading, setShowLoading] = useState(false);
+  
+  // Only show loading state if it takes more than 150ms to determine auth state
+  // This prevents the brief flash of the loading screen
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (loading) {
+        setShowLoading(true);
+      }
+    }, 150);
+    
+    return () => clearTimeout(timer);
+  }, [loading]);
   
   // Redirect authenticated users away from the login page
   useEffect(() => {
@@ -26,9 +39,18 @@ export default function Auth() {
     }
   }, [user, loading, navigate, location]);
   
-  // Don't render anything during loading to prevent flashing
-  if (loading) {
+  // Don't render anything during initial loading to prevent flashing
+  if (loading && !showLoading) {
     return null;
+  }
+
+  // Show loading spinner only if it's taking a while
+  if (loading && showLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   // If already authenticated, don't render the auth page at all
