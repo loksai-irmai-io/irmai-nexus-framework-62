@@ -30,13 +30,31 @@ const ProfileCard = () => {
     queryFn: async () => {
       if (!user) return null;
       
+      // First check if profile exists
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
         
       if (error) throw error;
+
+      // If profile doesn't exist, create one
+      if (!data) {
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            full_name: user.user_metadata?.full_name || '',
+            avatar_url: user.user_metadata?.avatar_url || '',
+          })
+          .select()
+          .single();
+          
+        if (createError) throw createError;
+        return newProfile;
+      }
+      
       return data;
     },
     enabled: !!user
@@ -44,11 +62,11 @@ const ProfileCard = () => {
   
   // Update profile data when it changes
   useEffect(() => {
-    if (user && profile) {
+    if (user) {
       setProfileData({
         full_name: profile?.full_name || user.user_metadata?.full_name || '',
         email: user.email || '',
-        avatar_url: profile?.avatar_url || ''
+        avatar_url: profile?.avatar_url || user.user_metadata?.avatar_url || ''
       });
     }
   }, [user, profile]);

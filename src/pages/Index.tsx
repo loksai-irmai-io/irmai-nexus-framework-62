@@ -9,6 +9,7 @@ import ProfileCard from '@/components/dashboard/ProfileCard';
 import DashboardMetrics from '@/components/dashboard/DashboardMetrics';
 import DashboardWidgets from '@/components/dashboard/DashboardWidgets';
 import AnnouncementsList from '@/components/dashboard/AnnouncementsList';
+import SubscriptionCard from '@/components/dashboard/SubscriptionCard';
 import { useDashboardData } from '@/components/dashboard/hooks/useDashboardData';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -32,11 +33,20 @@ const Index = () => {
         
         {/* User profile card */}
         {user && (
-          <div className="grid grid-cols-1 gap-6 mb-6">
-            <div className="col-span-1">
-              <ProfileCard />
+          <>
+            <div className="grid grid-cols-1 gap-6 mb-6">
+              <div className="col-span-1">
+                <ProfileCard />
+              </div>
             </div>
-          </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <SubscriptionCard />
+              <div className="col-span-1 md:col-span-2 grid grid-cols-1 gap-6">
+                {/* Additional widgets could go here */}
+              </div>
+            </div>
+          </>
         )}
         
         <DashboardMetrics dataLoaded={dataLoaded} loading={loading} />

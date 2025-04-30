@@ -9,6 +9,7 @@ import {
   LogOut, 
   User,
   Loader2,
+  Mail
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -152,6 +153,28 @@ const Header = () => {
       </div>
 
       <div className="ml-auto flex items-center gap-2">
+        {user && (
+          <Button
+            variant={isSubscribed ? "success" : "outline"}
+            size="sm"
+            className="flex items-center gap-1 mr-2"
+            onClick={handleSubscriptionToggle}
+            disabled={subscriberLoading || isLoading}
+          >
+            {subscriberLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Mail className="h-4 w-4" />
+            )}
+            <span className="hidden sm:inline-block">
+              {isSubscribed ? "Subscribed" : "Subscribe to Updates"}
+            </span>
+            <span className="inline-block sm:hidden">
+              {isSubscribed ? "Subscribed" : "Subscribe"}
+            </span>
+          </Button>
+        )}
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button 
