@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   user: User | null;
@@ -12,7 +12,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signInWithMagicLink: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
-  signUp: (email: string, password: string, name?: string) => Promise<void>;
+  signUp: (email: string, password: string, metadata?: object) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   loading: boolean;
 }
@@ -25,7 +25,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -105,10 +104,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
-        toast({
-          variant: "destructive",
-          title: "Login failed",
-          description: error.message,
+        toast.error("Login failed", {
+          description: error.message
         });
         throw error;
       }
@@ -126,19 +123,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.error("Error sending login notification:", emailError);
         }
         
-        toast({
-          title: "Login successful",
-          description: "Welcome back!",
+        toast.success("Login successful", {
+          description: "Welcome back!"
         });
       }
     } catch (error) {
       console.error("Authentication error:", error);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  const signUp = async (email: string, password: string, name?: string) => {
+  const signUp = async (email: string, password: string, metadata?: object) => {
     setLoading(true);
     try {
       const origin = window.location.origin;
@@ -148,30 +145,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email, 
         password,
         options: {
-          data: {
-            full_name: name || null,
-          },
+          data: metadata || {},
           emailRedirectTo: redirectUrl,
         }
       });
       
       if (error) {
-        toast({
-          variant: "destructive",
-          title: "Registration failed",
-          description: error.message,
+        toast.error("Registration failed", {
+          description: error.message
         });
         throw error;
       }
       
       if (data?.user) {
-        toast({
-          title: "Registration successful",
-          description: "Check your email to confirm your account",
+        // Send signup confirmation email
+        try {
+          await supabase.functions.invoke('send-auth-email', {
+            body: { 
+              email: email, 
+              type: 'signup',
+              name: metadata && 'full_name' in metadata ? metadata.full_name : ''
+            }
+          });
+        } catch (emailError) {
+          console.error("Error sending signup notification:", emailError);
+        }
+        
+        toast.success("Registration successful", {
+          description: "Check your email to confirm your account"
         });
       }
     } catch (error) {
       console.error("Registration error:", error);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -191,20 +197,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       
       if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: error.message,
+        toast.error("Error", {
+          description: error.message
         });
         throw error;
       }
       
-      toast({
-        title: "Magic Link Sent",
-        description: "Check your email for the login link",
+      // Send custom email
+      try {
+        await supabase.functions.invoke('send-auth-email', {
+          body: { 
+            email, 
+            type: 'magic-link',
+            token: redirectUrl
+          }
+        });
+      } catch (emailError) {
+        console.error("Error sending magic link email:", emailError);
+      }
+      
+      toast.success("Magic Link Sent", {
+        description: "Check your email for the login link"
       });
     } catch (error) {
       console.error("Magic link error:", error);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -226,19 +243,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       
       if (error) {
-        toast({
-          variant: "destructive",
-          title: "Google login failed",
-          description: error.message,
+        toast.error("Google login failed", {
+          description: error.message
         });
         throw error;
       }
     } catch (error) {
       console.error("Google login error:", error);
-      toast({
-        variant: "destructive",
-        title: "Google login failed",
-        description: "An error occurred during Google login.",
+      toast.error("Google login failed", {
+        description: "An error occurred during Google login."
       });
     }
   };
@@ -251,10 +264,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       navigate('/auth');
     } catch (error) {
       console.error("Sign out error:", error);
-      toast({
-        variant: "destructive",
-        title: "Sign out failed",
-        description: "There was a problem signing you out.",
+      toast.error("Sign out failed", {
+        description: "There was a problem signing you out."
       });
     } finally {
       setLoading(false);

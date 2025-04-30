@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@/components/ui/theme-provider';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from 'sonner';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -78,7 +78,7 @@ function App() {
                 <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
-              <Toaster closeButton position="bottom-right" />
+              <Toaster position="bottom-right" closeButton richColors />
             </AuthProvider>
           </Router>
         </QueryClientProvider>

@@ -1,9 +1,9 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ForgotPasswordButtonProps {
   email: string;
@@ -12,14 +12,11 @@ interface ForgotPasswordButtonProps {
 
 export const ForgotPasswordButton = ({ email, loading: parentLoading }: ForgotPasswordButtonProps) => {
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   const handleForgotPassword = async () => {
     if (!email) {
-      toast({
-        variant: "destructive",
-        title: "Missing email",
-        description: "Please enter your email address first",
+      toast.error("Missing email", {
+        description: "Please enter your email address first"
       });
       return;
     }
@@ -40,16 +37,13 @@ export const ForgotPasswordButton = ({ email, loading: parentLoading }: ForgotPa
         throw error;
       }
 
-      toast({
-        title: "Password reset email sent",
-        description: "Check your email for a link to reset your password",
+      toast.success("Password reset email sent", {
+        description: "Check your email for a link to reset your password"
       });
     } catch (error: any) {
       console.error("Password reset error:", error);
-      toast({
-        variant: "destructive",
-        title: "Password reset failed",
-        description: error.message || "Failed to send reset email",
+      toast.error("Password reset failed", {
+        description: error.message || "Failed to send reset email"
       });
     } finally {
       setLoading(false);

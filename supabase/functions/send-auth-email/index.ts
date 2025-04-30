@@ -9,8 +9,9 @@ const corsHeaders = {
 
 interface EmailRequestBody {
   email: string
-  type: 'login' | 'signup' | 'reset' | 'subscribe'
+  type: 'login' | 'signup' | 'reset' | 'magic-link' | 'subscribe'
   name?: string
+  token?: string
 }
 
 serve(async (req) => {
@@ -25,7 +26,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
     
-    const { email, type, name }: EmailRequestBody = await req.json();
+    const { email, type, name, token }: EmailRequestBody = await req.json();
     
     if (!email) {
       throw new Error('Email is required');
@@ -51,18 +52,28 @@ serve(async (req) => {
       case 'signup':
         emailSubject = "Welcome to IRMAI";
         emailHtml = `
-          <h1>Welcome to IRMAI!</h1>
+          <h1>Welcome to IRMAI${name ? ', ' + name : ''}!</h1>
           <p>Thank you for creating an account. We're excited to have you on board.</p>
           <p>You can log in to your account at any time to access your dashboard.</p>
         `;
         break;
         
       case 'reset':
-        emailSubject = "Password reset requested";
+        emailSubject = "Password reset successful";
         emailHtml = `
-          <h1>Password Reset Request</h1>
-          <p>A password reset was requested for your IRMAI account.</p>
-          <p>If you did not request this, please ignore this email or contact support if you have concerns.</p>
+          <h1>Password Reset Successful</h1>
+          <p>Your password for your IRMAI account has been updated successfully.</p>
+          <p>If you did not make this change, please contact support immediately.</p>
+        `;
+        break;
+        
+      case 'magic-link':
+        emailSubject = "Your login link";
+        emailHtml = `
+          <h1>Login Link</h1>
+          <p>Click the link below to log in to your IRMAI account:</p>
+          <p><a href="${token}">Log in to your account</a></p>
+          <p>If you did not request this link, please ignore this email.</p>
         `;
         break;
         

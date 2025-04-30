@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 
 export const RegisterForm = () => {
   const [email, setEmail] = useState('');
@@ -14,20 +14,23 @@ export const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { signUp, signInWithGoogle } = useAuth();
-  const { toast } = useToast();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      await signUp(email, password, name);
+      // Pass name as an object to fix the TypeScript error
+      await signUp(email, password, {
+        full_name: name,
+      });
+      toast.success("Registration successful", {
+        description: "Please check your email to confirm your account"
+      });
     } catch (error: any) {
       console.error("Registration error:", error);
-      toast({
-        variant: "destructive",
-        title: "Registration failed",
-        description: error.message || "An error occurred during registration",
+      toast.error("Registration failed", {
+        description: error.message || "An error occurred during registration"
       });
     } finally {
       setLoading(false);
@@ -38,8 +41,11 @@ export const RegisterForm = () => {
     e.preventDefault();
     try {
       await signInWithGoogle();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Google sign-in error:", error);
+      toast.error("Google sign-in failed", {
+        description: error.message || "An error occurred during sign-in"
+      });
     }
   };
 
@@ -87,7 +93,7 @@ export const RegisterForm = () => {
 
         <Button 
           type="submit" 
-          className="w-full h-12 text-lg font-semibold bg-blue-600 hover:bg-blue-700" 
+          className="w-full h-12 text-lg font-semibold" 
           disabled={loading}
         >
           {loading ? (
