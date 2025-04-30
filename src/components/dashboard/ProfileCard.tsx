@@ -7,17 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Save, Loader2 } from 'lucide-react';
+import { Mail, Save, User, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useQueryClient } from '@tanstack/react-query';
 
 const ProfileCard = () => {
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const queryClient = useQueryClient();
   
   const [profileData, setProfileData] = useState({
     full_name: '',
@@ -76,9 +74,6 @@ const ProfileCard = () => {
         setLastUpdated(profileData.updated_at);
       }
       
-      // Invalidate queries to ensure other components refresh
-      queryClient.invalidateQueries({ queryKey: ['profiles'] });
-      
     } catch (error) {
       console.error("Error fetching profile:", error);
       toast.error("Failed to load your profile data.");
@@ -115,9 +110,6 @@ const ProfileCard = () => {
       
       setLastUpdated(now);
       toast.success("Profile information has been updated");
-      
-      // Invalidate queries to ensure other components refresh
-      queryClient.invalidateQueries({ queryKey: ['profiles'] });
       
     } catch (error) {
       console.error("Error updating profile:", error);

@@ -40,15 +40,9 @@ function App() {
     const enableRealtime = async () => {
       try {
         // Enable realtime for tables directly with subscription
-        const channel = supabase.channel('custom-all-channel')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, (payload) => {
-            console.log('Profile table change:', payload);
-            queryClient.invalidateQueries({ queryKey: ['profiles'] });
-          })
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'subscribers' }, (payload) => {
-            console.log('Subscribers table change:', payload);
-            queryClient.invalidateQueries({ queryKey: ['subscribers'] });
-          })
+        await supabase.channel('custom-all-channel')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {})
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'subscribers' }, () => {})
           .subscribe(status => {
             if (status === 'SUBSCRIBED') {
               console.log('Realtime enabled for tables');
@@ -56,10 +50,6 @@ function App() {
               console.error('Error enabling realtime');
             }
           });
-          
-        return () => {
-          supabase.removeChannel(channel);
-        };
       } catch (error) {
         console.error('Failed to enable realtime:', error);
       }

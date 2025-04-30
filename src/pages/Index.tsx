@@ -1,8 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
 import Layout from '@/components/layout/Layout';
 import KnowledgeGraph from '@/components/dashboard/KnowledgeGraph';
 import AIRiskSummary from '@/components/dashboard/AIRiskSummary';
+import { Separator } from '@/components/ui/separator';
 import ProfileCard from '@/components/dashboard/ProfileCard';
 import DashboardMetrics from '@/components/dashboard/DashboardMetrics';
 import DashboardWidgets from '@/components/dashboard/DashboardWidgets';
