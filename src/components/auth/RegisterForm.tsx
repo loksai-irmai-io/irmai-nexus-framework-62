@@ -20,7 +20,8 @@ export const RegisterForm = () => {
     setLoading(true);
     
     try {
-      await signUp(email, password, name);
+      // Pass the name as an object instead of a string for the metadata parameter
+      await signUp(email, password, name ? { name } : undefined);
     } catch (error: any) {
       console.error("Registration error:", error);
     } finally {
