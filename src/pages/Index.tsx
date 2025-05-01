@@ -33,11 +33,7 @@ const Index = () => {
         
         {/* User profile card */}
         {user && (
-          <div className="grid grid-cols-1 gap-6 mb-6">
-            <div className="col-span-1">
-              <ProfileCard />
-            </div>
-          </div>
+          <ProfileCard />
         )}
         
         <DashboardMetrics dataLoaded={dataLoaded} loading={loading} />

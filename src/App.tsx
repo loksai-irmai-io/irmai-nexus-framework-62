@@ -9,7 +9,6 @@ import { supabase } from '@/integrations/supabase/client';
 // Pages
 import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
-import Profile from '@/pages/Profile';
 import ProcessDiscovery from '@/pages/ProcessDiscovery';
 import FMEAAnalysis from '@/pages/FMEAAnalysis';
 import OutlierAnalysis from '@/pages/OutlierAnalysis';
@@ -83,7 +82,6 @@ function App() {
                 <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="/process-discovery" element={<ProtectedRoute><ProcessDiscovery /></ProtectedRoute>} />
                 <Route path="/fmea-analysis" element={<ProtectedRoute><FMEAAnalysis /></ProtectedRoute>} />
                 <Route path="/outlier-analysis" element={<ProtectedRoute><OutlierAnalysis /></ProtectedRoute>} />
