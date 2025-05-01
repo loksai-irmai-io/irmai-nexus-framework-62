@@ -39,10 +39,24 @@ function App() {
   useEffect(() => {
     const enableRealtime = async () => {
       try {
-        // Enable realtime for tables directly with subscription
+        // Enable realtime for tables with detailed subscription
         await supabase.channel('custom-all-channel')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {})
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'subscribers' }, () => {})
+          .on('postgres_changes', { 
+            event: '*', 
+            schema: 'public', 
+            table: 'profiles' 
+          }, (payload) => {
+            console.log('Profile updated:', payload);
+            queryClient.invalidateQueries({ queryKey: ['profile'] });
+          })
+          .on('postgres_changes', { 
+            event: '*', 
+            schema: 'public', 
+            table: 'subscribers' 
+          }, (payload) => {
+            console.log('Subscription updated:', payload);
+            queryClient.invalidateQueries({ queryKey: ['subscription'] });
+          })
           .subscribe(status => {
             if (status === 'SUBSCRIBED') {
               console.log('Realtime enabled for tables');

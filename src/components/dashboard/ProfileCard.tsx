@@ -10,26 +10,54 @@ import { Label } from '@/components/ui/label';
 import { Mail, Save, User, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const ProfileCard = () => {
-  const [profileLoading, setProfileLoading] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   
   const [profileData, setProfileData] = useState({
     full_name: '',
     email: '',
     avatar_url: ''
   });
-  
-  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
+  // Fetch profile data with React Query
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      
+      // Get user data
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+        
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Update profile when data changes
+  useEffect(() => {
+    if (profile && user) {
+      setProfileData({
+        full_name: profile?.full_name || user.user_metadata?.full_name || '',
+        email: user.email || '',
+        avatar_url: profile?.avatar_url || ''
+      });
+    }
+  }, [profile, user]);
+
+  // Setup realtime listener for profile changes
   useEffect(() => {
     if (user) {
-      fetchProfileData();
-      
-      // Set up real-time listener for profile changes
       const channel = supabase
         .channel('profile-changes')
         .on(
@@ -37,7 +65,7 @@ const ProfileCard = () => {
           { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user?.id}` },
           (payload) => {
             console.log('Profile updated in real-time:', payload);
-            fetchProfileData();
+            queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
           }
         )
         .subscribe();
@@ -46,47 +74,13 @@ const ProfileCard = () => {
         supabase.removeChannel(channel);
       };
     }
-  }, [user]);
+  }, [user, queryClient]);
 
-  const fetchProfileData = async () => {
-    if (!user) return;
-    
-    setProfileLoading(true);
-    try {
-      // Get user data
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-        
-      if (profileError) throw profileError;
+  // Create mutation for updating profile
+  const updateProfileMutation = useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error("No authenticated user");
       
-      // Set profile data from both auth and profile table
-      setProfileData({
-        full_name: profileData?.full_name || user.user_metadata?.full_name || '',
-        email: user.email || '',
-        avatar_url: profileData?.avatar_url || ''
-      });
-
-      // Set last updated time
-      if (profileData?.updated_at) {
-        setLastUpdated(profileData.updated_at);
-      }
-      
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-      toast.error("Failed to load your profile data.");
-    } finally {
-      setProfileLoading(false);
-    }
-  };
-  
-  const updateProfile = async () => {
-    if (!user) return;
-    
-    setProfileSaving(true);
-    try {
       const now = new Date().toISOString();
       
       // Update profile data
@@ -108,12 +102,22 @@ const ProfileCard = () => {
       
       if (updateError) throw updateError;
       
-      setLastUpdated(now);
+      return { updated_at: now };
+    },
+    onSuccess: () => {
       toast.success("Profile information has been updated");
-      
-    } catch (error) {
+      queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
+    },
+    onError: (error) => {
       console.error("Error updating profile:", error);
       toast.error("Failed to update your profile");
+    }
+  });
+  
+  const updateProfile = async () => {
+    setProfileSaving(true);
+    try {
+      await updateProfileMutation.mutateAsync();
     } finally {
       setProfileSaving(false);
     }
@@ -139,9 +143,9 @@ const ProfileCard = () => {
                 <Mail className="h-3.5 w-3.5" />
                 <span>{profileData.email}</span>
               </CardDescription>
-              {lastUpdated && (
+              {profile?.updated_at && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  Last updated: {new Date(lastUpdated).toLocaleString()}
+                  Last updated: {new Date(profile.updated_at).toLocaleString()}
                 </p>
               )}
             </div>

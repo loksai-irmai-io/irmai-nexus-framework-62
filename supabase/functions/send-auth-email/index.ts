@@ -111,7 +111,7 @@ serve(async (req) => {
       throw error;
     }
     
-    console.log("Email sent successfully:", { data, error });
+    console.log("Email sent successfully:", { email, type });
     
     return new Response(JSON.stringify({ 
       success: true,

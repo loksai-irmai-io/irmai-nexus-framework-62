@@ -9,6 +9,7 @@ import ProfileCard from '@/components/dashboard/ProfileCard';
 import DashboardMetrics from '@/components/dashboard/DashboardMetrics';
 import DashboardWidgets from '@/components/dashboard/DashboardWidgets';
 import AnnouncementsList from '@/components/dashboard/AnnouncementsList';
+import SubscriptionCard from '@/components/dashboard/SubscriptionCard';
 import { useDashboardData } from '@/components/dashboard/hooks/useDashboardData';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -43,11 +44,15 @@ const Index = () => {
         
         <DashboardWidgets infoWidgetData={infoWidgetData} loading={loading} />
         
+        {/* Subscription and Risk Analysis section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-2">
             {dataLoaded ? (
               <AIRiskSummary isLoading={loading} />
             ) : null}
+          </div>
+          <div className="lg:col-span-1">
+            <SubscriptionCard />
           </div>
         </div>
         
