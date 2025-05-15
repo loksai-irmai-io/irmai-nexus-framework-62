@@ -7,21 +7,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 // Pages
-import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
-import ProcessDiscovery from '@/pages/ProcessDiscovery';
-import FMEAAnalysis from '@/pages/FMEAAnalysis';
-import OutlierAnalysis from '@/pages/OutlierAnalysis';
-import ComplianceMonitoring from '@/pages/ComplianceMonitoring';
-import ApiIntegrations from '@/pages/ApiIntegrations';
 import ResetPassword from '@/pages/ResetPassword';
-import Admin from '@/pages/Admin';
-
-// Components
-import ProtectedRoute from '@/components/ProtectedRoute';
-import ErrorBoundary from '@/components/ErrorBoundary';
 import NotFound from '@/pages/NotFound';
 
+// Components
 import { AuthProvider } from '@/contexts/AuthContext';
 
 const queryClient = new QueryClient({
@@ -72,30 +62,21 @@ function App() {
   }, []);
   
   return (
-    <ErrorBoundary>
-      <ThemeProvider defaultTheme="system" storageKey="irmai-ui-theme">
-        <QueryClientProvider client={queryClient}>
-          <Router>
-            <AuthProvider>
-              <Routes>
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/process-discovery" element={<ProtectedRoute><ProcessDiscovery /></ProtectedRoute>} />
-                <Route path="/fmea-analysis" element={<ProtectedRoute><FMEAAnalysis /></ProtectedRoute>} />
-                <Route path="/outlier-analysis" element={<ProtectedRoute><OutlierAnalysis /></ProtectedRoute>} />
-                <Route path="/compliance-monitoring" element={<ProtectedRoute><ComplianceMonitoring /></ProtectedRoute>} />
-                <Route path="/api-integrations" element={<ProtectedRoute><ApiIntegrations /></ProtectedRoute>} />
-                <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <Toaster position="bottom-right" closeButton richColors />
-            </AuthProvider>
-          </Router>
-        </QueryClientProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
+    <ThemeProvider defaultTheme="system" storageKey="irmai-ui-theme">
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<Navigate to="/auth" replace />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Toaster position="bottom-right" closeButton richColors />
+          </AuthProvider>
+        </Router>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

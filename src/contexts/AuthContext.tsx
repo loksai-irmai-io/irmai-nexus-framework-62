@@ -18,6 +18,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Dashboard URL to redirect users after successful authentication
+const DASHBOARD_URL = 'http://34.45.239.136:8501/';
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -47,7 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               
               // If user just logged in, redirect to the specified URL
               if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-                window.location.href = 'http://34.45.239.136:8501/';
+                window.location.href = DASHBOARD_URL;
               }
             } catch (error) {
               console.error("Error fetching user profile:", error);
@@ -76,6 +79,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               .eq('id', session.user.id)
               .maybeSingle();
             setIsAdmin(data?.is_admin || false);
+            
+            // Redirect authenticated users to dashboard
+            window.location.href = DASHBOARD_URL;
           } catch (error) {
             console.error("Error fetching user profile:", error);
             setIsAdmin(false);

@@ -104,20 +104,28 @@ serve(async (req) => {
         throw new Error('Invalid email type');
     }
     
-    // Send the email using Supabase Edge Function capabilities
-    const { data, error } = await supabase.auth.admin.generateLink({
-      type: 'noop',
-      email,
-      options: {
-        data: {
-          subject: emailSubject,
-          html: emailHtml,
-        },
-      }
+    // Use Resend to send emails with custom sender
+    const resendApiKey = Deno.env.get('RESEND_API_KEY') || 're_8crBUHuY_4oHZzVu63E3V9eeRdNqdvLTV';
+    
+    const emailData = {
+      from: 'IRMAI <info@irmai.io>',
+      to: email,
+      subject: emailSubject,
+      html: emailHtml,
+    };
+    
+    const resendResponse = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${resendApiKey}`,
+      },
+      body: JSON.stringify(emailData),
     });
-
-    if (error) {
-      throw error;
+    
+    if (!resendResponse.ok) {
+      const errorData = await resendResponse.json();
+      throw new Error(`Email sending failed: ${JSON.stringify(errorData)}`);
     }
     
     console.log("Email sent successfully:", { email, type });

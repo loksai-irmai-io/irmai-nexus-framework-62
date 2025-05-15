@@ -30,8 +30,8 @@ file_size_limit = "50MiB"
 
 [auth]
 enabled = true
-site_url = "http://localhost:5173"
-additional_redirect_urls = ["https://localhost:5173"]
+site_url = "http://34.45.239.136:8501/"
+additional_redirect_urls = ["http://34.45.239.136:8501/", "https://irmai.io"]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
@@ -62,3 +62,4 @@ port = 54328
 
 [functions.send-auth-email]
 verify_jwt = false
+
