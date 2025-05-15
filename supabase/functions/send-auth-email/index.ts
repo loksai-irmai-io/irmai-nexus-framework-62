@@ -39,6 +39,9 @@ serve(async (req) => {
     let emailSubject = '';
     let emailHtml = '';
     
+    // Define the redirectUrl for all authentication-related links
+    const redirectUrl = 'http://34.45.239.136:8501/';
+    
     switch(type) {
       case 'login':
         emailSubject = "Login detected on your IRMAI account";
@@ -46,6 +49,7 @@ serve(async (req) => {
           <h1>New login detected</h1>
           <p>A new login was detected on your IRMAI account. If this was you, no action is needed.</p>
           <p>If you did not log in, please contact support immediately.</p>
+          <p>You can access your dashboard at <a href="${redirectUrl}">${redirectUrl}</a></p>
         `;
         break;
         
@@ -54,7 +58,8 @@ serve(async (req) => {
         emailHtml = `
           <h1>Welcome to IRMAI${name ? ', ' + name : ''}!</h1>
           <p>Thank you for creating an account. We're excited to have you on board.</p>
-          <p>You can log in to your account at any time to access your dashboard.</p>
+          <p>You can log in to your account at any time to access your dashboard at <a href="${redirectUrl}">${redirectUrl}</a>.</p>
+          <img src="https://lovable-uploads.lovable.dev/71af5850-49b8-4d7a-9a67-8bd0fb9b89fb.png" alt="IRMAI Logo" style="max-width: 200px; margin-top: 20px;">
         `;
         break;
         
@@ -63,7 +68,9 @@ serve(async (req) => {
         emailHtml = `
           <h1>Password Reset Successful</h1>
           <p>Your password for your IRMAI account has been updated successfully.</p>
+          <p>You can now log in with your new password at <a href="${redirectUrl}">${redirectUrl}</a>.</p>
           <p>If you did not make this change, please contact support immediately.</p>
+          <img src="https://lovable-uploads.lovable.dev/71af5850-49b8-4d7a-9a67-8bd0fb9b89fb.png" alt="IRMAI Logo" style="max-width: 200px; margin-top: 20px;">
         `;
         break;
         
@@ -72,8 +79,9 @@ serve(async (req) => {
         emailHtml = `
           <h1>Login Link</h1>
           <p>Click the link below to log in to your IRMAI account:</p>
-          <p><a href="${token}">Log in to your account</a></p>
+          <p><a href="${token || redirectUrl}">Log in to your account</a></p>
           <p>If you did not request this link, please ignore this email.</p>
+          <img src="https://lovable-uploads.lovable.dev/71af5850-49b8-4d7a-9a67-8bd0fb9b89fb.png" alt="IRMAI Logo" style="max-width: 200px; margin-top: 20px;">
         `;
         break;
         
@@ -84,10 +92,11 @@ serve(async (req) => {
           <p>Hello ${name || 'there'},</p>
           <p>Thank you for subscribing to IRMAI updates!</p>
           <p>You will now receive notifications about new features, updates, and important announcements.</p>
-          <p>You can manage your subscription preferences at any time in your profile settings.</p>
+          <p>You can manage your subscription preferences at any time in your profile settings at <a href="${redirectUrl}">${redirectUrl}</a>.</p>
           <br>
           <p>Best regards,</p>
           <p>The IRMAI Team</p>
+          <img src="https://lovable-uploads.lovable.dev/71af5850-49b8-4d7a-9a67-8bd0fb9b89fb.png" alt="IRMAI Logo" style="max-width: 200px; margin-top: 20px;">
         `;
         break;
         

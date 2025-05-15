@@ -12,7 +12,7 @@ const SidebarLogo: React.FC<SidebarLogoProps> = ({ isOpen, className }) => {
       {isOpen ? (
         <div className="flex items-center justify-center w-full h-full">
           <img 
-            src="/lovable-uploads/f6af323e-8e1e-41cb-a223-30dc2436352c.png" 
+            src="/lovable-uploads/e0e5366a-be2b-4f02-97cb-831a9e41477f.png" 
             alt="IRMAI Logo" 
             className="h-12 object-contain" 
           />
@@ -20,7 +20,7 @@ const SidebarLogo: React.FC<SidebarLogoProps> = ({ isOpen, className }) => {
       ) : (
         <div className="flex items-center justify-center w-full h-full">
           <img 
-            src="/lovable-uploads/f6af323e-8e1e-41cb-a223-30dc2436352c.png" 
+            src="/lovable-uploads/e0e5366a-be2b-4f02-97cb-831a9e41477f.png" 
             alt="IRMAI Logo" 
             className="h-10 w-10 object-contain" 
           />

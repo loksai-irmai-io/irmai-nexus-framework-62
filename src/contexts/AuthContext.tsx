@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,12 +45,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .maybeSingle();
               setIsAdmin(data?.is_admin || false);
               
-              // If user just logged in, redirect to dashboard
+              // If user just logged in, redirect to the specified URL
               if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-                // Check if we're not already on the dashboard to prevent unnecessary redirects
-                if (!window.location.pathname.includes('/dashboard')) {
-                  navigate('/dashboard');
-                }
+                window.location.href = 'http://34.45.239.136:8501/';
               }
             } catch (error) {
               console.error("Error fetching user profile:", error);
@@ -186,8 +182,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithMagicLink = async (email: string) => {
     setLoading(true);
     try {
-      const origin = window.location.origin;
-      const redirectUrl = `${origin}/dashboard`;
+      const redirectUrl = 'http://34.45.239.136:8501/';
       
       const { error } = await supabase.auth.signInWithOtp({ 
         email,
@@ -229,8 +224,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
-      const origin = window.location.origin;
-      const redirectUrl = `${origin}/dashboard`;
+      const redirectUrl = 'https://irmai.io';
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
