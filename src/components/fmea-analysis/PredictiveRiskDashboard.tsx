@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,7 +29,7 @@ import {
 import useDraggableLayout from '@/hooks/useDraggableLayout';
 import ReactGridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
+// Removing the problematic import: import 'react-resizable/css/styles.css';
 
 const PredictiveRiskDashboard = () => {
   const [activeView, setActiveView] = useState<string>('overview');
